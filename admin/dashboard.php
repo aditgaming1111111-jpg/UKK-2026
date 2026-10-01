@@ -7,7 +7,8 @@
 
     $total_users = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) c FROM t_users ")) ['c'];
     $total_guru = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) c FROM t_guru ")) ['c'];
-    
+    $total_siswa = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) c FROM t_siswa ")) ['c'];
+
 ?>
 
 <!DOCTYPE html>
@@ -53,7 +54,7 @@
                     Laporan
                 </a>
 
-                <a href="pengguna/index.php" class="flex items-center px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-800 hover:text-white transition duration-500">
+                <a href="pengguna/index.php" class="flex items-center px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-800 hover:text-white mb-2 transition duration-500">
                     Pengguna
                 </a>
                 <a href="about.php" class="flex items-center px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-800 hover:text-white transition duration-500">
