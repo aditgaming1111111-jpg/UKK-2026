@@ -8,6 +8,7 @@ use App\Models\PelanggaranSiswa;
 use App\Models\Siswa;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Collection;
 
@@ -24,7 +25,7 @@ class SiswaReadService
         $major = $filters['jurusan'] ?? null;
 
         return Siswa::query()
-            ->with(['penempatanKelas' => static fn (Builder $query): Builder => $query
+            ->with(['penempatanKelas' => static fn (Relation $query): Relation => $query
                 ->where('status_aktif', true)
                 ->whereNull('tanggal_selesai')
                 ->with('kelas:id,nama_kelas,tingkat,jurusan')])

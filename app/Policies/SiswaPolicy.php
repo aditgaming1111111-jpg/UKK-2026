@@ -32,6 +32,11 @@ class SiswaPolicy
         return $user->role === 'admin';
     }
 
+    public function changeStatus(User $user, Siswa $siswa): bool
+    {
+        return $user->role === 'admin';
+    }
+
     public function managePlacements(User $user, Siswa $siswa): bool
     {
         return $user->role === 'admin';

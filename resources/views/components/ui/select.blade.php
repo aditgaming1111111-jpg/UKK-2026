@@ -10,10 +10,14 @@
         'border-gray-500' => $errors->has($name),
     ])
         {{ $attributes }}>
-        <option value="">{{ $placeholder }}</option>
-        @foreach ($options as $value => $label)
-            <option value="{{ $value }}" @selected(old($name) == $value)>{{ $label }}</option>
-        @endforeach
+        @if ($slot->isNotEmpty())
+            {{ $slot }}
+        @else
+            <option value="">{{ $placeholder }}</option>
+            @foreach ($options as $value => $optionLabel)
+                <option value="{{ $value }}" @selected(old($name) == $value)>{{ $optionLabel }}</option>
+            @endforeach
+        @endif
     </select>
     <x-ui.form-error :name="$name" />
 </div>

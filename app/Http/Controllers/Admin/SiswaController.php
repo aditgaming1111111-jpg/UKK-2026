@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\SiswaIndexRequest;
 use App\Http\Requests\Admin\StorePenempatanKelasRequest;
 use App\Http\Requests\Admin\StoreSiswaRequest;
 use App\Http\Requests\Admin\UpdateSiswaRequest;
+use App\Http\Requests\Admin\UpdateSiswaStatusRequest;
 use App\Models\Kelas;
 use App\Models\Siswa;
 use App\Models\TahunAjaran;
@@ -103,6 +104,23 @@ class SiswaController extends Controller
         });
 
         return to_route('admin.students.show', $siswa)->with('success', 'Siswa dinonaktifkan. Riwayat siswa tetap tersimpan.');
+    }
+
+    public function updateStatus(UpdateSiswaStatusRequest $request, Siswa $siswa): RedirectResponse
+    {
+        $status = $request->validated('status_siswa');
+
+        DB::transaction(static function () use ($siswa, $status): void {
+            Siswa::query()->whereKey($siswa->id)->lockForUpdate()->firstOrFail()->update([
+                'status_siswa' => $status,
+            ]);
+        });
+
+        $message = $status === 'aktif'
+            ? 'Siswa berhasil diaktifkan. Riwayat siswa tetap tersimpan.'
+            : 'Siswa dinonaktifkan. Riwayat siswa tetap tersimpan.';
+
+        return to_route('admin.students.show', $siswa)->with('success', $message);
     }
 
     public function storePlacement(

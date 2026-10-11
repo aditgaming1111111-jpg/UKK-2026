@@ -37,8 +37,12 @@ class WaliKelasManagementTest extends TestCase
             'status_aktif' => true,
         ]);
         $nextTeacher = Guru::factory()->create();
+        $inactiveTeacher = Guru::factory()->create(['nama' => 'Guru Nonaktif', 'status_aktif' => false]);
         $this->get(route('admin.homeroom-teachers.index'))->assertOk();
-        $this->get(route('admin.homeroom-teachers.create'))->assertOk();
+        $this->get(route('admin.homeroom-teachers.create'))
+            ->assertOk()
+            ->assertSee($nextTeacher->nama)
+            ->assertDontSee($inactiveTeacher->nama);
         $this->get(route('admin.homeroom-teachers.show', $previous))->assertOk();
 
         $this->post(route('admin.homeroom-teachers.store'), [

@@ -8,7 +8,8 @@
             class="mt-6 rounded-xl border border-gray-200 bg-white p-6">
             @if ($errors->any())
                 <div class="mb-5 rounded-lg bg-gray-100 p-4 text-sm text-gray-700">Periksa kembali isian yang ditandai.</div>
-            @endif@include('admin.tahun-ajaran._form', ['submitLabel' => 'Simpan tahun ajaran'])
+            @endif
+            @include('admin.tahun-ajaran._form', ['submitLabel' => 'Simpan tahun ajaran'])
         </form>
     </div>
 @endsection

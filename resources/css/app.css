@@ -7,3 +7,39 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+@keyframes modal-backdrop-enter {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes modal-backdrop-exit {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+dialog[data-modal]::backdrop {
+    animation: modal-backdrop-enter 220ms ease-out both;
+    background-color: rgb(3 7 18 / 40%);
+}
+
+dialog[data-modal][data-closing]::backdrop {
+    animation: modal-backdrop-exit 220ms ease-in both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    dialog[data-modal]::backdrop,
+    dialog[data-modal][data-closing]::backdrop {
+        animation-duration: 1ms;
+    }
+}

@@ -1,10 +1,10 @@
 @props(['id', 'title', 'description' => null])
-<dialog id="{{ $id }}" data-modal
-    class="w-[calc(100%-2rem)] max-w-md rounded-2xl border border-gray-200 p-0 text-gray-900 shadow-2xl backdrop:bg-gray-950/40">
-    <div class="p-6">
+<dialog id="{{ $id }}" data-modal aria-labelledby="{{ $id }}-title"
+    class="fixed inset-0 m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-2xl border border-gray-200 bg-white p-0 text-gray-900 shadow-2xl">
+    <div class="p-5 sm:p-6">
         <div class="flex items-start justify-between gap-4">
             <div>
-                <h2 class="text-lg font-semibold">{{ $title }}</h2>
+                <h2 id="{{ $id }}-title" class="text-lg font-semibold">{{ $title }}</h2>
                 @if ($description)
                     <p class="mt-1 text-sm text-gray-500">{{ $description }}</p>
                 @endif

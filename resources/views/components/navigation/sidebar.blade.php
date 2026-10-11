@@ -21,7 +21,7 @@
         ['label' => 'Data Siswa', 'route' => 'guru.students.index', 'icon' => 'users'],
         ['label' => 'Input Pelanggaran', 'route' => 'guru.violations.create', 'icon' => 'plus'],
         ['label' => 'Riwayat Pelanggaran', 'route' => 'guru.violations.index', 'icon' => 'clock'],
-        ['label' => 'Catatan Saya', 'route' => 'guru.my-notes.index', 'icon' => 'document'],
+        ['label' => 'Catatan Saya', 'route' => 'guru.my-notes.index', 'active' => 'guru.my-notes.*', 'icon' => 'document'],
         ['label' => 'Profil', 'route' => 'profile.edit', 'icon' => 'user'],
     ];
 
@@ -65,7 +65,7 @@
         <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-400">Menu utama</p>
         @foreach ($menuItems as $item)
             @php($available = \Illuminate\Support\Facades\Route::has($item['route']))
-            @php($active = $available && request()->routeIs($item['route']))
+            @php($active = $available && request()->routeIs($item['active'] ?? $item['route']))
 
             @if ($available)
                 <a href="{{ route($item['route']) }}" @if ($active) aria-current="page" @endif

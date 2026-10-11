@@ -16,6 +16,9 @@
                 @if ($student->status_siswa === 'aktif')
                     <x-ui.button variant="secondary" type="button"
                         data-modal-open="deactivate-student">Nonaktifkan</x-ui.button>
+                @else
+                    <x-ui.button variant="secondary" type="button"
+                        data-modal-open="activate-student">Aktifkan</x-ui.button>
                 @endif
             </div>
         @endif
@@ -69,9 +72,8 @@
             @if ($pointRecap->isNotEmpty())
                 <ul class="mt-4 divide-y divide-gray-100">
                     @foreach ($pointRecap as $recap)
-                        <li class="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"><span
-                                class="text-sm text-gray-700">{{ $recap['academic_year']->nama_tahun_ajaran }}</span><x-ui.badge>{{ number_format($recap['total_points'], 0, ',', '.') }}
-                                poin</x-ui.badge></li>
+                            <li class="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"><span
+                                    class="text-sm text-gray-700">{{ $recap['academic_year']->nama_tahun_ajaran }}</span><x-ui.badge>{{ number_format($recap['total_points'], 0, ',', '.') }} poin</x-ui.badge></li>
                     @endforeach
                 </ul>
             @else<div class="mt-4"><x-ui.empty-state title="Belum ada rekap poin"
@@ -207,6 +209,21 @@
             <form method="POST" action="{{ route('admin.students.destroy', $student) }}">@csrf @method('DELETE')<div
                     class="flex justify-end gap-2"><x-ui.button variant="secondary" type="button"
                         data-modal-close>Batal</x-ui.button><x-ui.button type="submit">Nonaktifkan siswa</x-ui.button>
+                </div>
+            </form>
+        </x-ui.modal>
+    @endif
+
+    @if ($canManageStudents && $student->status_siswa === 'nonaktif')
+        <x-ui.modal id="activate-student" title="Aktifkan siswa?"
+            description="Identitas dan seluruh riwayat kelas serta pelanggaran akan tetap tersimpan.">
+            <form method="POST" action="{{ route('admin.students.status', $student) }}">
+                @csrf
+                @method('PATCH')
+                <input type="hidden" name="status_siswa" value="aktif">
+                <div class="flex justify-end gap-2">
+                    <x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button>
+                    <x-ui.button type="submit">Aktifkan siswa</x-ui.button>
                 </div>
             </form>
         </x-ui.modal>

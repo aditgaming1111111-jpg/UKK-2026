@@ -81,6 +81,62 @@ class SiswaManagementTest extends TestCase
         $this->assertDatabaseCount('t_siswa', 1);
     }
 
+    public function test_admin_can_reactivate_student_and_status_changes_preserve_class_and_violation_history(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $student = Siswa::factory()->create(['status_siswa' => 'aktif']);
+        $class = Kelas::factory()->create();
+        $year = TahunAjaran::factory()->create();
+        $placement = KelasSiswa::factory()->for($student, 'siswa')->for($class, 'kelas')->for($year, 'tahunAjaran')->create();
+        $teacher = Guru::factory()->create();
+        $category = PelanggaranKategori::factory()->create();
+        $violationType = Pelanggaran::factory()->for($category, 'kategori')->create();
+        $violation = PelanggaranSiswa::factory()
+            ->for($placement, 'penempatanKelas')
+            ->for($violationType, 'pelanggaran')
+            ->for($teacher, 'guru')
+            ->create();
+
+        $this->actingAs($administrator)
+            ->patch(route('admin.students.status', $student), ['status_siswa' => 'nonaktif'])
+            ->assertRedirect(route('admin.students.show', $student))
+            ->assertSessionHas('success', 'Siswa dinonaktifkan. Riwayat siswa tetap tersimpan.');
+        $this->assertDatabaseHas('t_siswa', ['id' => $student->id, 'status_siswa' => 'nonaktif']);
+
+        $this->actingAs($administrator)->get(route('admin.students.show', $student))
+            ->assertOk()
+            ->assertSee('Aktifkan')
+            ->assertSee('activate-student');
+
+        $this->actingAs($administrator)
+            ->patch(route('admin.students.status', $student), ['status_siswa' => 'aktif'])
+            ->assertRedirect(route('admin.students.show', $student))
+            ->assertSessionHas('success', 'Siswa berhasil diaktifkan. Riwayat siswa tetap tersimpan.');
+
+        $this->assertDatabaseHas('t_siswa', ['id' => $student->id, 'status_siswa' => 'aktif']);
+        $this->assertDatabaseHas('t_kelas_siswa', ['id' => $placement->id, 'siswa_id' => $student->id]);
+        $this->assertDatabaseHas('t_pelanggaran_siswa', ['id' => $violation->id, 'kelas_siswa_id' => $placement->id]);
+    }
+
+    public function test_student_status_change_rejects_invalid_values_and_non_admin_users(): void
+    {
+        $student = Siswa::factory()->create(['status_siswa' => 'nonaktif']);
+        $administrator = User::factory()->create(['role' => 'admin']);
+
+        $this->actingAs($administrator)
+            ->from(route('admin.students.show', $student))
+            ->patch(route('admin.students.status', $student), ['status_siswa' => 'unknown'])
+            ->assertSessionHasErrors('status_siswa');
+        $this->assertDatabaseHas('t_siswa', ['id' => $student->id, 'status_siswa' => 'nonaktif']);
+
+        $teacher = User::factory()->create(['role' => 'guru']);
+        Guru::factory()->for($teacher, 'user')->create();
+        $this->actingAs($teacher)
+            ->patch(route('admin.students.status', $student), ['status_siswa' => 'aktif'])
+            ->assertForbidden();
+        $this->assertDatabaseHas('t_siswa', ['id' => $student->id, 'status_siswa' => 'nonaktif']);
+    }
+
     public function test_admin_can_move_a_student_and_keep_the_previous_class_history(): void
     {
         $administrator = User::factory()->create(['role' => 'admin']);
@@ -181,7 +237,7 @@ class SiswaManagementTest extends TestCase
         Guru::factory()->for($teacherUser, 'user')->create();
         $student = Siswa::factory()->create(['nama' => 'Siswa Terlihat']);
 
-        $this->actingAs($teacherUser)->get(route('guru.students.index'))->assertSee('Siswa Terlihat');
+        $this->actingAs($teacherUser)->get(route('guru.students.index'))->assertOk()->assertSee('Siswa Terlihat');
         $this->actingAs($teacherUser)->get(route('guru.students.show', $student))->assertSee('Identitas siswa');
         $this->actingAs($teacherUser)->get(route('admin.students.index'))->assertForbidden();
         $this->actingAs($teacherUser)->post(route('admin.students.store'), [])->assertForbidden();
@@ -203,9 +259,10 @@ class SiswaManagementTest extends TestCase
             'tingkat' => 'XI',
             'jurusan' => 'RPL',
             'status' => 'aktif',
-        ]))->assertSee('Nadia Utami')->assertSee('XI RPL 1');
+        ]))->assertOk()->assertSee('Nadia Utami')->assertSee('XI RPL 1');
 
         $this->actingAs($administrator)->get(route('admin.students.index', ['q' => 'tidak ada']))
+            ->assertOk()
             ->assertSee('Siswa tidak ditemukan');
     }
 

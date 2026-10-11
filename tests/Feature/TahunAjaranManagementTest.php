@@ -58,6 +58,37 @@ class TahunAjaranManagementTest extends TestCase
         $this->assertDatabaseCount('t_tahun_ajaran', 1);
     }
 
+    public function test_unchanged_academic_year_update_shows_success_notification(): void
+    {
+        $administrator = User::factory()->state(['role' => 'admin'])->create();
+        $year = TahunAjaran::factory()->create([
+            'nama_tahun_ajaran' => '2026/2027',
+            'tanggal_mulai' => '2026-07-01',
+            'tanggal_selesai' => '2027-06-30',
+            'status_aktif' => true,
+        ]);
+
+        $this->actingAs($administrator)
+            ->put(route('admin.academic-years.update', $year), [
+                'nama_tahun_ajaran' => $year->nama_tahun_ajaran,
+                'tanggal_mulai' => $year->tanggal_mulai->toDateString(),
+                'tanggal_selesai' => $year->tanggal_selesai->toDateString(),
+                'status_aktif' => '1',
+            ])
+            ->assertRedirect(route('admin.academic-years.show', $year))
+            ->assertSessionHas('success', 'Pengaturan tahun ajaran berhasil diperbarui.');
+
+        $this->actingAs($administrator)->get(route('admin.academic-years.show', $year))
+            ->assertOk()
+            ->assertSee('Pengaturan tahun ajaran berhasil diperbarui.')
+            ->assertSee('opacity-100');
+        $this->assertDatabaseHas('t_tahun_ajaran', [
+            'id' => $year->id,
+            'nama_tahun_ajaran' => '2026/2027',
+            'status_aktif' => true,
+        ]);
+    }
+
     public function test_teacher_cannot_access_academic_year_management(): void
     {
         $teacher = Guru::factory()->create();

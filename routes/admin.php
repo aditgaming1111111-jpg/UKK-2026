@@ -3,11 +3,14 @@
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\GuruController;
 use App\Http\Controllers\Admin\KelasController;
+use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\PelanggaranController;
 use App\Http\Controllers\Admin\PelanggaranKategoriController;
 use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Admin\TahunAjaranController;
 use App\Http\Controllers\Admin\WaliKelasController;
+use App\Http\Controllers\LogPelanggaranController;
+use App\Http\Controllers\RiwayatPelanggaranController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')
@@ -15,7 +18,18 @@ Route::prefix('admin')
     ->middleware('role:admin')
     ->group(function (): void {
         Route::get('/', AdminDashboardController::class)->name('dashboard');
+        Route::get('laporan', [LaporanController::class, 'index'])->name('reports.index');
+        Route::get('laporan/cetak', [LaporanController::class, 'print'])->name('reports.print');
+        Route::get('laporan/pdf', [LaporanController::class, 'pdf'])->name('reports.pdf');
+        Route::resource('data-pelanggaran', RiwayatPelanggaranController::class)
+            ->parameters(['data-pelanggaran' => 'pelanggaranSiswa'])
+            ->except(['create', 'store', 'destroy'])
+            ->names('student-violations');
+        Route::patch('data-pelanggaran/{pelanggaranSiswa}/batal', [RiwayatPelanggaranController::class, 'cancel'])
+            ->name('student-violations.cancel');
+        Route::get('log-pelanggaran', [LogPelanggaranController::class, 'index'])->name('audit-logs.index');
         Route::resource('siswa', SiswaController::class)->parameters(['siswa' => 'siswa'])->names('students');
+        Route::patch('siswa/{siswa}/status', [SiswaController::class, 'updateStatus'])->name('students.status');
         Route::post('siswa/{siswa}/penempatan', [SiswaController::class, 'storePlacement'])->name('students.placements.store');
         Route::resource('guru', GuruController::class)->parameters(['guru' => 'guru'])->except(['destroy'])->names('teachers');
         Route::delete('guru/{guru}', [GuruController::class, 'destroy'])->name('teachers.destroy');

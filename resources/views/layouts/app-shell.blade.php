@@ -13,13 +13,13 @@
     @php($role = $role ?? 'admin')
     @php($hasActiveWaliKelas = $hasActiveWaliKelas ?? false)
 
-    <div class="min-h-screen md:flex">
-        <aside class="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-gray-200 bg-white md:block">
+    <div class="min-h-screen lg:flex">
+        <aside class="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-gray-200 bg-white lg:block">
             <x-navigation.sidebar :role="$role" :has-active-wali-kelas="$hasActiveWaliKelas" />
         </aside>
 
-        <div class="min-w-0 flex-1 md:pl-64">
-            <div class="border-b border-gray-200 bg-white p-3 md:hidden">
+        <div class="min-w-0 flex-1 lg:pl-64">
+            <div class="border-b border-gray-200 bg-white p-3 lg:hidden">
                 <details class="group">
                     <summary
                         class="flex cursor-pointer list-none items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900">
