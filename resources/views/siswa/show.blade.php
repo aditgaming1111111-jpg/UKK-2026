@@ -165,7 +165,7 @@
             <div>
                 <h2 class="text-base font-semibold text-gray-950">Riwayat pelanggaran</h2>
                 <p class="mt-1 text-sm text-gray-500">Riwayat melekat pada kelas dan tahun ajaran saat kejadian.</p>
-            </div><span class="text-xs text-gray-500">{{ $violations->count() }} catatan</span>
+            </div><span class="text-xs text-gray-500">{{ $violations->total() }} catatan</span>
         </div>
         @if ($violations->isNotEmpty())
             <div class="mt-5"><x-ui.table>
@@ -198,7 +198,9 @@
                             </tr>
                         @endforeach
                     </tbody>
-            </x-ui.table></div>@else<x-ui.empty-state class="mt-5" title="Belum ada riwayat pelanggaran"
+            </x-ui.table></div>
+            <div class="mt-4"><x-ui.pagination :paginator="$violations" /></div>
+        @else<x-ui.empty-state class="mt-5" title="Belum ada riwayat pelanggaran"
                 description="Catatan pelanggaran siswa akan ditampilkan di sini." />
         @endif
     </x-ui.card>

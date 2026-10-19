@@ -103,7 +103,7 @@
                     @endforeach
                 </tbody>
             </x-ui.table>
-            <div class="border-t border-gray-200 px-5 py-4">{{ $records->links() }}</div>
+            <div class="border-t border-gray-200 px-5 py-4"><x-ui.pagination :paginator="$records" /></div>
         @else
             <div class="p-6">
                 <x-ui.empty-state title="Belum ada catatan yang sesuai" description="Catatan yang Anda buat akan muncul di sini. Sesuaikan pencarian atau filter jika catatan yang dicari belum terlihat." />

@@ -27,7 +27,7 @@ class TahunAjaranController extends Controller
             ->when(isset($filters['status']), static fn ($query) => $query->where('status_aktif', $filters['status'] === 'aktif'))
             ->orderByDesc('tanggal_mulai')
             ->orderByDesc('id')
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
 
         return view('admin.tahun-ajaran.index', compact('academicYears', 'filters'));

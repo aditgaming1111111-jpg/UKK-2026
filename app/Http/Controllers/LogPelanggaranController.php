@@ -35,7 +35,7 @@ class LogPelanggaranController extends Controller
             })
             ->orderByDesc('created_at')
             ->orderByDesc('id')
-            ->paginate(20)
+            ->paginate(10)
             ->withQueryString();
 
         return view('admin.log-pelanggaran.index', compact('logs', 'search'));

@@ -305,4 +305,61 @@ class SiswaManagementTest extends TestCase
             ->assertViewHas('violations', fn ($records): bool => $records->count() === 2)
             ->assertViewHas('pointRecap', fn ($recap): bool => $recap->first()['total_points'] === 13);
     }
+
+    public function test_student_directory_paginates_ten_results_and_preserves_search_and_status_filters(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        Siswa::factory()->count(12)->sequence(fn ($sequence): array => [
+            'nama' => 'Target Siswa '.str_pad((string) $sequence->index, 2, '0', STR_PAD_LEFT),
+            'status_siswa' => 'aktif',
+        ])->create();
+        Siswa::factory()->create(['nama' => 'Siswa Lain', 'status_siswa' => 'aktif']);
+
+        $filters = ['q' => 'Target Siswa', 'status' => 'aktif'];
+        $firstPage = $this->actingAs($administrator)->get(route('admin.students.index', $filters));
+
+        $firstPage->assertOk()
+            ->assertSee('Target Siswa 00')
+            ->assertDontSee('Target Siswa 11')
+            ->assertSeeText('')
+            ->assertViewHas('students', fn ($students): bool => $students->count() === 10 && $students->total() === 12);
+
+        $secondPage = $this->get(route('admin.students.index', [...$filters, 'page' => 2]));
+
+        $secondPage->assertOk()
+            ->assertSee('Target Siswa 10')
+            ->assertSee('Target Siswa 11')
+            ->assertDontSee('Target Siswa 00')
+            ->assertViewHas('students', fn ($students): bool => $students->count() === 2 && $students->total() === 12)
+            ->assertSee('q=Target%20Siswa')
+            ->assertSee('status=aktif');
+    }
+
+    public function test_student_detail_paginates_violation_history_without_losing_records_or_points(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $student = Siswa::factory()->create();
+        $class = Kelas::factory()->create();
+        $year = TahunAjaran::factory()->create();
+        $placement = KelasSiswa::factory()->for($student, 'siswa')->for($class, 'kelas')->for($year, 'tahunAjaran')->create();
+        $category = PelanggaranKategori::factory()->create();
+        $violation = Pelanggaran::factory()->for($category, 'kategori')->create();
+        $teacher = Guru::factory()->create();
+
+        PelanggaranSiswa::factory()->count(18)
+            ->for($placement, 'penempatanKelas')
+            ->for($violation, 'pelanggaran')
+            ->for($teacher, 'guru')
+            ->create(['poin_saat_dicatat' => 2]);
+
+        $this->actingAs($administrator)
+            ->get(route('admin.students.show', $student))
+            ->assertOk()
+            ->assertViewHas('violations', fn ($records): bool => $records->count() === 10 && $records->total() === 18)
+            ->assertViewHas('pointRecap', fn ($recap): bool => $recap->first()['total_points'] === 36);
+
+        $this->get(route('admin.students.show', [$student, 'page' => 2]))
+            ->assertOk()
+            ->assertViewHas('violations', fn ($records): bool => $records->count() === 8 && $records->total() === 18);
+    }
 }

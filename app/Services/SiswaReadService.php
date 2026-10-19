@@ -25,7 +25,9 @@ class SiswaReadService
         $major = $filters['jurusan'] ?? null;
 
         return Siswa::query()
+            ->select(['id', 'nisn', 'nama', 'jenis_kelamin', 'status_siswa'])
             ->with(['penempatanKelas' => static fn (Relation $query): Relation => $query
+                ->select(['id', 'siswa_id', 'kelas_id', 'status_aktif', 'tanggal_selesai'])
                 ->where('status_aktif', true)
                 ->whereNull('tanggal_selesai')
                 ->with('kelas:id,nama_kelas,tingkat,jurusan')])
@@ -47,7 +49,7 @@ class SiswaReadService
                             ->when($major, static fn (Builder $classQuery): Builder => $classQuery->where('jurusan', $major))))))
             ->orderBy('nama')
             ->orderBy('id')
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
     }
 
@@ -70,7 +72,7 @@ class SiswaReadService
     }
 
     /**
-     * @return array{placements: Collection, violations: Collection, pointRecap: Collection}
+     * @return array{placements: Collection, violations: LengthAwarePaginator, pointRecap: Collection}
      */
     public function detail(Siswa $siswa, ?Guru $guru = null): array
     {
@@ -90,10 +92,20 @@ class SiswaReadService
                 'pelanggaran:id,nama_pelanggaran',
                 'guru:id,nama',
             ])
+            ->select([
+                'id',
+                'kelas_siswa_id',
+                'pelanggaran_id',
+                'guru_id',
+                'tanggal_pelanggaran',
+                'poin_saat_dicatat',
+                'status',
+            ])
             ->whereHas('penempatanKelas', static fn (Builder $query): Builder => $query->where('siswa_id', $siswa->id))
             ->orderByDesc('tanggal_pelanggaran')
             ->orderByDesc('id')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         $pointsByAcademicYear = PelanggaranSiswa::query()
             ->join('t_kelas_siswa', 't_kelas_siswa.id', '=', 't_pelanggaran_siswa.kelas_siswa_id')

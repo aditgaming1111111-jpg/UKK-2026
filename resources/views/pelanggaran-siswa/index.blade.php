@@ -93,7 +93,7 @@
                     @endforeach
                 </tbody>
             </x-ui.table>
-            <div class="border-t border-gray-200 px-5 py-4">{{ $records->links() }}</div>
+            <div class="border-t border-gray-200 px-5 py-4"><x-ui.pagination :paginator="$records" /></div>
         @else
             <div class="p-6"><x-ui.empty-state title="Catatan tidak ditemukan" description="Sesuaikan pencarian atau filter. Catatan yang dibatalkan tetap muncul jika statusnya dipilih." /></div>
         @endif

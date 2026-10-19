@@ -28,7 +28,7 @@ class GuruDirectory
                 ->where('status_aktif', $status === 'aktif'))
             ->orderBy('nama')
             ->orderBy('id')
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
     }
 }

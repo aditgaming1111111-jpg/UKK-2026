@@ -8,6 +8,25 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
+:where(input:not([type='checkbox']):not([type='radio']):not([type='hidden']), select, textarea) {
+    min-height: 2.75rem;
+    border-radius: 0.5rem;
+    font-family: inherit;
+    font-size: 0.875rem;
+}
+
+html.app-scrollbar-hidden,
+html.app-scrollbar-hidden body,
+html.app-scrollbar-hidden * {
+    scrollbar-width: none;
+}
+
+html.app-scrollbar-hidden::-webkit-scrollbar,
+html.app-scrollbar-hidden body::-webkit-scrollbar,
+html.app-scrollbar-hidden *::-webkit-scrollbar {
+    display: none;
+}
+
 @keyframes modal-backdrop-enter {
     from {
         opacity: 0;

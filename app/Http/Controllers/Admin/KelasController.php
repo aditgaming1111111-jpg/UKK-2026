@@ -42,7 +42,7 @@ class KelasController extends Controller
             ->orderBy('tingkat')
             ->orderBy('nama_kelas')
             ->orderBy('id')
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
 
         return view('admin.kelas.index', compact('classes', 'filters'));

@@ -58,6 +58,24 @@ class TahunAjaranManagementTest extends TestCase
         $this->assertDatabaseCount('t_tahun_ajaran', 1);
     }
 
+    public function test_academic_year_directory_paginates_ten_records(): void
+    {
+        $administrator = User::factory()->state(['role' => 'admin'])->create();
+        TahunAjaran::factory()->count(11)->sequence(fn ($sequence): array => [
+            'nama_tahun_ajaran' => (2020 + $sequence->index).'/'.(2021 + $sequence->index),
+            'tanggal_mulai' => (2020 + $sequence->index).'-07-01',
+            'tanggal_selesai' => (2021 + $sequence->index).'-06-30',
+            'status_aktif' => false,
+        ])->create();
+
+        $this->actingAs($administrator)->get(route('admin.academic-years.index'))
+            ->assertViewHas('academicYears', fn ($years): bool => $years->count() === 10 && $years->total() === 11)
+            ->assertSeeText('');
+
+        $this->get(route('admin.academic-years.index', ['page' => 2]))
+            ->assertViewHas('academicYears', fn ($years): bool => $years->count() === 1 && $years->total() === 11);
+    }
+
     public function test_unchanged_academic_year_update_shows_success_notification(): void
     {
         $administrator = User::factory()->state(['role' => 'admin'])->create();

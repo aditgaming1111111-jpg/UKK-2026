@@ -102,4 +102,17 @@ class WaliKelasManagementTest extends TestCase
         $teacher = Guru::factory()->create();
         $this->actingAs($teacher->user)->get(route('admin.homeroom-teachers.index'))->assertForbidden();
     }
+
+    public function test_homeroom_assignment_history_paginates_ten_records(): void
+    {
+        $administrator = User::factory()->state(['role' => 'admin'])->create();
+        WaliKelas::factory()->count(11)->create();
+
+        $this->actingAs($administrator)->get(route('admin.homeroom-teachers.index'))
+            ->assertViewHas('assignments', fn ($assignments): bool => $assignments->count() === 10 && $assignments->total() === 11)
+            ->assertSeeText('');
+
+        $this->get(route('admin.homeroom-teachers.index', ['page' => 2]))
+            ->assertViewHas('assignments', fn ($assignments): bool => $assignments->count() === 1 && $assignments->total() === 11);
+    }
 }

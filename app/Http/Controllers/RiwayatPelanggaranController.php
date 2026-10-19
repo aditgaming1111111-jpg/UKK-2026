@@ -49,7 +49,7 @@ class RiwayatPelanggaranController extends Controller
             ->when($filters['tanggal_mulai'] ?? null, static fn ($builder, string $date) => $builder->whereDate('tanggal_pelanggaran', '>=', $date))
             ->when($filters['tanggal_selesai'] ?? null, static fn ($builder, string $date) => $builder->whereDate('tanggal_pelanggaran', '<=', $date));
 
-        $records = $query->orderByDesc('tanggal_pelanggaran')->orderByDesc('id')->paginate(15)->withQueryString();
+        $records = $query->orderByDesc('tanggal_pelanggaran')->orderByDesc('id')->paginate(10)->withQueryString();
 
         return view('pelanggaran-siswa.index', [
             'records' => $records,

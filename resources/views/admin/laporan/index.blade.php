@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 @section('title', 'Laporan Pelanggaran')
 
@@ -126,7 +126,7 @@
                     @endforeach
                 </tbody>
             </x-ui.table>
-            <div class="border-t border-gray-200 px-4 py-4 sm:px-5">{{ $records->links() }}</div>
+            <div class="border-t border-gray-200 px-4 py-4 sm:px-5"><x-ui.pagination :paginator="$records" /></div>
         @endif
     </x-ui.card>
 @endsection

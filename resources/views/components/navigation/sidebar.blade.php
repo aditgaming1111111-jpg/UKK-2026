@@ -27,16 +27,6 @@
 
     $menuItems = $role === 'admin' ? $adminMenu : $guruMenu;
 
-    if ($role === 'guru' && $hasActiveWaliKelas) {
-        array_splice($menuItems, 5, 0, [
-            [
-                'label' => 'Rekap Kelas',
-                'route' => 'guru.class-recap.index',
-                'icon' => 'chart',
-            ],
-        ]);
-    }
-
     $roleTitle = $role === 'admin' ? 'Administrator' : 'Guru';
 @endphp
 

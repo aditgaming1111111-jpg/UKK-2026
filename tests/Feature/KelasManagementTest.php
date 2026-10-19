@@ -49,6 +49,21 @@ class KelasManagementTest extends TestCase
         $this->assertDatabaseHas('t_kelas', ['id' => $kelas->id]);
     }
 
+    public function test_class_directory_shows_at_most_ten_records_per_page(): void
+    {
+        $administrator = User::factory()->state(['role' => 'admin'])->create();
+        Kelas::factory()->count(11)->sequence(fn ($sequence): array => [
+            'nama_kelas' => 'Kelas Pagination '.$sequence->index,
+        ])->create();
+
+        $firstPage = $this->actingAs($administrator)->get(route('admin.classes.index'));
+        $firstPage->assertViewHas('classes', fn ($classes): bool => $classes->count() === 10 && $classes->total() === 11)
+            ->assertSeeText('');
+
+        $this->get(route('admin.classes.index', ['page' => 2]))
+            ->assertViewHas('classes', fn ($classes): bool => $classes->count() === 1 && $classes->total() === 11);
+    }
+
     public function test_teacher_cannot_access_class_management(): void
     {
         $teacher = Guru::factory()->create();

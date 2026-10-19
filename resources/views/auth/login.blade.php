@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="app-scrollbar-hidden">
 
 <head>
     <meta charset="utf-8">
@@ -29,23 +29,23 @@
                     <label for="email" class="mb-2 block text-sm font-medium">Email</label>
                     <input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus
                         autocomplete="username"
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-gray-700 focus:ring-2 focus:ring-gray-200 @error('email') border-red-500 @enderror">
+                        class="min-h-11 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-gray-700 focus:ring-2 focus:ring-gray-200 focus:ring-offset-1 @error('email') border-gray-500 @enderror">
                     @error('email')
-                        <p class="mt-2 text-sm text-red-700" role="alert">{{ $message }}</p>
+                        <p class="mt-2 text-sm text-gray-700" role="alert">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
                     <label for="password" class="mb-2 block text-sm font-medium">Kata sandi</label>
                     <input id="password" name="password" type="password" required autocomplete="current-password"
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-gray-700 focus:ring-2 focus:ring-gray-200 @error('password') border-red-500 @enderror">
+                        class="min-h-11 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-gray-700 focus:ring-2 focus:ring-gray-200 focus:ring-offset-1 @error('password') border-gray-500 @enderror">
                     @error('password')
-                        <p class="mt-2 text-sm text-red-700" role="alert">{{ $message }}</p>
+                        <p class="mt-2 text-sm text-gray-700" role="alert">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <button type="submit"
-                    class="w-full rounded-lg bg-gray-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                    class="min-h-11 w-full rounded-lg bg-gray-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-gray-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 motion-reduce:transition-none">
                     Masuk
                 </button>
             </form>

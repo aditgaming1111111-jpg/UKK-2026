@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Oct 14, 2026 at 03:36 PM
+-- Generation Time: Oct 19, 2026 at 02:34 PM
 -- Server version: 8.4.3
 -- PHP Version: 8.3.30
 
@@ -32,6 +32,18 @@ CREATE TABLE `cache` (
   `value` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `expiration` bigint NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `cache`
+--
+
+INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
+('sekolahku-cache-818cb4847ce323a3aa5cc5587b165e84dcc60a71', 'i:1;', 1792073405),
+('sekolahku-cache-818cb4847ce323a3aa5cc5587b165e84dcc60a71:timer', 'i:1792073405;', 1792073405),
+('sekolahku-cache-bb2926e45c06ec8262bb785a3aae4dd2ffaca6d2', 'i:1;', 1792069644),
+('sekolahku-cache-bb2926e45c06ec8262bb785a3aae4dd2ffaca6d2:timer', 'i:1792069644;', 1792069644),
+('sekolahku-cache-fc26eb645d3edf739579e766ba23e8f5291583bb', 'i:1;', 1791991221),
+('sekolahku-cache-fc26eb645d3edf739579e766ba23e8f5291583bb:timer', 'i:1791991221;', 1791991221);
 
 -- --------------------------------------------------------
 
@@ -147,6 +159,13 @@ CREATE TABLE `sessions` (
   `last_activity` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `sessions`
+--
+
+INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
+('ZLPcXwwvITg7MdFf07IoFQHJjdjSG81m6m7pVmad', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJWR01nYjZaNmg4OWg3cGJjMkVnRTUzbnFscjlyc1MybG95ZTQ2dVFpIiwiX2ZsYXNoIjp7Im5ldyI6W10sIm9sZCI6W119LCJfcHJldmlvdXMiOnsidXJsIjoiaHR0cDpcL1wvbG9jYWxob3N0OjgwMDBcL2FkbWluIiwicm91dGUiOiJhZG1pbi5kYXNoYm9hcmQifSwibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiOjEsInBhc3N3b3JkX2hhc2hfd2ViIjoiNmMzNGM2N2I4ZTc4YTgxNDhlNjBmNTMzOTllNzA5ZDA5N2Q0NGMxNWExZDM4ZWQyOTkwZDcwMDdhMWM1YWE3NyJ9', 1792420360);
+
 -- --------------------------------------------------------
 
 --
@@ -216,7 +235,17 @@ CREATE TABLE `t_kelas_siswa` (
 --
 
 INSERT INTO `t_kelas_siswa` (`id`, `siswa_id`, `kelas_id`, `tahun_ajaran_id`, `tanggal_mulai`, `tanggal_selesai`, `status_aktif`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 1, '2026-07-01', NULL, 1, '2026-10-14 08:04:42', '2026-10-14 08:04:42');
+(1, 1, 1, 1, '2026-07-01', NULL, 1, '2026-10-14 08:04:42', '2026-10-14 08:04:42'),
+(2, 2, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:21:19', '2026-10-19 06:21:19'),
+(3, 4, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:28:14', '2026-10-19 06:28:14'),
+(4, 3, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:28:36', '2026-10-19 06:28:36'),
+(5, 10, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:28:57', '2026-10-19 06:28:57'),
+(6, 7, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:29:17', '2026-10-19 06:29:17'),
+(7, 6, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:29:37', '2026-10-19 06:29:37'),
+(8, 8, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:29:57', '2026-10-19 06:29:57'),
+(9, 11, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:30:16', '2026-10-19 06:30:16'),
+(10, 9, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:30:38', '2026-10-19 06:30:38'),
+(11, 5, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:30:57', '2026-10-19 06:30:57');
 
 -- --------------------------------------------------------
 
@@ -241,7 +270,11 @@ CREATE TABLE `t_log_pelanggaran` (
 
 INSERT INTO `t_log_pelanggaran` (`id`, `pelanggaran_siswa_id`, `user_id`, `aksi`, `data_sebelum`, `data_sesudah`, `alasan`, `created_at`) VALUES
 (1, 1, 2, 'tambah', NULL, '{\"kelas_siswa_id\":1,\"pelanggaran_id\":1,\"guru_id\":1,\"tanggal_pelanggaran\":\"2026-10-14 00:00:00\",\"tanggal_dicatat\":\"2026-10-14 15:12:15\",\"poin_saat_dicatat\":5,\"keterangan\":\"Andi datang terlambat saat jam masuk sekolah\",\"tindakan\":null,\"status\":\"aktif\",\"updated_at\":\"2026-10-14 15:12:15\",\"created_at\":\"2026-10-14 15:12:15\",\"id\":1}', 'Pencatatan awal', '2026-10-14 08:12:15'),
-(2, 1, 2, 'edit', '{\"id\":1,\"kelas_siswa_id\":1,\"pelanggaran_id\":1,\"guru_id\":1,\"tanggal_pelanggaran\":\"2026-10-14\",\"tanggal_dicatat\":\"2026-10-14 15:12:15\",\"poin_saat_dicatat\":5,\"keterangan\":\"Andi datang terlambat saat jam masuk sekolah\",\"tindakan\":null,\"status\":\"aktif\",\"created_at\":\"2026-10-14 15:12:15\",\"updated_at\":\"2026-10-14 15:12:15\"}', '{\"id\":1,\"kelas_siswa_id\":1,\"pelanggaran_id\":1,\"guru_id\":1,\"tanggal_pelanggaran\":\"2026-10-14 00:00:00\",\"tanggal_dicatat\":\"2026-10-14 15:12:15\",\"poin_saat_dicatat\":5,\"keterangan\":\"Andi datang terlambat saat jam masuk sekolah. Sudah diberikan teguran oleh guru piket.\",\"tindakan\":null,\"status\":\"aktif\",\"created_at\":\"2026-10-14 15:12:15\",\"updated_at\":\"2026-10-14 15:30:48\"}', 'TEST', '2026-10-14 08:30:48');
+(2, 1, 2, 'edit', '{\"id\":1,\"kelas_siswa_id\":1,\"pelanggaran_id\":1,\"guru_id\":1,\"tanggal_pelanggaran\":\"2026-10-14\",\"tanggal_dicatat\":\"2026-10-14 15:12:15\",\"poin_saat_dicatat\":5,\"keterangan\":\"Andi datang terlambat saat jam masuk sekolah\",\"tindakan\":null,\"status\":\"aktif\",\"created_at\":\"2026-10-14 15:12:15\",\"updated_at\":\"2026-10-14 15:12:15\"}', '{\"id\":1,\"kelas_siswa_id\":1,\"pelanggaran_id\":1,\"guru_id\":1,\"tanggal_pelanggaran\":\"2026-10-14 00:00:00\",\"tanggal_dicatat\":\"2026-10-14 15:12:15\",\"poin_saat_dicatat\":5,\"keterangan\":\"Andi datang terlambat saat jam masuk sekolah. Sudah diberikan teguran oleh guru piket.\",\"tindakan\":null,\"status\":\"aktif\",\"created_at\":\"2026-10-14 15:12:15\",\"updated_at\":\"2026-10-14 15:30:48\"}', 'TEST', '2026-10-14 08:30:48'),
+(3, 2, 2, 'tambah', NULL, '{\"kelas_siswa_id\":5,\"pelanggaran_id\":1,\"guru_id\":1,\"tanggal_pelanggaran\":\"2026-10-19 00:00:00\",\"tanggal_dicatat\":\"2026-10-19 13:59:42\",\"poin_saat_dicatat\":5,\"keterangan\":\"Terlambat masuk sekolah 15 menit\",\"tindakan\":\"Membaca 10 surah pendek\",\"status\":\"aktif\",\"updated_at\":\"2026-10-19 13:59:42\",\"created_at\":\"2026-10-19 13:59:42\",\"id\":2}', 'Pencatatan awal', '2026-10-19 06:59:42'),
+(4, 3, 2, 'tambah', NULL, '{\"kelas_siswa_id\":3,\"pelanggaran_id\":1,\"guru_id\":1,\"tanggal_pelanggaran\":\"2026-10-15 00:00:00\",\"tanggal_dicatat\":\"2026-10-19 14:00:31\",\"poin_saat_dicatat\":5,\"keterangan\":\"Terlambat datang ke sekolah\",\"tindakan\":\"Membersihkan lapangan\",\"status\":\"aktif\",\"updated_at\":\"2026-10-19 14:00:31\",\"created_at\":\"2026-10-19 14:00:31\",\"id\":3}', 'Pencatatan awal', '2026-10-19 07:00:31'),
+(5, 4, 2, 'tambah', NULL, '{\"kelas_siswa_id\":1,\"pelanggaran_id\":1,\"guru_id\":1,\"tanggal_pelanggaran\":\"2026-10-07 00:00:00\",\"tanggal_dicatat\":\"2026-10-19 14:01:43\",\"poin_saat_dicatat\":5,\"keterangan\":\"Terlambat datang ke sekolah 1 jam\",\"tindakan\":\"membaca al quran\",\"status\":\"aktif\",\"updated_at\":\"2026-10-19 14:01:43\",\"created_at\":\"2026-10-19 14:01:43\",\"id\":4}', 'Pencatatan awal', '2026-10-19 07:01:43'),
+(6, 4, 2, 'batal', '{\"id\":4,\"kelas_siswa_id\":1,\"pelanggaran_id\":1,\"guru_id\":1,\"tanggal_pelanggaran\":\"2026-10-07\",\"tanggal_dicatat\":\"2026-10-19 14:01:43\",\"poin_saat_dicatat\":5,\"keterangan\":\"Terlambat datang ke sekolah 1 jam\",\"tindakan\":\"membaca al quran\",\"status\":\"aktif\",\"created_at\":\"2026-10-19 14:01:43\",\"updated_at\":\"2026-10-19 14:01:43\"}', '{\"id\":4,\"kelas_siswa_id\":1,\"pelanggaran_id\":1,\"guru_id\":1,\"tanggal_pelanggaran\":\"2026-10-07\",\"tanggal_dicatat\":\"2026-10-19 14:01:43\",\"poin_saat_dicatat\":5,\"keterangan\":\"Terlambat datang ke sekolah 1 jam\",\"tindakan\":\"membaca al quran\",\"status\":\"dibatalkan\",\"created_at\":\"2026-10-19 14:01:43\",\"updated_at\":\"2026-10-19 14:02:39\"}', 'Sakit pulang dari rumah sakit, Datang ke sekolah', '2026-10-19 07:02:39');
 
 -- --------------------------------------------------------
 
@@ -316,7 +349,10 @@ CREATE TABLE `t_pelanggaran_siswa` (
 --
 
 INSERT INTO `t_pelanggaran_siswa` (`id`, `kelas_siswa_id`, `pelanggaran_id`, `guru_id`, `tanggal_pelanggaran`, `tanggal_dicatat`, `poin_saat_dicatat`, `keterangan`, `tindakan`, `status`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 1, '2026-10-14', '2026-10-14 15:12:15', 5, 'Andi datang terlambat saat jam masuk sekolah. Sudah diberikan teguran oleh guru piket.', NULL, 'aktif', '2026-10-14 08:12:15', '2026-10-14 08:30:48');
+(1, 1, 1, 1, '2026-10-14', '2026-10-14 15:12:15', 5, 'Andi datang terlambat saat jam masuk sekolah. Sudah diberikan teguran oleh guru piket.', NULL, 'aktif', '2026-10-14 08:12:15', '2026-10-14 08:30:48'),
+(2, 5, 1, 1, '2026-10-19', '2026-10-19 13:59:42', 5, 'Terlambat masuk sekolah 15 menit', 'Membaca 10 surah pendek', 'aktif', '2026-10-19 06:59:42', '2026-10-19 06:59:42'),
+(3, 3, 1, 1, '2026-10-15', '2026-10-19 14:00:31', 5, 'Terlambat datang ke sekolah', 'Membersihkan lapangan', 'aktif', '2026-10-19 07:00:31', '2026-10-19 07:00:31'),
+(4, 1, 1, 1, '2026-10-07', '2026-10-19 14:01:43', 5, 'Terlambat datang ke sekolah 1 jam', 'membaca al quran', 'dibatalkan', '2026-10-19 07:01:43', '2026-10-19 07:02:39');
 
 -- --------------------------------------------------------
 
@@ -341,7 +377,17 @@ CREATE TABLE `t_siswa` (
 --
 
 INSERT INTO `t_siswa` (`id`, `nisn`, `nama`, `jenis_kelamin`, `alamat`, `tahun_masuk`, `status_siswa`, `created_at`, `updated_at`) VALUES
-(1, '0061234567', 'Andi Saputra', 'L', 'Jl. Melati No. 10, Tasikmalaya', 2026, 'aktif', '2026-10-14 08:03:48', '2026-10-14 08:03:48');
+(1, '0061234567', 'Andi Saputra', 'L', 'Jl. Melati No. 10, Tasikmalaya', 2026, 'aktif', '2026-10-14 08:03:48', '2026-10-14 08:03:48'),
+(2, '0987612345', 'Sri Lestari', 'P', 'Tasikmalaya', 2026, 'aktif', '2026-10-19 06:20:39', '2026-10-19 06:20:39'),
+(3, '0000000001', 'Andi Santoso', 'L', 'Tasikamalaya', 2026, 'aktif', '2026-10-19 06:22:08', '2026-10-19 06:22:08'),
+(4, '0000000002', 'Ali Syahbana', 'L', 'Cilolohan', 2026, 'aktif', '2026-10-19 06:22:40', '2026-10-19 06:22:40'),
+(5, '0000000003', 'Zahru Fikri', 'L', 'Kawalu', 2026, 'aktif', '2026-10-19 06:23:08', '2026-10-19 06:23:08'),
+(6, '0000000004', 'Nazril Ilham', 'L', 'Ciberem', 2026, 'aktif', '2026-10-19 06:23:33', '2026-10-19 06:23:33'),
+(7, '0000000005', 'Fitri indah', 'P', 'Tasikmalaya', 2026, 'aktif', '2026-10-19 06:24:02', '2026-10-19 06:24:02'),
+(8, '0000000006', 'Nijar Saputra', 'L', 'Ciamis', 2026, 'aktif', '2026-10-19 06:24:31', '2026-10-19 06:24:31'),
+(9, '0000000007', 'Sofi Nurjanah', 'P', 'Tasikamalaya', 2026, 'aktif', '2026-10-19 06:25:58', '2026-10-19 06:25:58'),
+(10, '0000000008', 'Arfa belingham', 'P', 'Tasimalaya', 2026, 'aktif', '2026-10-19 06:26:20', '2026-10-19 06:26:20'),
+(11, '0000000009', 'Ressa Juiansayah', 'L', 'Cilolohan', 2026, 'aktif', '2026-10-19 06:26:51', '2026-10-19 06:26:51');
 
 -- --------------------------------------------------------
 
@@ -407,6 +453,13 @@ CREATE TABLE `t_wali_kelas` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `t_wali_kelas`
+--
+
+INSERT INTO `t_wali_kelas` (`id`, `guru_id`, `kelas_id`, `tahun_ajaran_id`, `tanggal_mulai`, `tanggal_selesai`, `status_aktif`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 1, '2026-07-01', NULL, 1, '2026-10-15 06:05:58', '2026-10-15 06:05:58');
 
 --
 -- Indexes for dumped tables
@@ -589,13 +642,13 @@ ALTER TABLE `t_kelas`
 -- AUTO_INCREMENT for table `t_kelas_siswa`
 --
 ALTER TABLE `t_kelas_siswa`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `t_log_pelanggaran`
 --
 ALTER TABLE `t_log_pelanggaran`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `t_pelanggaran`
@@ -613,13 +666,13 @@ ALTER TABLE `t_pelanggaran_kategori`
 -- AUTO_INCREMENT for table `t_pelanggaran_siswa`
 --
 ALTER TABLE `t_pelanggaran_siswa`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `t_siswa`
 --
 ALTER TABLE `t_siswa`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `t_tahun_ajaran`
@@ -637,7 +690,7 @@ ALTER TABLE `t_users`
 -- AUTO_INCREMENT for table `t_wali_kelas`
 --
 ALTER TABLE `t_wali_kelas`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables

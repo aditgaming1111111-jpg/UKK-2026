@@ -51,6 +51,45 @@ class RiwayatPelanggaranTest extends TestCase
             ->assertSee($context['year']->nama_tahun_ajaran);
     }
 
+    public function test_violation_history_paginates_ten_records_without_duplicates(): void
+    {
+        $context = $this->recordingContext();
+        $records = collect(range(1, 12))->map(fn (): PelanggaranSiswa => $this->createRecord($context));
+        $administrator = User::factory()->create(['role' => 'admin']);
+
+        $firstPage = $this->actingAs($administrator)->get(route('admin.student-violations.index'));
+        $firstPage->assertViewHas('records', fn ($page): bool => $page->count() === 10 && $page->total() === 12)
+            ->assertSeeText('');
+        $firstPageIds = $firstPage->viewData('records')->getCollection()->modelKeys();
+
+        $secondPage = $this->get(route('admin.student-violations.index', ['page' => 2]));
+        $secondPage->assertViewHas('records', fn ($page): bool => $page->count() === 2 && $page->total() === 12);
+        $secondPageIds = $secondPage->viewData('records')->getCollection()->modelKeys();
+
+        $this->assertSame([], array_values(array_intersect($firstPageIds, $secondPageIds)));
+        $this->assertCount(12, $records);
+    }
+
+    public function test_audit_log_directory_paginates_ten_records_and_preserves_search(): void
+    {
+        $context = $this->recordingContext();
+        $record = $this->createRecord($context);
+        $administrator = User::factory()->create(['role' => 'admin', 'nama' => 'Admin Pagination']);
+        LogPelanggaran::factory()->count(12)
+            ->for($record, 'catatanPelanggaran')
+            ->for($administrator, 'pengguna')
+            ->create();
+        $filters = ['q' => 'Admin Pagination'];
+
+        $firstPage = $this->actingAs($administrator)->get(route('admin.audit-logs.index', $filters));
+        $firstPage->assertViewHas('logs', fn ($logs): bool => $logs->count() === 10 && $logs->total() === 12)
+            ->assertSeeText('');
+
+        $this->get(route('admin.audit-logs.index', [...$filters, 'page' => 2]))
+            ->assertViewHas('logs', fn ($logs): bool => $logs->count() === 2 && $logs->total() === 12)
+            ->assertSee('q=Admin%20Pagination');
+    }
+
     public function test_teacher_history_is_limited_to_own_or_assigned_class_records_and_cannot_correct_another_teachers_record(): void
     {
         $context = $this->recordingContext();

@@ -22,7 +22,7 @@ class LaporanController extends Controller
         $filters['tahun_ajaran_id'] = $selectedYear?->id;
         $query = $service->query($filters);
         $summary = $service->summary($query);
-        $records = (clone $query)->paginate(15)->withQueryString();
+        $records = (clone $query)->paginate(10)->withQueryString();
 
         return view('admin.laporan.index', [
             'records' => $records,

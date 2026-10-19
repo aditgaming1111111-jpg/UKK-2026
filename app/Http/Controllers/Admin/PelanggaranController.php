@@ -33,7 +33,7 @@ class PelanggaranController extends Controller
             ->when(isset($filters['status']), static fn ($query) => $query->where('status_aktif', $filters['status'] === 'aktif'))
             ->orderBy('kode')
             ->orderBy('id')
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
 
         return view('admin.jenis-pelanggaran.index', [

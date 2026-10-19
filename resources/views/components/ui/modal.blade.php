@@ -1,6 +1,6 @@
 @props(['id', 'title', 'description' => null])
 <dialog id="{{ $id }}" data-modal aria-labelledby="{{ $id }}-title"
-    class="fixed inset-0 m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-2xl border border-gray-200 bg-white p-0 text-gray-900 shadow-2xl">
+    class="fixed inset-0 m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-2xl border border-gray-200 bg-white p-0 text-gray-900 shadow-xl">
     <div class="p-5 sm:p-6">
         <div class="flex items-start justify-between gap-4">
             <div>

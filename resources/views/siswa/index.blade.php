@@ -107,7 +107,7 @@
                     @endforeach
                 </tbody>
             </x-ui.table>
-            <div class="border-t border-gray-200 px-5 py-4">{{ $students->links() }}</div>
+            <div class="border-t border-gray-200 px-5 py-4"><x-ui.pagination :paginator="$students" /></div>
         @else
             <div class="p-5"><x-ui.empty-state title="Siswa tidak ditemukan"
                     description="Ubah kata pencarian atau filter untuk melihat hasil lain." />

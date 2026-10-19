@@ -124,6 +124,27 @@ class CatatanSayaTest extends TestCase
             ->assertSee('Dibatalkan');
     }
 
+    public function test_my_notes_paginates_ten_records_and_keeps_search_filter_between_pages(): void
+    {
+        $context = $this->recordingContext(['nama' => 'Siswa Filter Pagination']);
+        $records = collect(range(1, 12))->map(fn (): PelanggaranSiswa => $this->createRecord($context));
+        $filters = ['q' => 'Siswa Filter Pagination', 'status' => 'aktif'];
+
+        $firstPage = $this->actingAs($context['user'])->get(route('guru.my-notes.index', $filters));
+        $firstPage->assertViewHas('records', fn ($page): bool => $page->count() === 10 && $page->total() === 12)
+            ->assertSeeText('');
+        $firstPageIds = $firstPage->viewData('records')->getCollection()->modelKeys();
+
+        $secondPage = $this->get(route('guru.my-notes.index', [...$filters, 'page' => 2]));
+        $secondPage->assertViewHas('records', fn ($page): bool => $page->count() === 2 && $page->total() === 12)
+            ->assertSee('q=Siswa%20Filter%20Pagination')
+            ->assertSee('status=aktif');
+        $secondPageIds = $secondPage->viewData('records')->getCollection()->modelKeys();
+
+        $this->assertSame([], array_values(array_intersect($firstPageIds, $secondPageIds)));
+        $this->assertCount(12, $records);
+    }
+
     public function test_guru_can_view_own_detail_and_cancellation_audit_but_not_another_teachers_detail(): void
     {
         $context = $this->recordingContext();

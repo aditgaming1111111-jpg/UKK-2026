@@ -48,7 +48,7 @@ class CatatanSayaController extends Controller
             ->when($filters['status'] ?? null, static fn (Builder $query, string $status) => $query->where('status', $status))
             ->orderByDesc('tanggal_pelanggaran')
             ->orderByDesc('id')
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
 
         return view('guru.catatan-saya.index', [

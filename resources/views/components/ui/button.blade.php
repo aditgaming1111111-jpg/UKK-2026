@@ -5,7 +5,7 @@
         'secondary' => 'border border-gray-300 bg-white text-gray-800 hover:bg-gray-100 focus-visible:outline-gray-700',
         'ghost' => 'bg-transparent text-gray-700 hover:bg-gray-100 focus-visible:outline-gray-700',
     ];
-    $sizes = ['sm' => 'px-3 py-2 text-xs', 'md' => 'px-4 py-2.5 text-sm'];
+    $sizes = ['sm' => 'min-h-10 px-3 py-2 text-xs', 'md' => 'min-h-11 px-4 py-2.5 text-sm'];
     $classes =
         'inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none ' .
         ($styles[$variant] ?? $styles['primary']) .

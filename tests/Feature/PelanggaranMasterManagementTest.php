@@ -44,6 +44,19 @@ class PelanggaranMasterManagementTest extends TestCase
         $this->assertDatabaseHas('t_pelanggaran_kategori', ['id' => $category->id, 'nama_kategori' => 'Kedisiplinan Siswa']);
     }
 
+    public function test_category_directory_paginates_ten_records(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        PelanggaranKategori::factory()->count(11)->create();
+
+        $this->actingAs($administrator)->get(route('admin.violation-categories.index'))
+            ->assertViewHas('categories', fn ($categories): bool => $categories->count() === 10 && $categories->total() === 11)
+            ->assertSeeText('');
+
+        $this->get(route('admin.violation-categories.index', ['page' => 2]))
+            ->assertViewHas('categories', fn ($categories): bool => $categories->count() === 1 && $categories->total() === 11);
+    }
+
     public function test_admin_can_manage_violation_types_and_search_filter_and_paginate(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
@@ -61,7 +74,11 @@ class PelanggaranMasterManagementTest extends TestCase
             'kategori_id' => $category->id,
             'status' => 'aktif',
         ]))->assertSee('Terlambat masuk sekolah');
-        $this->get(route('admin.violations.index'))->assertSee('page=2');
+        $this->get(route('admin.violations.index'))
+            ->assertSee('page=2')
+            ->assertViewHas('violations', fn ($violations): bool => $violations->count() === 10 && $violations->total() === 16);
+        $this->get(route('admin.violations.index', ['page' => 2]))
+            ->assertViewHas('violations', fn ($violations): bool => $violations->count() === 6 && $violations->total() === 16);
         $this->get(route('admin.violations.create'))->assertSee('Kedisiplinan');
         $this->get(route('admin.violations.show', $violation))->assertSee('5');
         $this->get(route('admin.violations.edit', $violation))->assertSee('PLG-0001');

@@ -14,6 +14,9 @@ Route::prefix('guru')
     ->group(function (): void {
         Route::get('/', GuruDashboardController::class)->name('dashboard');
         Route::get('rekap-kelas', [RekapKelasController::class, 'index'])->name('class-recap.index');
+        Route::get('rekap-kelas/{tahunAjaran}/{kelas}/pdf', [RekapKelasController::class, 'pdf'])->whereNumber('tahunAjaran')->whereNumber('kelas')->name('class-recap.pdf');
+        Route::get('rekap-kelas/{tahunAjaran}/{kelas}/excel', [RekapKelasController::class, 'excel'])->whereNumber('tahunAjaran')->whereNumber('kelas')->name('class-recap.excel');
+        Route::get('rekap-kelas/{tahunAjaran}/{kelas}/{siswa}', [RekapKelasController::class, 'show'])->whereNumber('tahunAjaran')->whereNumber('kelas')->whereNumber('siswa')->name('class-recap.show');
         Route::get('pelanggaran/create', [PelanggaranSiswaController::class, 'create'])->name('violations.create');
         Route::get('pelanggaran/cari-siswa', [PelanggaranSiswaController::class, 'searchStudents'])->name('violations.student-search');
         Route::post('pelanggaran', [PelanggaranSiswaController::class, 'store'])->name('violations.store');

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="app-scrollbar-hidden">
 
 <head>
     <meta charset="utf-8">
@@ -17,7 +17,7 @@
             <form method="POST" action="{{ route('logout') }}" class="mt-8">
                 @csrf
                 <button type="submit"
-                    class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold hover:bg-gray-100">Keluar</button>
+                    class="min-h-11 rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold transition hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 motion-reduce:transition-none">Keluar</button>
             </form>
         </section>
     </main>

@@ -1,15 +1,23 @@
 @extends('layouts.admin')
+
+@section('breadcrumbs')
+    <x-ui.breadcrumbs :items="[['label' => 'Tahun Ajaran', 'url' => route('admin.academic-years.index')], ['label' => 'Tambah']]" />
+@endsection
+
+@section('page-heading')
+    <x-ui.page-heading title="Tambah Tahun Ajaran" description="Tanggal periode tidak boleh bertumpang tindih dengan periode lain." />
+@endsection
+
 @section('content')
-    <div class="mx-auto max-w-3xl px-4 py-8 sm:px-6"><a class="text-sm text-gray-600 underline"
-            href="{{ route('admin.academic-years.index') }}">← Tahun Ajaran</a>
-        <h1 class="mt-4 text-2xl font-semibold">Tambah Tahun Ajaran</h1>
-        <p class="mt-2 text-sm text-gray-600">Tanggal periode tidak boleh bertumpang tindih dengan periode lain.</p>
-        <form method="POST" action="{{ route('admin.academic-years.store') }}"
-            class="mt-6 rounded-xl border border-gray-200 bg-white p-6">
-            @if ($errors->any())
-                <div class="mb-5 rounded-lg bg-gray-100 p-4 text-sm text-gray-700">Periksa kembali isian yang ditandai.</div>
-            @endif
-            @include('admin.tahun-ajaran._form', ['submitLabel' => 'Simpan tahun ajaran'])
-        </form>
+    <div class="max-w-3xl">
+        <x-ui.card>
+            <form method="POST" action="{{ route('admin.academic-years.store') }}" class="space-y-5">
+                @if ($errors->any())
+                    <x-ui.error-state title="Tahun ajaran belum tersimpan" description="Periksa kembali isian yang ditandai." />
+                @endif
+
+                @include('admin.tahun-ajaran._form', ['submitLabel' => 'Simpan tahun ajaran'])
+            </form>
+        </x-ui.card>
     </div>
 @endsection

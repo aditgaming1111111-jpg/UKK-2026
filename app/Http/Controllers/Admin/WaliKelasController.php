@@ -38,7 +38,7 @@ class WaliKelasController extends Controller
             ->orderByDesc('t_tahun_ajaran.tanggal_mulai')
             ->orderByDesc('t_wali_kelas.tanggal_mulai')
             ->orderByDesc('t_wali_kelas.id')
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
 
         return view('admin.wali-kelas.index', [

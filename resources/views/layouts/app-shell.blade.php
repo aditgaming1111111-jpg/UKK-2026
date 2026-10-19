@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="app-scrollbar-hidden">
 
 <head>
     <meta charset="utf-8">

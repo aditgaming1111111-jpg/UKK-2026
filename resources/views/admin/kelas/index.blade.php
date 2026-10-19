@@ -60,7 +60,7 @@
                     @endforeach
                 </tbody>
             </x-ui.table>
-            <div class="border-t border-gray-200 px-5 py-4">{{ $classes->links() }}</div>
+            <div class="border-t border-gray-200 px-5 py-4"><x-ui.pagination :paginator="$classes" /></div>
         @else<div class="p-5"><x-ui.empty-state title="Data kelas belum tersedia"
                     description="Ubah filter atau tambahkan data kelas." />
                 <div class="mt-4 text-center"><x-ui.button size="sm" :href="route('admin.classes.create')">Tambah kelas</x-ui.button></div>

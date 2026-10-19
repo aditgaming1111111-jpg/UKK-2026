@@ -27,7 +27,7 @@ class PelanggaranKategoriController extends Controller
             ->when(isset($filters['status']), static fn ($query) => $query->where('status_aktif', $filters['status'] === 'aktif'))
             ->orderBy('nama_kategori')
             ->orderBy('id')
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
 
         return view('admin.kategori-pelanggaran.index', compact('categories', 'filters'));

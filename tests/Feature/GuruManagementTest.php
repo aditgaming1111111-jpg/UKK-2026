@@ -201,6 +201,29 @@ class GuruManagementTest extends TestCase
             ->assertSee('page=2');
     }
 
+    public function test_teacher_directory_limits_pages_to_ten_and_keeps_search_filters(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        Guru::factory()->count(12)->sequence(fn ($sequence): array => [
+            'nama' => 'Guru Filter '.str_pad((string) $sequence->index, 2, '0', STR_PAD_LEFT),
+            'status_aktif' => true,
+        ])->create();
+        Guru::factory()->create(['nama' => 'Guru Nonaktif Filter', 'status_aktif' => false]);
+        $filters = ['q' => 'Guru Filter', 'status' => 'aktif'];
+
+        $this->actingAs($administrator)->get(route('admin.teachers.index', $filters))
+            ->assertViewHas('teachers', fn ($teachers): bool => $teachers->count() === 10 && $teachers->total() === 12)
+            ->assertSeeText('');
+
+        $this->get(route('admin.teachers.index', [...$filters, 'page' => 2]))
+            ->assertViewHas('teachers', fn ($teachers): bool => $teachers->count() === 2 && $teachers->total() === 12)
+            ->assertSee('Guru Filter 10')
+            ->assertSee('Guru Filter 11')
+            ->assertDontSee('Guru Filter 00')
+            ->assertSee('q=Guru%20Filter')
+            ->assertSee('status=aktif');
+    }
+
     public function test_only_admin_can_manage_teacher_records(): void
     {
         $guruUser = User::factory()->create(['role' => 'guru']);

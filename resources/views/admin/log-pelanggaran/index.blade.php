@@ -28,7 +28,7 @@
                     @endforeach
                 </tbody>
             </x-ui.table>
-            <div class="border-t border-gray-200 px-5 py-4">{{ $logs->links() }}</div>
+            <div class="border-t border-gray-200 px-5 py-4"><x-ui.pagination :paginator="$logs" /></div>
         @else
             <div class="p-6"><x-ui.empty-state title="Belum ada log aktivitas" description="Aksi pencatatan dan perubahan catatan akan ditampilkan di sini." /></div>
         @endif
