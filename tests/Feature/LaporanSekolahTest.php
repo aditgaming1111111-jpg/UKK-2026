@@ -81,6 +81,8 @@ class LaporanSekolahTest extends TestCase
 
     public function test_admin_print_report_includes_all_filtered_records_across_pages(): void
     {
+        $this->travelTo('2026-10-20 12:00:00');
+
         $admin = User::factory()->create(['role' => 'admin']);
         [$year, , $placement, $teacher, $violation] = $this->recordContext();
         $student = $placement->siswa;
@@ -88,7 +90,7 @@ class LaporanSekolahTest extends TestCase
             'kelas_siswa_id' => $placement->id,
             'guru_id' => $teacher->id,
             'pelanggaran_id' => $violation->id,
-            'tanggal_pelanggaran' => now()->subDays($sequence->index)->toDateString(),
+            'tanggal_pelanggaran' => now()->subDays($sequence->index + 1)->toDateString(),
             'keterangan' => 'Catatan laporan '.$sequence->index,
         ])->create();
 
