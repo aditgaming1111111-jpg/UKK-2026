@@ -4,6 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use App\Models\Guru;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreGuruRequest extends FormRequest
 {
@@ -25,8 +26,7 @@ class StoreGuruRequest extends FormRequest
         return [
             'nip' => ['required', 'string', 'max:255', 'unique:t_guru,nip'],
             'nama' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255'],
-            'email_login' => ['required', 'string', 'email', 'max:255', 'unique:t_users,email'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:t_guru,email', Rule::unique('t_users', 'email')],
             'password_login' => ['required', 'string', 'min:8', 'confirmed'],
         ];
     }
@@ -37,7 +37,6 @@ class StoreGuruRequest extends FormRequest
             'nip' => trim((string) $this->input('nip', '')),
             'nama' => trim((string) $this->input('nama', '')),
             'email' => strtolower(trim((string) $this->input('email', ''))),
-            'email_login' => strtolower(trim((string) $this->input('email_login', ''))),
         ]);
     }
 
@@ -47,11 +46,9 @@ class StoreGuruRequest extends FormRequest
             'nip.required' => 'NIP wajib diisi.',
             'nip.unique' => 'NIP sudah terdaftar.',
             'nama.required' => 'Nama Guru wajib diisi.',
-            'email.required' => 'Email identitas Guru wajib diisi.',
-            'email.email' => 'Email identitas Guru tidak valid.',
-            'email_login.required' => 'Email login wajib diisi.',
-            'email_login.email' => 'Email login tidak valid.',
-            'email_login.unique' => 'Email login sudah digunakan.',
+            'email.required' => 'Email Guru wajib diisi.',
+            'email.email' => 'Email Guru tidak valid.',
+            'email.unique' => 'Email sudah digunakan pada data Guru atau akun pengguna.',
             'password_login.required' => 'Kata sandi wajib diisi.',
             'password_login.min' => 'Kata sandi minimal 8 karakter.',
             'password_login.confirmed' => 'Konfirmasi kata sandi tidak sama.',

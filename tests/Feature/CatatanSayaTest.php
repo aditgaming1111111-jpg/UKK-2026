@@ -54,6 +54,13 @@ class CatatanSayaTest extends TestCase
             ], false)
             ->assertDontSee('Siswa Guru Lain')
             ->assertDontSee('2000000002');
+
+        $this->actingAs($otherContext['user'])
+            ->get(route('guru.my-notes.index'))
+            ->assertViewHas('records', fn ($records): bool => $records->total() === 1
+                && $records->getCollection()->first()->is($otherRecord))
+            ->assertSee('Siswa Guru Lain')
+            ->assertDontSee('Siswa Milik Saya');
     }
 
     public function test_guru_can_search_own_notes_by_student_name_or_nisn(): void

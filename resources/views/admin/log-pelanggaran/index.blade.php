@@ -12,7 +12,7 @@
 
 @section('content')
     <x-ui.card>
-        <form method="GET" class="flex flex-col gap-3 sm:flex-row">
+        <form method="GET" class="flex flex-col gap-3 sm:flex-row sm:items-end">
             <x-ui.search placeholder="Cari nama siswa, NISN, atau pengguna" :value="$search" class="flex-1" />
             <x-ui.button type="submit">Cari</x-ui.button>
         </form>

@@ -50,7 +50,7 @@ class GuruController extends Controller
         $guru = DB::transaction(static function () use ($data): Guru {
             $user = User::query()->create([
                 'nama' => $data['nama'],
-                'email' => Str::lower(trim($data['email_login'])),
+                'email' => Str::lower(trim($data['email'])),
                 'password' => $data['password_login'],
                 'role' => 'guru',
             ]);
@@ -111,7 +111,10 @@ class GuruController extends Controller
                     ]);
                 }
 
-                $user->update(['nama' => $lockedGuru->nama]);
+                $user->update([
+                    'nama' => $lockedGuru->nama,
+                    'email' => $lockedGuru->email,
+                ]);
             }
         });
 
@@ -140,11 +143,9 @@ class GuruController extends Controller
 
         DB::transaction(function () use ($guru, $data): void {
             $lockedGuru = Guru::query()->whereKey($guru->id)->lockForUpdate()->firstOrFail();
-            $email = Str::lower(trim($data['email_login']));
-
             if ($lockedGuru->user_id === null) {
                 throw ValidationException::withMessages([
-                    'email_login' => 'Identitas Guru tidak memiliki akun login yang valid.',
+                    'password_login' => 'Identitas Guru tidak memiliki akun login yang valid.',
                 ]);
             }
 
@@ -152,11 +153,11 @@ class GuruController extends Controller
 
             if ($user->role !== 'guru') {
                 throw ValidationException::withMessages([
-                    'email_login' => 'Akun terhubung tidak memiliki role Guru. Relasi akun tidak diubah.',
+                    'password_login' => 'Akun terhubung tidak memiliki role Guru. Relasi akun tidak diubah.',
                 ]);
             }
 
-            $user->email = $email;
+            $user->email = $lockedGuru->email;
 
             if (! empty($data['password_login'])) {
                 $user->password = $data['password_login'];

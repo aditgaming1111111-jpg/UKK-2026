@@ -43,7 +43,7 @@
                     <dd class="mt-1 text-sm text-gray-800">{{ $teacher->nama }}</dd>
                 </div>
                 <div class="sm:col-span-2">
-                    <dt class="text-xs font-medium uppercase tracking-wide text-gray-500">Email identitas</dt>
+                    <dt class="text-xs font-medium uppercase tracking-wide text-gray-500">Email</dt>
                     <dd class="mt-1 text-sm text-gray-800">{{ $teacher->email }}</dd>
                 </div>
                 <div>
@@ -69,16 +69,17 @@
             @else
                 <form method="POST" action="{{ route('admin.teachers.account.update', $teacher) }}" class="mt-5 space-y-4">
                     @csrf @method('PUT')
-                    <x-ui.input label="Email login" name="email_login" type="email" :value="$teacher->user?->email" required />
-                    <p class="-mt-2 text-xs text-gray-500">Kosongkan kata sandi jika tidak ingin menggantinya. Status login
-                        mengikuti status Guru.</p>
+                    <p class="text-sm text-gray-800">Email login: <span class="font-medium">{{ $teacher->email }}</span></p>
+                    @if ($teacher->user->email !== $teacher->email)
+                        <p role="alert" class="rounded-lg border border-gray-300 bg-gray-50 p-3 text-sm text-gray-700">Email akun lama berbeda. Simpan perubahan email pada halaman Edit Identitas untuk menyamakan email identitas dan login.</p>
+                    @endif
+                    <p class="text-xs text-gray-500">Email login mengikuti email identitas. Kosongkan kata sandi jika tidak ingin menggantinya. Status login mengikuti status Guru.</p>
                     <x-ui.input label="Kata sandi baru (opsional)" name="password_login" type="password"
                         autocomplete="new-password" hint="Minimal 8 karakter." />
                     <x-ui.input label="Konfirmasi kata sandi" name="password_login_confirmation" type="password"
                         autocomplete="new-password" />
                     @if ($teacher->user)
-                        <p class="text-xs text-gray-500">Akun: {{ $teacher->user->email }} · Role:
-                            {{ $teacher->user->role }} · {{ $teacher->status_aktif ? 'Aktif' : 'Nonaktif' }}</p>
+                        <p class="text-xs text-gray-500">Role: {{ $teacher->user->role }} · {{ $teacher->status_aktif ? 'Aktif' : 'Nonaktif' }}</p>
                     @endif
                     <div class="flex justify-end"><x-ui.button type="submit">Simpan akun</x-ui.button></div>
                 </form>

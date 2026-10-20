@@ -64,6 +64,54 @@ class KelasManagementTest extends TestCase
             ->assertViewHas('classes', fn ($classes): bool => $classes->count() === 1 && $classes->total() === 11);
     }
 
+    public function test_class_detail_shows_only_active_students_placed_in_the_active_academic_year(): void
+    {
+        $administrator = User::factory()->state(['role' => 'admin'])->create();
+        $kelas = Kelas::factory()->create(['nama_kelas' => 'XI RPL 2']);
+        $activeYear = TahunAjaran::factory()->create(['nama_tahun_ajaran' => '2026/2027', 'status_aktif' => true]);
+        $oldYear = TahunAjaran::factory()->create(['nama_tahun_ajaran' => '2025/2026', 'status_aktif' => false]);
+        $currentStudent = Siswa::factory()->create(['nama' => 'Siswa Tahun Aktif']);
+        $oldStudent = Siswa::factory()->create(['nama' => 'Siswa Riwayat Lama']);
+        $inactiveStudent = Siswa::factory()->create(['nama' => 'Siswa Nonaktif', 'status_siswa' => 'nonaktif']);
+
+        KelasSiswa::factory()->for($currentStudent, 'siswa')->for($kelas, 'kelas')->for($activeYear, 'tahunAjaran')->create();
+        KelasSiswa::factory()->for($oldStudent, 'siswa')->for($kelas, 'kelas')->for($oldYear, 'tahunAjaran')->create([
+            'status_aktif' => false,
+            'tanggal_selesai' => $oldYear->tanggal_selesai,
+        ]);
+        KelasSiswa::factory()->for($inactiveStudent, 'siswa')->for($kelas, 'kelas')->for($activeYear, 'tahunAjaran')->create();
+
+        $this->actingAs($administrator)->get(route('admin.classes.show', $kelas))
+            ->assertOk()
+            ->assertSee('Siswa Tahun Aktif')
+            ->assertSee('2026/2027')
+            ->assertDontSee('Siswa Riwayat Lama')
+            ->assertDontSee('Siswa Nonaktif')
+            ->assertViewHas('placements', fn ($placements): bool => $placements->total() === 1);
+    }
+
+    public function test_class_detail_roster_search_and_pagination_keep_the_search_query(): void
+    {
+        $administrator = User::factory()->state(['role' => 'admin'])->create();
+        $kelas = Kelas::factory()->create();
+        $activeYear = TahunAjaran::factory()->create();
+        Siswa::factory()->count(12)->sequence(fn ($sequence): array => [
+            'nama' => 'Siswa Roster '.str_pad((string) $sequence->index, 2, '0', STR_PAD_LEFT),
+        ])->create()->each(fn (Siswa $siswa) => KelasSiswa::factory()
+            ->for($siswa, 'siswa')->for($kelas, 'kelas')->for($activeYear, 'tahunAjaran')->create());
+
+        $firstPage = $this->actingAs($administrator)->get(route('admin.classes.show', $kelas));
+        $firstPage->assertViewHas('placements', fn ($placements): bool => $placements->count() === 10 && $placements->total() === 12);
+
+        $this->get(route('admin.classes.show', ['kelas' => $kelas, 'q' => 'Siswa Roster', 'page' => 2]))
+            ->assertOk()
+            ->assertSee('Siswa Roster 10')
+            ->assertSee('Siswa Roster 11')
+            ->assertDontSee('Siswa Roster 00')
+            ->assertSee('q=Siswa%20Roster')
+            ->assertViewHas('placements', fn ($placements): bool => $placements->count() === 2 && $placements->total() === 12);
+    }
+
     public function test_teacher_cannot_access_class_management(): void
     {
         $teacher = Guru::factory()->create();

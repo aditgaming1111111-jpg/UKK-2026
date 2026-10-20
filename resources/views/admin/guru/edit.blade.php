@@ -9,7 +9,7 @@
 ]" />@endsection
 
 @section('page-heading')<x-ui.page-heading title="Edit Identitas Guru"
-    description="Perbarui data {{ $teacher->nama }}. Email login dikelola terpisah." />@endsection
+    description="Perbarui data Guru dan email yang digunakan untuk login." />@endsection
 
 @section('content')
     <x-ui.card>

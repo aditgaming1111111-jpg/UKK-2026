@@ -27,7 +27,7 @@
                     <h2 class="text-base font-semibold">Daftar catatan terbaru</h2>
                     <p class="mt-1 text-sm text-gray-500">Contoh tabel, pencarian, filter, dan status.</p>
                 </div>
-                <div class="flex flex-col gap-3 sm:flex-row"><x-ui.search placeholder="Cari nama siswa"
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-end"><x-ui.search placeholder="Cari nama siswa"
                         class="sm:w-56" /><x-ui.filter label="Kelas"><select
                             class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-200">
                             <option>Semua kelas</option>

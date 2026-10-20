@@ -11,18 +11,16 @@
     <x-ui.card>
         <form method="POST" action="{{ route('admin.teachers.store') }}">
             @csrf
-            <h2 class="text-base font-semibold text-gray-950">Identitas Guru</h2>
+            <h2 class="text-base font-semibold text-gray-950">Identitas dan akun Guru</h2>
             <div class="mt-4 grid gap-5 sm:grid-cols-2"><x-ui.input label="NIP" name="nip" required /><x-ui.input
                     label="Nama lengkap" name="nama" required />
-                <div class="sm:col-span-2"><x-ui.input label="Email identitas Guru" name="email" type="email"
-                        hint="Email kontak Guru, terpisah dari email untuk login." required /></div>
+                <div class="sm:col-span-2"><x-ui.input label="Email" name="email" type="email"
+                        hint="Email ini digunakan untuk identitas Guru sekaligus login." required /></div>
             </div>
             <div class="mt-7 border-t border-gray-200 pt-6">
                 <h2 class="text-base font-semibold text-gray-950">Akun login</h2>
-                <p class="mt-1 text-sm text-gray-500">Sesuai relasi database, setiap identitas Guru harus terhubung ke satu
-                    akun dengan role Guru.</p>
-                <div class="mt-4 grid gap-5 sm:grid-cols-2"><x-ui.input label="Email login" name="email_login"
-                        type="email" required /><x-ui.input label="Kata sandi login" name="password_login" type="password"
+                <p class="mt-1 text-sm text-gray-500">Akun dibuat dengan role Guru dan menggunakan email di atas.</p>
+                <div class="mt-4 grid gap-5 sm:grid-cols-2"><x-ui.input label="Kata sandi login" name="password_login" type="password"
                         autocomplete="new-password" hint="Minimal 8 karakter." required /><x-ui.input
                         label="Konfirmasi kata sandi" name="password_login_confirmation" type="password"
                         autocomplete="new-password" required /></div>

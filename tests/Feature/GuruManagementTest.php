@@ -33,8 +33,7 @@ class GuruManagementTest extends TestCase
         $response = $this->actingAs($administrator)->post(route('admin.teachers.store'), [
             'nip' => '198700123',
             'nama' => 'Rina Puspita',
-            'email' => 'rina.contact@example.test',
-            'email_login' => 'RINA.LOGIN@example.test',
+            'email' => 'RINA.LOGIN@example.test',
             'password_login' => 'rahasia-guru-2026',
             'password_login_confirmation' => 'rahasia-guru-2026',
             'role' => 'admin',
@@ -48,6 +47,7 @@ class GuruManagementTest extends TestCase
         $this->assertTrue(Hash::check('rahasia-guru-2026', $user->password));
         $this->assertTrue($teacher->user->is($user));
         $this->assertTrue($user->guru->is($teacher));
+        $this->assertSame($teacher->email, $user->email);
     }
 
     public function test_admin_needs_no_teacher_record_and_teacher_creation_requires_a_linked_login(): void
@@ -58,7 +58,7 @@ class GuruManagementTest extends TestCase
             'nip' => '198700124',
             'nama' => 'Guru Tanpa Login',
             'email' => 'contact@example.test',
-        ])->assertSessionHasErrors(['email_login', 'password_login']);
+        ])->assertSessionHasErrors(['password_login']);
 
         $this->assertModelExists($administrator);
         $this->assertNull($administrator->guru);
@@ -66,7 +66,7 @@ class GuruManagementTest extends TestCase
         $this->assertDatabaseMissing('t_guru', ['nip' => '198700124']);
     }
 
-    public function test_duplicate_login_email_is_rejected_without_creating_a_teacher(): void
+    public function test_duplicate_email_is_rejected_without_creating_a_teacher(): void
     {
         $administrator = User::factory()->create(['role' => 'admin']);
         User::factory()->create(['email' => 'same.login@example.test']);
@@ -75,12 +75,11 @@ class GuruManagementTest extends TestCase
             ->post(route('admin.teachers.store'), [
                 'nip' => '198700125',
                 'nama' => 'Guru Email Duplikat',
-                'email' => 'contact@example.test',
-                'email_login' => 'SAME.LOGIN@example.test',
+                'email' => 'SAME.LOGIN@example.test',
                 'password_login' => 'rahasia-guru-2026',
                 'password_login_confirmation' => 'rahasia-guru-2026',
             ])
-            ->assertSessionHasErrors(['email_login' => 'Email login sudah digunakan.']);
+            ->assertSessionHasErrors(['email' => 'Email sudah digunakan pada data Guru atau akun pengguna.']);
 
         $this->assertDatabaseMissing('t_guru', ['nip' => '198700125']);
     }
@@ -98,7 +97,7 @@ class GuruManagementTest extends TestCase
         $this->assertNull($orphanTeacherAccount->fresh()->guru);
     }
 
-    public function test_admin_can_update_teacher_identity_and_login_email_without_breaking_the_relation(): void
+    public function test_admin_can_update_teacher_email_and_keep_identity_and_login_in_sync(): void
     {
         $administrator = User::factory()->create(['role' => 'admin']);
         $teacher = Guru::factory()->for(User::factory()->state([
@@ -110,11 +109,11 @@ class GuruManagementTest extends TestCase
         $this->actingAs($administrator)->put(route('admin.teachers.update', $teacher), [
             'nip' => $teacher->nip,
             'nama' => 'Nama Sesudah',
-            'email' => 'contact.updated@example.test',
+            'email' => 'UPDATED.LOGIN@example.test',
         ])->assertRedirect(route('admin.teachers.show', $teacher));
 
         $this->actingAs($administrator)->put(route('admin.teachers.account.update', $teacher), [
-            'email_login' => 'UPDATED.LOGIN@example.test',
+            'email_login' => 'ignored@example.test',
             'password_login' => '',
             'password_login_confirmation' => '',
         ])->assertRedirect(route('admin.teachers.show', $teacher));
@@ -124,7 +123,7 @@ class GuruManagementTest extends TestCase
         $this->assertDatabaseHas('t_guru', [
             'id' => $teacher->id,
             'nama' => 'Nama Sesudah',
-            'email' => 'contact.updated@example.test',
+            'email' => 'updated.login@example.test',
             'user_id' => $user->id,
         ]);
         $this->assertDatabaseHas('t_users', [
@@ -137,18 +136,18 @@ class GuruManagementTest extends TestCase
         $this->assertTrue($user->guru->is($teacher));
     }
 
-    public function test_teacher_login_email_cannot_be_changed_to_another_users_email(): void
+    public function test_teacher_email_cannot_be_changed_to_another_users_email(): void
     {
         $administrator = User::factory()->create(['role' => 'admin']);
         $teacher = Guru::factory()->create();
         User::factory()->create(['email' => 'already.used@example.test']);
 
         $this->actingAs($administrator)->from(route('admin.teachers.show', $teacher))
-            ->put(route('admin.teachers.account.update', $teacher), [
-                'email_login' => 'already.used@example.test',
-                'password_login' => '',
-                'password_login_confirmation' => '',
-            ])->assertSessionHasErrors(['email_login' => 'Email login sudah digunakan.']);
+            ->put(route('admin.teachers.update', $teacher), [
+                'nip' => $teacher->nip,
+                'nama' => $teacher->nama,
+                'email' => 'already.used@example.test',
+            ])->assertSessionHasErrors(['email' => 'Email sudah digunakan pada data Guru atau akun pengguna lain.']);
 
         $this->assertDatabaseHas('t_users', ['id' => $teacher->user_id, 'email' => $teacher->user->email]);
     }

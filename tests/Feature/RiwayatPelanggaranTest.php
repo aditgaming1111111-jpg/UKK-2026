@@ -12,7 +12,6 @@ use App\Models\PelanggaranSiswa;
 use App\Models\Siswa;
 use App\Models\TahunAjaran;
 use App\Models\User;
-use App\Models\WaliKelas;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -90,34 +89,91 @@ class RiwayatPelanggaranTest extends TestCase
             ->assertSee('q=Admin%20Pagination');
     }
 
-    public function test_teacher_history_is_limited_to_own_or_assigned_class_records_and_cannot_correct_another_teachers_record(): void
+    public function test_all_teachers_can_view_full_history_and_other_authors_records_without_homeroom_assignment(): void
     {
         $context = $this->recordingContext();
         $ownRecord = $this->createRecord($context);
-        $otherTeacherUser = User::factory()->create(['role' => 'guru']);
-        $otherTeacher = Guru::factory()->for($otherTeacherUser, 'user')->create();
-        $sharedRecord = $this->createRecord($context, $otherTeacher);
+        $otherContext = $this->recordingContext();
+        $recordByOtherTeacher = $this->createRecord($context, $otherContext['teacher']);
+        $recordByFirstTeacherInOtherClass = $this->createRecord($otherContext, $context['teacher']);
         $unrelatedContext = $this->recordingContext();
-        $unrelatedRecord = $this->createRecord($unrelatedContext, $otherTeacher);
-        WaliKelas::factory()->for($context['teacher'], 'guru')
-            ->for($context['class'], 'kelas')->for($context['year'], 'tahunAjaran')
-            ->create([
-                'tanggal_mulai' => now()->subDay()->toDateString(),
-                'tanggal_selesai' => now()->addDay()->toDateString(),
-                'status_aktif' => true,
-            ]);
+        $unrelatedRecord = $this->createRecord($unrelatedContext);
+        $this->assertDatabaseCount('t_wali_kelas', 0);
 
         $this->actingAs($context['user'])->get(route('guru.violations.index'))
             ->assertOk()
-            ->assertViewHas('records', fn ($records): bool => $records->total() === 2
+            ->assertViewHas('records', fn ($records): bool => $records->total() === 4
                 && $records->getCollection()->contains(fn (PelanggaranSiswa $record): bool => $record->is($ownRecord))
-                && $records->getCollection()->contains(fn (PelanggaranSiswa $record): bool => $record->is($sharedRecord)))
-            ->assertDontSee($unrelatedContext['student']->nisn);
+                && $records->getCollection()->contains(fn (PelanggaranSiswa $record): bool => $record->is($recordByOtherTeacher))
+                && $records->getCollection()->contains(fn (PelanggaranSiswa $record): bool => $record->is($recordByFirstTeacherInOtherClass))
+                && $records->getCollection()->contains(fn (PelanggaranSiswa $record): bool => $record->is($unrelatedRecord)));
 
-        $this->get(route('guru.violations.show', $sharedRecord))->assertOk();
-        $this->put(route('guru.violations.update', $sharedRecord), $this->updatePayload($sharedRecord))
+        $this->get(route('guru.violations.show', $recordByOtherTeacher))->assertOk();
+        $this->get(route('guru.violations.show', $unrelatedRecord))->assertOk();
+        $this->put(route('guru.violations.update', $recordByOtherTeacher), $this->updatePayload($recordByOtherTeacher))
             ->assertForbidden();
-        $this->get(route('guru.violations.show', $unrelatedRecord))->assertForbidden();
+
+        $this->actingAs($otherContext['user'])->get(route('guru.violations.index'))
+            ->assertViewHas('records', fn ($records): bool => $records->total() === 4
+                && $records->getCollection()->contains(fn (PelanggaranSiswa $record): bool => $record->is($recordByOtherTeacher))
+                && $records->getCollection()->contains(fn (PelanggaranSiswa $record): bool => $record->is($recordByFirstTeacherInOtherClass))
+                && $records->getCollection()->contains(fn (PelanggaranSiswa $record): bool => $record->is($unrelatedRecord)));
+        $this->get(route('guru.violations.show', $recordByFirstTeacherInOtherClass))->assertOk();
+    }
+
+    public function test_teacher_history_search_filters_and_pagination_include_other_teachers_and_cancelled_notes(): void
+    {
+        $context = $this->recordingContext();
+        $otherContext = $this->recordingContext();
+        $records = collect(range(1, 12))->map(fn (): PelanggaranSiswa => $this->createRecord($context, $otherContext['teacher']));
+        $cancelledRecord = $this->createRecord($context, $otherContext['teacher'], status: 'dibatalkan');
+        $filters = [
+            'q' => $context['student']->nisn,
+            'tahun_ajaran_id' => $context['year']->id,
+            'kelas_id' => $context['class']->id,
+            'guru_id' => $otherContext['teacher']->id,
+            'status' => 'aktif',
+        ];
+
+        $firstPage = $this->actingAs($context['user'])->get(route('guru.violations.index', $filters));
+        $firstPage->assertOk()
+            ->assertViewHas('records', fn ($page): bool => $page->count() === 10 && $page->total() === 12)
+            ->assertSee($otherContext['teacher']->nama);
+
+        $this->get(route('guru.violations.index', [...$filters, 'page' => 2]))
+            ->assertOk()
+            ->assertViewHas('records', fn ($page): bool => $page->count() === 2 && $page->total() === 12)
+            ->assertSee('q='.$context['student']->nisn)
+            ->assertSee('tahun_ajaran_id='.$context['year']->id)
+            ->assertSee('kelas_id='.$context['class']->id)
+            ->assertSee('guru_id='.$otherContext['teacher']->id)
+            ->assertViewHas('records', fn ($page): bool => ! $page->getCollection()->contains(fn (PelanggaranSiswa $record): bool => $record->is($cancelledRecord)));
+
+        $this->get(route('guru.violations.index', [...$filters, 'status' => 'dibatalkan']))
+            ->assertViewHas('records', fn ($page): bool => $page->total() === 1
+                && $page->getCollection()->first()->is($cancelledRecord))
+            ->assertSee('Dibatalkan');
+        $this->assertCount(12, $records);
+    }
+
+    public function test_new_teacher_without_homeroom_assignment_can_view_all_older_history(): void
+    {
+        $authorContext = $this->recordingContext();
+        $permittedRecord = $this->createRecord($authorContext);
+        $permittedRecord->update(['tanggal_pelanggaran' => now()->subDays(5)->toDateString()]);
+        $outsidePeriodRecord = $this->createRecord($authorContext);
+        $outsidePeriodRecord->update(['tanggal_pelanggaran' => now()->subDays(20)->toDateString()]);
+
+        $newTeacherUser = User::factory()->create(['role' => 'guru']);
+        Guru::factory()->for($newTeacherUser, 'user')->create();
+        $this->assertDatabaseCount('t_wali_kelas', 0);
+
+        $this->actingAs($newTeacherUser)->get(route('guru.violations.index'))
+            ->assertOk()
+            ->assertViewHas('records', fn ($records): bool => $records->total() === 2
+                && $records->getCollection()->contains(fn (PelanggaranSiswa $record): bool => $record->is($permittedRecord))
+                && $records->getCollection()->contains(fn (PelanggaranSiswa $record): bool => $record->is($outsidePeriodRecord)))
+            ->assertSee($permittedRecord->penempatanKelas->siswa->nama);
     }
 
     public function test_teacher_can_correct_own_record_and_audit_before_after_data_and_reason(): void

@@ -40,17 +40,6 @@
         </span>
     </a>
 
-    <div class="flex items-center gap-3 border-b border-gray-100 px-5 py-4">
-        <span
-            class="grid size-9 place-items-center rounded-full border border-gray-300 bg-gray-100 text-xs font-semibold text-gray-700">
-            {{ str($roleTitle)->substr(0, 1) }}
-        </span>
-        <span class="min-w-0">
-            <span class="block truncate text-sm font-medium">{{ $roleTitle }}</span>
-            <span class="block text-xs text-gray-500">Ruang kerja</span>
-        </span>
-    </div>
-
     <nav class="flex-1 space-y-1 overflow-y-auto px-3 py-4" aria-label="Navigasi {{ $roleTitle }}">
         <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-400">Menu utama</p>
         @foreach ($menuItems as $item)
@@ -73,6 +62,15 @@
                 </span>
             @endif
         @endforeach
+
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit"
+                class="group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-600 transition hover:bg-gray-100 hover:text-gray-950 focus-visible:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 motion-reduce:transition-none">
+                <x-ui.icon name="logout" class="size-[18px] shrink-0" />
+                <span class="min-w-0 flex-1 truncate">Keluar</span>
+            </button>
+        </form>
     </nav>
 
     <div class="border-t border-gray-200 px-5 py-3 text-xs text-gray-500">SekolahKu <span aria-hidden="true">·</span>
