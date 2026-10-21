@@ -26,7 +26,7 @@ class UpdateProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama' => ['required', 'string', 'max:255'],
+            'nama' => ['required', 'string', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('t_users', 'email')->ignore($this->user()?->id)],
         ];
     }
@@ -40,7 +40,7 @@ class UpdateProfileRequest extends FormRequest
     {
         return [
             'nama.required' => 'Nama wajib diisi.',
-            'nama.max' => 'Nama maksimal 255 karakter.',
+            'nama.max' => 'Nama maksimal 100 karakter.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Masukkan alamat email yang valid.',
             'email.unique' => 'Email sudah digunakan akun lain.',

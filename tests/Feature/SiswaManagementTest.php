@@ -81,6 +81,44 @@ class SiswaManagementTest extends TestCase
         $this->assertDatabaseCount('t_siswa', 1);
     }
 
+    public function test_student_name_is_limited_to_one_hundred_characters_on_create_and_update(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $this->actingAs($administrator);
+        $name = str_repeat('S', 100);
+
+        $this->post(route('admin.students.store'), [
+            'nisn' => '1234567890',
+            'nama' => $name,
+            'jenis_kelamin' => 'L',
+            'tahun_masuk' => 2026,
+        ])->assertRedirect();
+
+        $student = Siswa::query()->where('nisn', '1234567890')->firstOrFail();
+        $this->assertSame($name, $student->nama);
+
+        $this->from(route('admin.students.create'))->post(route('admin.students.store'), [
+            'nisn' => '1234567891',
+            'nama' => str_repeat('S', 101),
+            'jenis_kelamin' => 'L',
+            'tahun_masuk' => 2026,
+        ])->assertSessionHasErrors(['nama' => 'Nama siswa maksimal 100 karakter.']);
+
+        $this->from(route('admin.students.edit', $student))->put(route('admin.students.update', $student), [
+            'nisn' => $student->nisn,
+            'nama' => str_repeat('S', 101),
+            'jenis_kelamin' => 'L',
+            'tahun_masuk' => 2026,
+        ])->assertSessionHasErrors(['nama' => 'Nama siswa maksimal 100 karakter.']);
+
+        $this->put(route('admin.students.update', $student), [
+            'nisn' => $student->nisn,
+            'nama' => $name,
+            'jenis_kelamin' => 'L',
+            'tahun_masuk' => 2026,
+        ])->assertRedirect(route('admin.students.show', $student));
+    }
+
     public function test_admin_can_reactivate_student_and_status_changes_preserve_class_and_violation_history(): void
     {
         $administrator = User::factory()->create(['role' => 'admin']);

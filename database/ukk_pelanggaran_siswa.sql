@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Oct 19, 2026 at 02:34 PM
+-- Generation Time: Oct 20, 2026 at 12:58 PM
 -- Server version: 8.4.3
 -- PHP Version: 8.3.30
 
@@ -40,6 +40,8 @@ CREATE TABLE `cache` (
 INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
 ('sekolahku-cache-818cb4847ce323a3aa5cc5587b165e84dcc60a71', 'i:1;', 1792073405),
 ('sekolahku-cache-818cb4847ce323a3aa5cc5587b165e84dcc60a71:timer', 'i:1792073405;', 1792073405),
+('sekolahku-cache-9fb7e9d5af1dbc37c9464e14407f3a9299f9bce6', 'i:1;', 1792498856),
+('sekolahku-cache-9fb7e9d5af1dbc37c9464e14407f3a9299f9bce6:timer', 'i:1792498856;', 1792498856),
 ('sekolahku-cache-bb2926e45c06ec8262bb785a3aae4dd2ffaca6d2', 'i:1;', 1792069644),
 ('sekolahku-cache-bb2926e45c06ec8262bb785a3aae4dd2ffaca6d2:timer', 'i:1792069644;', 1792069644),
 ('sekolahku-cache-fc26eb645d3edf739579e766ba23e8f5291583bb', 'i:1;', 1791991221),
@@ -164,7 +166,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('ZLPcXwwvITg7MdFf07IoFQHJjdjSG81m6m7pVmad', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJWR01nYjZaNmg4OWg3cGJjMkVnRTUzbnFscjlyc1MybG95ZTQ2dVFpIiwiX2ZsYXNoIjp7Im5ldyI6W10sIm9sZCI6W119LCJfcHJldmlvdXMiOnsidXJsIjoiaHR0cDpcL1wvbG9jYWxob3N0OjgwMDBcL2FkbWluIiwicm91dGUiOiJhZG1pbi5kYXNoYm9hcmQifSwibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiOjEsInBhc3N3b3JkX2hhc2hfd2ViIjoiNmMzNGM2N2I4ZTc4YTgxNDhlNjBmNTMzOTllNzA5ZDA5N2Q0NGMxNWExZDM4ZWQyOTkwZDcwMDdhMWM1YWE3NyJ9', 1792420360);
+('WhekWjycCkP8Od9pOF6iBMhn5UMrIwjOqbfxxGvG', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJKMVlaRElUN3AxUU5yNWxhZUVOSHhneEFpSVM3SUtWNmRmWXJHUVU2IiwiX2ZsYXNoIjp7Im5ldyI6W10sIm9sZCI6W119LCJfcHJldmlvdXMiOnsidXJsIjoiaHR0cDpcL1wvbG9jYWxob3N0OjgwMDBcL2FkbWluIiwicm91dGUiOiJhZG1pbi5kYXNoYm9hcmQifSwibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiOjEsInBhc3N3b3JkX2hhc2hfd2ViIjoiNmMzNGM2N2I4ZTc4YTgxNDhlNjBmNTMzOTllNzA5ZDA5N2Q0NGMxNWExZDM4ZWQyOTkwZDcwMDdhMWM1YWE3NyJ9', 1792501085);
 
 -- --------------------------------------------------------
 
@@ -188,7 +190,9 @@ CREATE TABLE `t_guru` (
 --
 
 INSERT INTO `t_guru` (`id`, `nip`, `nama`, `email`, `status_aktif`, `user_id`, `created_at`, `updated_at`) VALUES
-(1, '1980010120260001', 'Anton Saputra', 'anton@sekolahku.com', 1, 2, '2026-10-14 07:47:00', '2026-10-14 08:16:53');
+(1, '1980010120260001', 'Anton Saputra', 'anton@sekolahku.com', 1, 2, '2026-10-14 07:47:00', '2026-10-14 08:16:53'),
+(2, '123456789123456789', 'Surya Santoso', 'surya@sekolahku.com', 1, 3, '2026-10-20 04:49:05', '2026-10-20 04:49:05'),
+(3, '123456780000000017', 'Andi Saputra', 'andisaputra@sekolahku.com', 1, 4, '2026-10-20 05:19:42', '2026-10-20 05:19:42');
 
 -- --------------------------------------------------------
 
@@ -210,7 +214,8 @@ CREATE TABLE `t_kelas` (
 --
 
 INSERT INTO `t_kelas` (`id`, `nama_kelas`, `tingkat`, `jurusan`, `created_at`, `updated_at`) VALUES
-(1, 'X RPL 1', '10', 'RPL', '2026-10-14 08:03:01', '2026-10-14 08:03:01');
+(1, 'X RPL 1', '10', 'RPL', '2026-10-14 08:03:01', '2026-10-14 08:03:01'),
+(2, 'X RPL 2', '10', 'RPL', '2026-10-20 04:51:16', '2026-10-20 04:51:16');
 
 -- --------------------------------------------------------
 
@@ -245,7 +250,8 @@ INSERT INTO `t_kelas_siswa` (`id`, `siswa_id`, `kelas_id`, `tahun_ajaran_id`, `t
 (8, 8, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:29:57', '2026-10-19 06:29:57'),
 (9, 11, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:30:16', '2026-10-19 06:30:16'),
 (10, 9, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:30:38', '2026-10-19 06:30:38'),
-(11, 5, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:30:57', '2026-10-19 06:30:57');
+(11, 5, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:30:57', '2026-10-19 06:30:57'),
+(12, 12, 2, 1, '2026-07-01', NULL, 1, '2026-10-20 04:53:47', '2026-10-20 04:53:47');
 
 -- --------------------------------------------------------
 
@@ -387,7 +393,8 @@ INSERT INTO `t_siswa` (`id`, `nisn`, `nama`, `jenis_kelamin`, `alamat`, `tahun_m
 (8, '0000000006', 'Nijar Saputra', 'L', 'Ciamis', 2026, 'aktif', '2026-10-19 06:24:31', '2026-10-19 06:24:31'),
 (9, '0000000007', 'Sofi Nurjanah', 'P', 'Tasikamalaya', 2026, 'aktif', '2026-10-19 06:25:58', '2026-10-19 06:25:58'),
 (10, '0000000008', 'Arfa belingham', 'P', 'Tasimalaya', 2026, 'aktif', '2026-10-19 06:26:20', '2026-10-19 06:26:20'),
-(11, '0000000009', 'Ressa Juiansayah', 'L', 'Cilolohan', 2026, 'aktif', '2026-10-19 06:26:51', '2026-10-19 06:26:51');
+(11, '0000000009', 'Ressa Juiansayah', 'L', 'Cilolohan', 2026, 'aktif', '2026-10-19 06:26:51', '2026-10-19 06:26:51'),
+(12, '0000000078', 'Abdul somad', 'L', 'Tasik', 2026, 'aktif', '2026-10-20 04:53:35', '2026-10-20 04:53:35');
 
 -- --------------------------------------------------------
 
@@ -434,7 +441,9 @@ CREATE TABLE `t_users` (
 
 INSERT INTO `t_users` (`id`, `nama`, `email`, `password`, `created_at`, `updated_at`, `role`) VALUES
 (1, 'Administrator SekolahKu', 'admin@sekolahku.com', '$2y$12$pxbv9apoz8s2DbfzJ9OW2OvxptH6X/rJ/xL1pMH6L5Jc/XcOli67.', '2026-10-14 07:47:00', '2026-10-14 08:18:31', 'admin'),
-(2, 'Anton Saputra', 'anton@sekolahku.com', '$2y$12$YYmP6kFFK0dUqLsxe3MrRO9b5ce1NmXCS/4s10lEeLdNEHUvnWr16', '2026-10-14 07:47:00', '2026-10-14 08:20:32', 'guru');
+(2, 'Anton Saputra', 'anton@sekolahku.com', '$2y$12$YYmP6kFFK0dUqLsxe3MrRO9b5ce1NmXCS/4s10lEeLdNEHUvnWr16', '2026-10-14 07:47:00', '2026-10-14 08:20:32', 'guru'),
+(3, 'Surya Santoso', 'surya@sekolahku.com', '$2y$12$0QGsZ.AmqOlMmWhy1zVxMOhUMRn1PNBq7omrIbUw1b8sdetBgYpgW', '2026-10-20 04:49:05', '2026-10-20 04:49:05', 'guru'),
+(4, 'Andi Saputra', 'andisaputra@sekolahku.com', '$2y$12$dFvrKoQpG5O.myuNX51HKeuZQ1Mcn3YrQyQcRPf3R98aENqhja4my', '2026-10-20 05:19:42', '2026-10-20 05:19:42', 'guru');
 
 -- --------------------------------------------------------
 
@@ -630,19 +639,19 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT for table `t_guru`
 --
 ALTER TABLE `t_guru`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `t_kelas`
 --
 ALTER TABLE `t_kelas`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `t_kelas_siswa`
 --
 ALTER TABLE `t_kelas_siswa`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `t_log_pelanggaran`
@@ -672,7 +681,7 @@ ALTER TABLE `t_pelanggaran_siswa`
 -- AUTO_INCREMENT for table `t_siswa`
 --
 ALTER TABLE `t_siswa`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `t_tahun_ajaran`
@@ -684,7 +693,7 @@ ALTER TABLE `t_tahun_ajaran`
 -- AUTO_INCREMENT for table `t_users`
 --
 ALTER TABLE `t_users`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `t_wali_kelas`

@@ -116,6 +116,113 @@ class PelanggaranMasterManagementTest extends TestCase
         $this->assertDatabaseCount('t_pelanggaran', 1);
     }
 
+    public function test_violation_points_are_limited_to_one_through_one_hundred_on_create_and_update(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $category = PelanggaranKategori::factory()->create();
+        $this->actingAs($admin);
+
+        foreach ([0, -1, 101, 1000] as $invalidPoints) {
+            $this->from(route('admin.violations.create'))->post(route('admin.violations.store'), [
+                'kode' => 'PLG-INVALID-'.$invalidPoints,
+                'nama_pelanggaran' => 'Pelanggaran uji poin',
+                'kategori_id' => $category->id,
+                'poin' => $invalidPoints,
+            ])->assertSessionHasErrors(['poin' => 'Nilai poin harus antara 1 dan 100.']);
+        }
+
+        foreach ([1, 100] as $validPoints) {
+            $this->post(route('admin.violations.store'), [
+                'kode' => 'PLG-VALID-'.$validPoints,
+                'nama_pelanggaran' => 'Pelanggaran uji poin',
+                'kategori_id' => $category->id,
+                'poin' => $validPoints,
+            ])->assertRedirect();
+        }
+
+        $violation = Pelanggaran::factory()->for($category, 'kategori')->create(['poin' => 5]);
+
+        foreach ([0, -1, 101, 1000] as $invalidPoints) {
+            $this->from(route('admin.violations.edit', $violation))->put(route('admin.violations.update', $violation), [
+                'kode' => $violation->kode,
+                'nama_pelanggaran' => $violation->nama_pelanggaran,
+                'kategori_id' => $category->id,
+                'poin' => $invalidPoints,
+                'status_aktif' => '1',
+            ])->assertSessionHasErrors(['poin' => 'Nilai poin harus antara 1 dan 100.']);
+        }
+
+        foreach ([1, 100] as $validPoints) {
+            $this->put(route('admin.violations.update', $violation), [
+                'kode' => $violation->kode,
+                'nama_pelanggaran' => 'Pelanggaran uji poin',
+                'kategori_id' => $category->id,
+                'poin' => $validPoints,
+                'status_aktif' => '1',
+            ])->assertRedirect(route('admin.violations.show', $violation));
+
+            $this->assertDatabaseHas('t_pelanggaran', ['id' => $violation->id, 'poin' => $validPoints]);
+        }
+
+        $this->assertDatabaseCount('t_pelanggaran', 3);
+    }
+
+    public function test_violation_and_category_names_are_limited_to_one_hundred_characters(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $this->actingAs($admin);
+        $categoryName = str_repeat('K', 100);
+
+        $this->post(route('admin.violation-categories.store'), ['nama_kategori' => $categoryName])
+            ->assertRedirect();
+        $category = PelanggaranKategori::query()->firstOrFail();
+        $this->assertSame($categoryName, $category->nama_kategori);
+
+        $this->from(route('admin.violation-categories.create'))
+            ->post(route('admin.violation-categories.store'), ['nama_kategori' => str_repeat('K', 101)])
+            ->assertSessionHasErrors(['nama_kategori' => 'Nama kategori maksimal 100 karakter.']);
+
+        $this->from(route('admin.violation-categories.edit', $category))
+            ->put(route('admin.violation-categories.update', $category), ['nama_kategori' => str_repeat('K', 101)])
+            ->assertSessionHasErrors(['nama_kategori' => 'Nama kategori maksimal 100 karakter.']);
+
+        $this->put(route('admin.violation-categories.update', $category), ['nama_kategori' => $categoryName])
+            ->assertRedirect(route('admin.violation-categories.show', $category));
+
+        $violationName = str_repeat('P', 100);
+        $this->post(route('admin.violations.store'), [
+            'kode' => 'PLG-NAME-100',
+            'nama_pelanggaran' => $violationName,
+            'kategori_id' => $category->id,
+            'poin' => 1,
+        ])->assertRedirect();
+        $violation = Pelanggaran::query()->where('kode', 'PLG-NAME-100')->firstOrFail();
+        $this->assertSame($violationName, $violation->nama_pelanggaran);
+
+        $this->from(route('admin.violations.create'))->post(route('admin.violations.store'), [
+            'kode' => 'PLG-NAME-101',
+            'nama_pelanggaran' => str_repeat('P', 101),
+            'kategori_id' => $category->id,
+            'poin' => 1,
+        ])->assertSessionHasErrors(['nama_pelanggaran' => 'Nama pelanggaran maksimal 100 karakter.']);
+
+        $this->from(route('admin.violations.edit', $violation))->put(route('admin.violations.update', $violation), [
+            'kode' => $violation->kode,
+            'nama_pelanggaran' => str_repeat('P', 101),
+            'kategori_id' => $category->id,
+            'poin' => 1,
+            'status_aktif' => '1',
+        ])->assertSessionHasErrors(['nama_pelanggaran' => 'Nama pelanggaran maksimal 100 karakter.']);
+
+        $this->put(route('admin.violations.update', $violation), [
+            'kode' => $violation->kode,
+            'nama_pelanggaran' => $violationName,
+            'kategori_id' => $category->id,
+            'poin' => 1,
+            'status_aktif' => '1',
+        ])->assertRedirect(route('admin.violations.show', $violation));
+    }
+
     public function test_inactive_category_cannot_be_selected_for_a_new_violation(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);

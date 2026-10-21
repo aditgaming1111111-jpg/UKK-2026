@@ -50,6 +50,44 @@ class GuruManagementTest extends TestCase
         $this->assertSame($teacher->email, $user->email);
     }
 
+    public function test_teacher_name_is_limited_to_one_hundred_characters_on_create_and_update(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $this->actingAs($administrator);
+        $name = str_repeat('G', 100);
+
+        $this->post(route('admin.teachers.store'), [
+            'nip' => '198700123',
+            'nama' => $name,
+            'email' => 'guru.name@example.test',
+            'password_login' => 'rahasia-guru-2026',
+            'password_login_confirmation' => 'rahasia-guru-2026',
+        ])->assertRedirect();
+
+        $teacher = Guru::query()->where('nip', '198700123')->firstOrFail();
+        $this->assertSame($name, $teacher->nama);
+
+        $this->from(route('admin.teachers.create'))->post(route('admin.teachers.store'), [
+            'nip' => '198700124',
+            'nama' => str_repeat('G', 101),
+            'email' => 'guru.name.invalid@example.test',
+            'password_login' => 'rahasia-guru-2026',
+            'password_login_confirmation' => 'rahasia-guru-2026',
+        ])->assertSessionHasErrors(['nama' => 'Nama Guru maksimal 100 karakter.']);
+
+        $this->from(route('admin.teachers.edit', $teacher))->put(route('admin.teachers.update', $teacher), [
+            'nip' => $teacher->nip,
+            'nama' => str_repeat('G', 101),
+            'email' => $teacher->email,
+        ])->assertSessionHasErrors(['nama' => 'Nama Guru maksimal 100 karakter.']);
+
+        $this->put(route('admin.teachers.update', $teacher), [
+            'nip' => $teacher->nip,
+            'nama' => $name,
+            'email' => $teacher->email,
+        ])->assertRedirect(route('admin.teachers.show', $teacher));
+    }
+
     public function test_admin_needs_no_teacher_record_and_teacher_creation_requires_a_linked_login(): void
     {
         $administrator = User::factory()->create(['role' => 'admin']);

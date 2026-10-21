@@ -23,7 +23,7 @@ class StorePelanggaranKategoriRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama_kategori' => ['required', 'string', 'max:255'],
+            'nama_kategori' => ['required', 'string', 'max:100'],
             'deskripsi' => ['nullable', 'string', 'max:10000'],
         ];
     }
@@ -37,7 +37,7 @@ class StorePelanggaranKategoriRequest extends FormRequest
     {
         return [
             'nama_kategori.required' => 'Nama kategori wajib diisi.',
-            'nama_kategori.max' => 'Nama kategori maksimal 255 karakter.',
+            'nama_kategori.max' => 'Nama kategori maksimal 100 karakter.',
             'deskripsi.max' => 'Deskripsi kategori maksimal 10.000 karakter.',
         ];
     }

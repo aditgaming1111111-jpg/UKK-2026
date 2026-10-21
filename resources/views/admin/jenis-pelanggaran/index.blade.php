@@ -1,9 +1,77 @@
 @extends('layouts.admin')
 @section('title', 'Jenis Pelanggaran')
-@section('breadcrumbs')<x-ui.breadcrumbs :items="[['label' => 'Jenis Pelanggaran']]" />@endsection
-@section('page-heading')<x-ui.page-heading title="Jenis Pelanggaran" description="Kelola kode, kategori, nilai poin, serta status jenis pelanggaran."><x-ui.button :href="route('admin.violations.create')">Tambah jenis</x-ui.button></x-ui.page-heading>@endsection
+@section('breadcrumbs')<x-ui.breadcrumbs :items="[['label' => 'Jenis Pelanggaran']]" />
+@endsection
+@section('page-heading')<x-ui.page-heading title="Jenis Pelanggaran"
+        description="Kelola kode, kategori, nilai poin, serta status jenis pelanggaran."><x-ui.button
+        :href="route('admin.violations.create')">Tambah jenis</x-ui.button></x-ui.page-heading>@endsection
 @section('content')
-    @if(session('success'))<x-ui.toast>{{ session('success') }}</x-ui.toast>@endif
-    <x-ui.card><form method="GET" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><x-ui.search placeholder="Cari kode atau nama pelanggaran" :value="$filters['q'] ?? null"/><label class="space-y-1.5"><span class="block text-sm font-medium text-gray-700">Kategori</span><select name="kategori_id" class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200"><option value="">Semua kategori</option>@foreach($categories as $category)<option value="{{ $category->id }}" @selected((string)($filters['kategori_id'] ?? '') === (string)$category->id)>{{ $category->nama_kategori }}</option>@endforeach</select></label><label class="space-y-1.5"><span class="block text-sm font-medium text-gray-700">Status</span><select name="status" class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200"><option value="">Semua status</option><option value="aktif" @selected(($filters['status'] ?? '') === 'aktif')>Aktif</option><option value="nonaktif" @selected(($filters['status'] ?? '') === 'nonaktif')>Nonaktif</option></select></label><div class="flex items-end gap-2"><x-ui.button type="submit">Terapkan</x-ui.button><x-ui.button variant="secondary" :href="route('admin.violations.index')">Reset</x-ui.button></div></form></x-ui.card>
-    <x-ui.card :padding="false">@if($violations->isNotEmpty())<x-ui.table><thead class="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500"><tr><th class="px-5 py-3">Kode</th><th class="px-5 py-3">Nama pelanggaran</th><th class="px-5 py-3">Kategori</th><th class="px-5 py-3">Poin master</th><th class="px-5 py-3">Catatan</th><th class="px-5 py-3">Status</th><th class="px-5 py-3"></th></tr></thead><tbody class="divide-y divide-gray-100">@foreach($violations as $violation)<tr class="hover:bg-gray-50"><td class="whitespace-nowrap px-5 py-4 font-mono text-sm">{{ $violation->kode }}</td><td class="px-5 py-4"><a class="font-medium text-gray-900 hover:underline" href="{{ route('admin.violations.show', $violation) }}">{{ $violation->nama_pelanggaran }}</a></td><td class="px-5 py-4 text-sm">{{ $violation->kategori->nama_kategori }}@if(!$violation->kategori->status_aktif) <span class="text-xs text-gray-500">(nonaktif)</span>@endif</td><td class="px-5 py-4">{{ $violation->poin }}</td><td class="px-5 py-4">{{ $violation->catatan_siswa_count }}</td><td class="px-5 py-4"><x-ui.badge :variant="$violation->status_aktif ? 'dark' : 'outline'">{{ $violation->status_aktif ? 'Aktif' : 'Nonaktif' }}</x-ui.badge></td><td class="px-5 py-4 text-right"><a class="text-sm font-medium underline" href="{{ route('admin.violations.show', $violation) }}">Detail</a></td></tr>@endforeach</tbody></x-ui.table><div class="border-t border-gray-200 px-5 py-4"><x-ui.pagination :paginator="$violations" /></div>@else<div class="p-5"><x-ui.empty-state title="Jenis pelanggaran belum tersedia" description="Tambahkan jenis pada kategori aktif untuk digunakan dalam pencatatan."/><div class="mt-4 text-center"><x-ui.button size="sm" :href="route('admin.violations.create')">Tambah jenis</x-ui.button></div></div>@endif</x-ui.card>
+    @if (session('success'))
+        <x-ui.toast>{{ session('success') }}</x-ui.toast>
+    @endif
+    <x-ui.card>
+        <form method="GET" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><x-ui.search
+                placeholder="Cari kode atau nama pelanggaran" :value="$filters['q'] ?? null" /><label class="space-y-1.5"><span
+                    class="block text-sm font-medium text-gray-700">Kategori</span><select name="kategori_id"
+                    class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200">
+                    <option value="">Semua kategori</option>
+                    @foreach ($categories as $category)
+                        <option value="{{ $category->id }}" @selected((string) ($filters['kategori_id'] ?? '') === (string) $category->id)>{{ $category->nama_kategori }}
+                        </option>
+                    @endforeach
+                </select>
+            </label><label class="space-y-1.5"><span class="block text-sm font-medium text-gray-700">Status</span><select
+                    name="status"
+                    class="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200">
+                    <option value="">Semua status</option>
+                    <option value="aktif" @selected(($filters['status'] ?? '') === 'aktif')>Aktif</option>
+                    <option value="nonaktif" @selected(($filters['status'] ?? '') === 'nonaktif')>Nonaktif</option>
+                </select></label>
+            <div class="flex items-end gap-2"><x-ui.button type="submit">Terapkan</x-ui.button><x-ui.button
+                    variant="secondary" :href="route('admin.violations.index')">Reset</x-ui.button></div>
+        </form>
+    </x-ui.card>
+    <x-ui.card :padding="false">
+        @if ($violations->isNotEmpty())
+            <x-ui.table>
+                <thead class="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
+                    <tr>
+                        <th class="px-5 py-3">Kode</th>
+                        <th class="px-5 py-3">Nama pelanggaran</th>
+                        <th class="px-5 py-3">Kategori</th>
+                        <th class="px-5 py-3">Poin master</th>
+                        <th class="px-5 py-3">Catatan</th>
+                        <th class="px-5 py-3">Status</th>
+                        <th class="px-5 py-3"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @foreach ($violations as $violation)
+                        <tr class="hover:bg-gray-50">
+                            <td class="whitespace-nowrap px-5 py-4 font-mono text-sm">{{ $violation->kode }}</td>
+                            <td class="px-5 py-4"><a class="font-medium text-gray-900 hover:underline"
+                                    href="{{ route('admin.violations.show', $violation) }}">{{ $violation->nama_pelanggaran }}</a>
+                            </td>
+                            <td class="px-5 py-4 text-sm">{{ $violation->kategori->nama_kategori }}@if (!$violation->kategori->status_aktif)
+                                    <span class="text-xs text-gray-500">(nonaktif)</span>
+                                @endif
+                            </td>
+                            <td class="px-5 py-4">{{ $violation->poin }}</td>
+                            <td class="px-5 py-4">{{ $violation->catatan_siswa_count }}</td>
+                            <td class="px-5 py-4"><x-ui.badge
+                                    :variant="$violation->status_aktif ? 'dark' : 'outline'">{{ $violation->status_aktif ? 'Aktif' : 'Nonaktif' }}</x-ui.badge>
+                            </td>
+                            <td class="px-5 py-4 text-right"><a class="text-sm font-medium underline"
+                                    href="{{ route('admin.violations.show', $violation) }}">Detail</a></td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </x-ui.table>
+        <div class="border-t border-gray-200 px-5 py-4"><x-ui.pagination :paginator="$violations" /></div>@else<div
+                class="p-5"><x-ui.empty-state title="Jenis pelanggaran belum tersedia"
+                    description="Tambahkan jenis pada kategori aktif untuk digunakan dalam pencatatan." />
+                <div class="mt-4 text-center"><x-ui.button size="sm" :href="route('admin.violations.create')">Tambah jenis</x-ui.button></div>
+            </div>
+        @endif
+    </x-ui.card>
 @endsection

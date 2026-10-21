@@ -25,7 +25,7 @@ class StoreSiswaRequest extends FormRequest
     {
         return [
             'nisn' => ['required', 'digits:10', 'unique:t_siswa,nisn'],
-            'nama' => ['required', 'string', 'max:255'],
+            'nama' => ['required', 'string', 'max:100'],
             'jenis_kelamin' => ['required', Rule::in(['L', 'P'])],
             'alamat' => ['nullable', 'string', 'max:5000'],
             'tahun_masuk' => ['required', 'integer', 'between:1900,2100'],
@@ -39,7 +39,7 @@ class StoreSiswaRequest extends FormRequest
             'nisn.digits' => 'NISN harus terdiri dari 10 angka.',
             'nisn.unique' => 'NISN sudah terdaftar.',
             'nama.required' => 'Nama siswa wajib diisi.',
-            'nama.max' => 'Nama siswa maksimal 255 karakter.',
+            'nama.max' => 'Nama siswa maksimal 100 karakter.',
             'jenis_kelamin.required' => 'Jenis kelamin wajib dipilih.',
             'jenis_kelamin.in' => 'Jenis kelamin yang dipilih tidak valid.',
             'alamat.max' => 'Alamat maksimal 5000 karakter.',

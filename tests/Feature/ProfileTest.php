@@ -76,6 +76,26 @@ class ProfileTest extends TestCase
         $this->assertSame($user->email, $user->fresh()->email);
     }
 
+    public function test_profile_name_is_limited_to_one_hundred_characters(): void
+    {
+        $user = User::factory()->create(['role' => 'admin']);
+        $name = str_repeat('A', 100);
+
+        $this->actingAs($user)->put(route('profile.update'), [
+            'nama' => $name,
+            'email' => $user->email,
+        ])->assertRedirect(route('profile.edit'));
+
+        $this->assertSame($name, $user->fresh()->nama);
+
+        $this->from(route('profile.edit'))->put(route('profile.update'), [
+            'nama' => str_repeat('A', 101),
+            'email' => $user->email,
+        ])->assertSessionHasErrors(['nama' => 'Nama maksimal 100 karakter.']);
+
+        $this->assertSame($name, $user->fresh()->nama);
+    }
+
     public function test_password_change_requires_current_password_and_confirmed_new_password(): void
     {
         $user = User::factory()->create(['role' => 'admin', 'password' => 'current-secret']);

@@ -25,10 +25,10 @@ class StorePelanggaranRequest extends FormRequest
     {
         return [
             'kode' => ['required', 'string', 'max:30', Rule::unique('t_pelanggaran', 'kode')],
-            'nama_pelanggaran' => ['required', 'string', 'max:255'],
+            'nama_pelanggaran' => ['required', 'string', 'max:100'],
             'kategori_id' => ['required', 'integer', Rule::exists('t_pelanggaran_kategori', 'id')->where('status_aktif', true)],
             'deskripsi' => ['nullable', 'string', 'max:10000'],
-            'poin' => ['required', 'integer', 'min:1', 'max:65535'],
+            'poin' => ['required', 'integer', 'min:1', 'max:100'],
             'status_aktif' => ['sometimes', 'boolean'],
         ];
     }
@@ -49,14 +49,14 @@ class StorePelanggaranRequest extends FormRequest
             'kode.max' => 'Kode pelanggaran maksimal 30 karakter.',
             'kode.unique' => 'Kode pelanggaran sudah digunakan.',
             'nama_pelanggaran.required' => 'Nama pelanggaran wajib diisi.',
-            'nama_pelanggaran.max' => 'Nama pelanggaran maksimal 255 karakter.',
+            'nama_pelanggaran.max' => 'Nama pelanggaran maksimal 100 karakter.',
             'kategori_id.required' => 'Kategori pelanggaran wajib dipilih.',
             'kategori_id.exists' => 'Kategori tidak ditemukan atau sedang nonaktif.',
             'deskripsi.max' => 'Deskripsi maksimal 10.000 karakter.',
             'poin.required' => 'Nilai poin wajib diisi.',
             'poin.integer' => 'Nilai poin harus berupa bilangan bulat.',
-            'poin.min' => 'Nilai poin minimal 1.',
-            'poin.max' => 'Nilai poin maksimal 65.535.',
+            'poin.min' => 'Nilai poin harus antara 1 dan 100.',
+            'poin.max' => 'Nilai poin harus antara 1 dan 100.',
             'status_aktif.required' => 'Status jenis pelanggaran wajib ditentukan.',
             'status_aktif.boolean' => 'Status jenis pelanggaran tidak valid.',
         ];

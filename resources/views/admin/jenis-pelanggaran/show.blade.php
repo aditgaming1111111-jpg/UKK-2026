@@ -1,62 +1,102 @@
 @extends('layouts.admin')
 @section('title', 'Detail Jenis Pelanggaran')
-@section('breadcrumbs')<x-ui.breadcrumbs :items="[['label' => 'Jenis Pelanggaran', 'url' => route('admin.violations.index')], ['label' => $pelanggaran->kode]]" />@endsection
-@section('page-heading')<x-ui.page-heading title="{{ $pelanggaran->nama_pelanggaran }}" description="Kode {{ $pelanggaran->kode }} · {{ $pelanggaran->kategori->nama_kategori }}"><x-ui.button variant="secondary" :href="route('admin.violations.edit', $pelanggaran)">Edit jenis</x-ui.button></x-ui.page-heading>@endsection
+@section('breadcrumbs')<x-ui.breadcrumbs :items="[
+    ['label' => 'Jenis Pelanggaran', 'url' => route('admin.violations.index')],
+    ['label' => $pelanggaran->kode],
+]" />@endsection
+@section('page-heading')<x-ui.page-heading title="{{ $pelanggaran->nama_pelanggaran }}"
+        description="Kode {{ $pelanggaran->kode }} · {{ $pelanggaran->kategori->nama_kategori }}"><x-ui.button
+        variant="secondary" :href="route('admin.violations.edit', $pelanggaran)">Edit jenis</x-ui.button></x-ui.page-heading>@endsection
 @section('content')
-@if(session('success'))<x-ui.toast>{{ session('success') }}</x-ui.toast>@endif
-@if($errors->any())<x-ui.error-state title="Status belum diubah" :description="$errors->first()"/>@endif
-<x-ui.card>
-    <div class="flex flex-wrap items-start justify-between gap-4">
-        <div class="flex items-center gap-3">
-            <x-ui.badge :variant="$pelanggaran->status_aktif ? 'dark' : 'outline'">
-                {{ $pelanggaran->status_aktif ? 'Aktif' : 'Nonaktif' }}
-            </x-ui.badge>
-            @if (!$pelanggaran->kategori->status_aktif)
-                <x-ui.badge variant="outline">Kategori nonaktif</x-ui.badge>
-            @endif
+    @if (session('success'))
+        <x-ui.toast>{{ session('success') }}</x-ui.toast>
+    @endif
+    @if ($errors->any())
+        <x-ui.error-state title="Status belum diubah" :description="$errors->first()" />
+    @endif
+    <x-ui.card>
+        <div class="flex flex-wrap items-start justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <x-ui.badge :variant="$pelanggaran->status_aktif ? 'dark' : 'outline'">
+                    {{ $pelanggaran->status_aktif ? 'Aktif' : 'Nonaktif' }}
+                </x-ui.badge>
+                @if (!$pelanggaran->kategori->status_aktif)
+                    <x-ui.badge variant="outline">Kategori nonaktif</x-ui.badge>
+                @endif
+            </div>
+            <form id="violation-status-form" method="POST" data-modal-confirm-form
+                action="{{ route('admin.violations.status', $pelanggaran) }}">
+                @csrf
+                @method('PATCH')
+                <x-ui.button variant="secondary" type="button" data-modal-open="violation-status-confirmation">
+                    {{ $pelanggaran->status_aktif ? 'Nonaktifkan' : 'Aktifkan' }}
+                </x-ui.button>
+            </form>
         </div>
-        <form id="violation-status-form" method="POST" data-modal-confirm-form
-            action="{{ route('admin.violations.status', $pelanggaran) }}">
-            @csrf
-            @method('PATCH')
-            <x-ui.button variant="secondary" type="button" data-modal-open="violation-status-confirmation">
-                {{ $pelanggaran->status_aktif ? 'Nonaktifkan' : 'Aktifkan' }}
-            </x-ui.button>
-        </form>
-    </div>
-    <dl class="mt-6 grid gap-5 sm:grid-cols-2">
-        <div>
-            <dt class="text-sm text-gray-500">Kategori</dt>
-            <dd class="mt-1 font-medium">{{ $pelanggaran->kategori->nama_kategori }}</dd>
+        <dl class="mt-6 grid gap-5 sm:grid-cols-2">
+            <div>
+                <dt class="text-sm text-gray-500">Kategori</dt>
+                <dd class="mt-1 font-medium">{{ $pelanggaran->kategori->nama_kategori }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm text-gray-500">Poin master saat ini</dt>
+                <dd class="mt-1 text-2xl font-semibold">{{ $pelanggaran->poin }}</dd>
+            </div>
+            <div class="sm:col-span-2">
+                <dt class="text-sm text-gray-500">Deskripsi</dt>
+                <dd class="mt-1 whitespace-pre-line text-gray-700">
+                    {{ $pelanggaran->deskripsi ?: 'Tidak ada deskripsi.' }}
+                </dd>
+            </div>
+            <div>
+                <dt class="text-sm text-gray-500">Jumlah catatan historis</dt>
+                <dd class="mt-1 font-medium">{{ $pelanggaran->catatan_siswa_count }}</dd>
+            </div>
+        </dl>
+        <p class="mt-5 border-t border-gray-100 pt-4 text-xs text-gray-500">
+            Nilai pada catatan lama tetap menggunakan kolom poin saat dicatat, meskipun poin master berubah.
+        </p>
+        <x-ui.modal id="violation-status-confirmation" :title="$pelanggaran->status_aktif ? 'Nonaktifkan jenis pelanggaran?' : 'Aktifkan jenis pelanggaran?'" :description="$pelanggaran->status_aktif
+            ? 'Catatan lama tetap tersimpan.'
+            : 'Jenis ini tersedia untuk pencatatan baru.'">
+            <div class="flex justify-end gap-2">
+                <x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button>
+                <x-ui.button type="submit" form="violation-status-form">
+                    {{ $pelanggaran->status_aktif ? 'Nonaktifkan' : 'Aktifkan' }}
+                </x-ui.button>
+            </div>
+        </x-ui.modal>
+    </x-ui.card>
+    <x-ui.card :padding="false">
+        <div class="border-b border-gray-200 px-5 py-4">
+            <h2 class="font-semibold text-gray-900">Riwayat catatan terbaru</h2>
         </div>
-        <div>
-            <dt class="text-sm text-gray-500">Poin master saat ini</dt>
-            <dd class="mt-1 text-2xl font-semibold">{{ $pelanggaran->poin }}</dd>
-        </div>
-        <div class="sm:col-span-2">
-            <dt class="text-sm text-gray-500">Deskripsi</dt>
-            <dd class="mt-1 whitespace-pre-line text-gray-700">
-                {{ $pelanggaran->deskripsi ?: 'Tidak ada deskripsi.' }}
-            </dd>
-        </div>
-        <div>
-            <dt class="text-sm text-gray-500">Jumlah catatan historis</dt>
-            <dd class="mt-1 font-medium">{{ $pelanggaran->catatan_siswa_count }}</dd>
-        </div>
-    </dl>
-    <p class="mt-5 border-t border-gray-100 pt-4 text-xs text-gray-500">
-        Nilai pada catatan lama tetap menggunakan kolom poin saat dicatat, meskipun poin master berubah.
-    </p>
-    <x-ui.modal id="violation-status-confirmation"
-        :title="$pelanggaran->status_aktif ? 'Nonaktifkan jenis pelanggaran?' : 'Aktifkan jenis pelanggaran?'"
-        :description="$pelanggaran->status_aktif ? 'Catatan lama tetap tersimpan.' : 'Jenis ini tersedia untuk pencatatan baru.'">
-        <div class="flex justify-end gap-2">
-            <x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button>
-            <x-ui.button type="submit" form="violation-status-form">
-                {{ $pelanggaran->status_aktif ? 'Nonaktifkan' : 'Aktifkan' }}
-            </x-ui.button>
-        </div>
-    </x-ui.modal>
-</x-ui.card>
-<x-ui.card :padding="false"><div class="border-b border-gray-200 px-5 py-4"><h2 class="font-semibold text-gray-900">Riwayat catatan terbaru</h2></div>@if($recentRecords->isNotEmpty())<x-ui.table><thead class="bg-gray-50 text-left text-xs uppercase text-gray-500"><tr><th class="px-5 py-3">Tanggal kejadian</th><th class="px-5 py-3">Siswa</th><th class="px-5 py-3">Guru pencatat</th><th class="px-5 py-3">Poin saat dicatat</th><th class="px-5 py-3">Status catatan</th></tr></thead><tbody class="divide-y divide-gray-100">@foreach($recentRecords as $record)<tr><td class="px-5 py-4">{{ $record->tanggal_pelanggaran->format('d/m/Y') }}</td><td class="px-5 py-4">{{ $record->penempatanKelas->siswa->nama }} <span class="text-xs text-gray-500">({{ $record->penempatanKelas->siswa->nisn }})</span></td><td class="px-5 py-4">{{ $record->guru->nama }}</td><td class="px-5 py-4 font-medium">{{ $record->poin_saat_dicatat }}</td><td class="px-5 py-4"><x-ui.badge variant="outline">{{ ucfirst($record->status) }}</x-ui.badge></td></tr>@endforeach</tbody></x-ui.table>@else<div class="p-5"><x-ui.empty-state title="Belum pernah dicatat" description="Catatan siswa untuk jenis ini akan tampil setelah kejadian dicatat."/></div>@endif</x-ui.card>
+        @if ($recentRecords->isNotEmpty())
+            <x-ui.table>
+                <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
+                    <tr>
+                        <th class="px-5 py-3">Tanggal kejadian</th>
+                        <th class="px-5 py-3">Siswa</th>
+                        <th class="px-5 py-3">Guru pencatat</th>
+                        <th class="px-5 py-3">Poin saat dicatat</th>
+                        <th class="px-5 py-3">Status catatan</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @foreach ($recentRecords as $record)
+                        <tr>
+                            <td class="px-5 py-4">{{ $record->tanggal_pelanggaran->format('d/m/Y') }}</td>
+                            <td class="px-5 py-4">{{ $record->penempatanKelas->siswa->nama }} <span
+                                    class="text-xs text-gray-500">({{ $record->penempatanKelas->siswa->nisn }})</span></td>
+                            <td class="px-5 py-4">{{ $record->guru->nama }}</td>
+                            <td class="px-5 py-4 font-medium">{{ $record->poin_saat_dicatat }}</td>
+                            <td class="px-5 py-4"><x-ui.badge variant="outline">{{ ucfirst($record->status) }}</x-ui.badge>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+        </x-ui.table>@else<div class="p-5"><x-ui.empty-state title="Belum pernah dicatat"
+                    description="Catatan siswa untuk jenis ini akan tampil setelah kejadian dicatat." /></div>
+        @endif
+    </x-ui.card>
 @endsection

@@ -24,7 +24,7 @@ class UpdateGuruRequest extends FormRequest
     {
         return [
             'nip' => ['required', 'string', 'max:255', Rule::unique('t_guru', 'nip')->ignore($this->route('guru'))],
-            'nama' => ['required', 'string', 'max:255'],
+            'nama' => ['required', 'string', 'max:100'],
             'email' => [
                 'required', 'string', 'email', 'max:255',
                 Rule::unique('t_guru', 'email')->ignore($this->route('guru')),
@@ -48,6 +48,7 @@ class UpdateGuruRequest extends FormRequest
             'nip.required' => 'NIP wajib diisi.',
             'nip.unique' => 'NIP sudah digunakan Guru lain.',
             'nama.required' => 'Nama Guru wajib diisi.',
+            'nama.max' => 'Nama Guru maksimal 100 karakter.',
             'email.required' => 'Email Guru wajib diisi.',
             'email.email' => 'Email Guru tidak valid.',
             'email.unique' => 'Email sudah digunakan pada data Guru atau akun pengguna lain.',
