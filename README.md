@@ -1,58 +1,180 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SekolahKu
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+SekolahKu adalah aplikasi administrasi pelanggaran siswa berbasis Laravel. Aplikasi menyediakan pengelolaan siswa dan riwayat kelas, data Guru, tahun ajaran, jenis pelanggaran, pencatatan kejadian, rekap wali kelas, laporan, dan audit perubahan.
 
-## About Laravel
+Role login hanya `admin` dan `guru`. Wali kelas ditentukan oleh penugasan Guru untuk kelas dan tahun ajaran tertentu.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Teknologi
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- PHP `^8.3` dan Laravel `^13.17`.
+- MySQL.
+- Blade, Tailwind CSS 4, JavaScript, dan Vite 8.
+- Composer dan npm untuk memasang dependency dari lock file.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Untuk Vite 8, gunakan Node.js `^20.19.0` atau `>=22.12.0`.
 
-## Learning Laravel
+## Menjalankan di Laragon (Windows)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Ikuti langkah berurutan. Perintah clone dijalankan dari `C:\laragon\www`; perintah berikutnya dijalankan dari folder proyek.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 1. Siapkan perangkat
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+Pasang Laragon dengan PHP 8.3 atau lebih baru yang sesuai, MySQL, Composer, Node.js yang didukung Vite, dan npm. Buka Laragon lalu nyalakan MySQL.
 
-## Agentic Development
+Periksa tool yang tersedia:
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```powershell
+php -v
+composer --version
+node --version
+npm --version
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 2. Ambil proyek
 
-## Contributing
+Jika proyek belum ada di komputer:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```powershell
+Set-Location C:\laragon\www
+git clone https://github.com/aditgaming1111111-jpg/UKK-2026.git sekolahku
+```
 
-## Code of Conduct
+Masuk ke foldernya:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```powershell
+cd C:\laragon\www\sekolahku
+```
 
-## Security Vulnerabilities
+Jika proyek sudah tersedia, buka terminal di folder tersebut dan lewati perintah clone serta `cd`. Jangan membuat clone kedua di dalam folder proyek.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 3. Pasang dependency PHP
 
-## License
+```powershell
+composer install
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Perintah ini memasang versi dependency yang dikunci di `composer.lock`. Jangan gunakan `composer update` untuk setup biasa karena dapat mengganti versi dependency.
+
+### 4. Siapkan konfigurasi lokal
+
+Buat `.env` dari template hanya jika file lokal belum ada. Perintah ini tidak menimpa `.env` yang sudah ada:
+
+```powershell
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+```
+
+Buka `.env` secara lokal dan isi koneksi MySQL untuk database khusus SekolahKu:
+
+```dotenv
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=ukk_pelanggaran_siswa
+DB_USERNAME=isi_user_mysql_lokal
+DB_PASSWORD=isi_password_mysql_lokal
+```
+
+Sesuaikan user dan password dengan Laragon. Jangan menyalin `.env` dari komputer lain, jangan membagikan isinya, dan jangan commit file tersebut.
+
+Untuk instalasi baru yang `.env`-nya baru dibuat, buat application key satu kali:
+
+```powershell
+php artisan key:generate
+```
+
+Jangan jalankan ulang perintah itu pada instalasi yang sudah berjalan tanpa alasan; mengganti key dapat membuat data sesi atau data terenkripsi lama tidak dapat dibaca.
+
+### 5. Siapkan database dengan aman
+
+Di HeidiSQL atau phpMyAdmin Laragon, buat database kosong bernama `ukk_pelanggaran_siswa` dengan charset `utf8mb4`. Pastikan MySQL aktif dan database yang dipilih memang database lokal SekolahKu.
+
+Setelah mengubah `.env`, bersihkan cache konfigurasi:
+
+```powershell
+php artisan config:clear
+```
+
+Untuk database baru yang kosong, jalankan migration:
+
+```powershell
+php artisan migrate
+```
+
+Migration membangun skema berdasarkan file di `database/migrations`. Jika database sudah pernah dipakai, ekspor cadangan terlebih dahulu dan periksa statusnya:
+
+```powershell
+php artisan migrate:status
+```
+
+Hentikan proses jika database atau migration yang tertunda belum dipahami. Jangan gunakan `migrate:fresh`, `db:wipe`, atau rollback untuk memperbaiki setup karena dapat menghapus data atau tabel.
+
+Repository juga memiliki dump SQL. Gunakan migration sebagai jalur setup standar; jangan mengimpor dump sekaligus menjalankan migration tanpa memastikan skema dan isi database cocok.
+
+### 6. Buat akun pengembangan lokal (opsional)
+
+Seeder autentikasi hanya berjalan ketika `APP_ENV=local`. Jalankan hanya pada database development yang memang ingin diisi/diperbarui oleh akun contoh:
+
+```powershell
+php artisan db:seed --class=AuthenticationSeeder
+```
+
+Akun lokal yang disiapkan:
+
+| Role | Email | Password lokal |
+|---|---|---|
+| Admin | `admin@sekolahku.com` | `password` (khusus lokal) |
+| Guru | `anton@sekolahku.com` | `password` (khusus lokal) |
+
+Password contoh ini hanya untuk pengembangan lokal. Seeder menyimpan password dengan hashing Laravel, tetapi password bawaan tetap mudah ditebak; ganti sebelum akun dipakai di lingkungan lain. Seeder menggunakan `updateOrCreate`, jadi menjalankannya kembali dapat memperbarui data dua akun tersebut.
+
+### 7. Pasang dan build asset frontend
+
+```powershell
+npm ci
+```
+
+```powershell
+npm run build
+```
+
+`npm ci` menggunakan `package-lock.json`; `npm run build` membuat asset produksi di `public/build`.
+
+### 8. Jalankan aplikasi
+
+```powershell
+php artisan serve
+```
+
+Buka `http://127.0.0.1:8000` di browser dan masuk memakai akun lokal jika seeder sudah dijalankan.
+
+Untuk pengembangan frontend dengan hot reload, hentikan server bila perlu, buka terminal kedua, lalu jalankan:
+
+```powershell
+npm run dev
+```
+
+Biarkan Vite tetap berjalan selama mengembangkan tampilan. Untuk penggunaan lokal tanpa Vite dev server, jalankan build pada langkah sebelumnya.
+
+### 9. Periksa aplikasi
+
+```powershell
+php artisan route:list
+```
+
+```powershell
+php artisan test
+```
+
+Jika halaman melaporkan koneksi ditolak, periksa apakah MySQL Laragon berjalan dan nilai host, port, database, serta akun lokal pada `.env` sudah sesuai. Jangan menampilkan password ketika meminta bantuan.
+
+## Catatan keselamatan data
+
+- `.env` menyimpan konfigurasi lokal dan tidak boleh masuk Git. File ini berbeda dari `.env.example`.
+- Gunakan database khusus SekolahKu; jangan arahkan setup development ke database berisi data penting.
+- `php artisan migrate` hanya menjalankan migration yang belum diterapkan, tetapi tetap tinjau status dan cadangkan database yang sudah berisi data.
+- Jangan menjalankan seeder contoh di server atau database produksi.
+- Riwayat kelas dan pelanggaran penting untuk laporan; jangan menghapus atau membangun ulang tabel hanya demi memperbaiki instalasi.
+
+## Panduan belajar kode
+
+Dokumentasi ringkas untuk memahami implementasi tersedia di [`docs/belajar-sekolahku/README.md`](docs/belajar-sekolahku/README.md). Mulai dari gambaran alur aplikasi, lanjut ke tabel dan relasi, lalu pelajari migration dan seeder.
