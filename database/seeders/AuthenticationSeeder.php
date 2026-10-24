@@ -10,15 +10,6 @@ use Illuminate\Support\Facades\Hash;
 class AuthenticationSeeder extends Seeder
 {
     /**
-     * Local development credentials:
-     * admin@sekolahku.test / AdminSekolahKu#2026
-     * guru@sekolahku.test / GuruSekolahKu#2026
-     */
-    private const ADMIN_PASSWORD = 'AdminSekolahKu#2026';
-
-    private const GURU_PASSWORD = 'GuruSekolahKu#2026';
-
-    /**
      * Run the database seeds.
      */
     public function run(): void
@@ -27,20 +18,31 @@ class AuthenticationSeeder extends Seeder
             throw new \RuntimeException('AuthenticationSeeder hanya boleh dijalankan pada APP_ENV=local.');
         }
 
+        $adminPassword = config('app.seed_admin_password');
+        $guruPassword = config('app.seed_guru_password');
+
+        if (! is_string($adminPassword) || mb_strlen($adminPassword) < 8) {
+            throw new \RuntimeException('SEED_ADMIN_PASSWORD wajib diisi minimal 8 karakter di .env lokal.');
+        }
+
+        if (! is_string($guruPassword) || mb_strlen($guruPassword) < 8) {
+            throw new \RuntimeException('SEED_GURU_PASSWORD wajib diisi minimal 8 karakter di .env lokal.');
+        }
+
         $admin = User::updateOrCreate(
-            ['email' => 'admin@sekolahku.test'],
+            ['email' => 'admin@sekolahku.com'],
             [
                 'nama' => 'Administrator SekolahKu',
-                'password' => Hash::make(self::ADMIN_PASSWORD),
+                'password' => Hash::make($adminPassword),
                 'role' => 'admin',
             ],
         );
 
         $guru = User::updateOrCreate(
-            ['email' => 'guru@sekolahku.test'],
+            ['email' => 'anton@sekolahku.com'],
             [
-                'nama' => 'Guru SekolahKu',
-                'password' => Hash::make(self::GURU_PASSWORD),
+                'nama' => 'Anton',
+                'password' => Hash::make($guruPassword),
                 'role' => 'guru',
             ],
         );

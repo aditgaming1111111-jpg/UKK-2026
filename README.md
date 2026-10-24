@@ -112,20 +112,20 @@ Repository juga memiliki dump SQL. Gunakan migration sebagai jalur setup standar
 
 ### 6. Buat akun pengembangan lokal (opsional)
 
-Seeder autentikasi hanya berjalan ketika `APP_ENV=local`. Jalankan hanya pada database development yang memang ingin diisi/diperbarui oleh akun contoh:
+Seeder autentikasi hanya berjalan ketika `APP_ENV=local`. Sebelum menjalankannya, isi `SEED_ADMIN_PASSWORD` dan `SEED_GURU_PASSWORD` di `.env` lokal dengan password pilihanmu yang masing-masing minimal 8 karakter. Jangan mencantumkan nilainya di chat atau commit ke Git. Jalankan hanya pada database development yang memang ingin diisi/diperbarui oleh akun contoh:
 
 ```powershell
 php artisan db:seed --class=AuthenticationSeeder
 ```
 
-Akun lokal yang disiapkan:
+Email akun lokal yang disiapkan:
 
-| Role | Email | Password lokal |
-|---|---|---|
-| Admin | `admin@sekolahku.com` | `password` (khusus lokal) |
-| Guru | `anton@sekolahku.com` | `password` (khusus lokal) |
+| Role | Email |
+|---|---|
+| Admin | `admin@sekolahku.com` |
+| Guru | `anton@sekolahku.com` |
 
-Password contoh ini hanya untuk pengembangan lokal. Seeder menyimpan password dengan hashing Laravel, tetapi password bawaan tetap mudah ditebak; ganti sebelum akun dipakai di lingkungan lain. Seeder menggunakan `updateOrCreate`, jadi menjalankannya kembali dapat memperbarui data dua akun tersebut.
+Seeder menyimpan password dengan hashing Laravel. Seeder menggunakan `updateOrCreate`, jadi menjalankannya kembali dapat memperbarui data dan password untuk dua akun tersebut.
 
 ### 7. Pasang dan build asset frontend
 
