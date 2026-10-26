@@ -26,4 +26,9 @@ class TahunAjaranPolicy
     {
         return $user->role === 'admin';
     }
+
+    public function delete(User $user, TahunAjaran $tahunAjaran): bool
+    {
+        return $user->role === 'admin';
+    }
 }

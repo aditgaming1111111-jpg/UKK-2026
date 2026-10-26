@@ -44,7 +44,7 @@ class PelanggaranKategoriPolicy
      */
     public function delete(User $user, PelanggaranKategori $pelanggaranKategori): bool
     {
-        return false;
+        return $user->role === 'admin';
     }
 
     /**

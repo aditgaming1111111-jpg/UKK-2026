@@ -13,6 +13,7 @@ use App\Models\WaliKelas;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -134,14 +135,18 @@ class KelasController extends Controller
     {
         Gate::authorize('delete', $kelas);
 
-        if (KelasSiswa::query()->where('kelas_id', $kelas->id)->exists()
-            || WaliKelas::query()->where('kelas_id', $kelas->id)->exists()) {
-            throw ValidationException::withMessages([
-                'kelas' => 'Kelas sudah memiliki riwayat penempatan atau penugasan sehingga tidak dapat dihapus.',
-            ]);
-        }
+        DB::transaction(static function () use ($kelas): void {
+            $lockedClass = Kelas::query()->whereKey($kelas->id)->lockForUpdate()->firstOrFail();
 
-        $kelas->delete();
+            if (KelasSiswa::query()->where('kelas_id', $lockedClass->id)->exists()
+                || WaliKelas::query()->where('kelas_id', $lockedClass->id)->exists()) {
+                throw ValidationException::withMessages([
+                    'kelas' => 'Kelas sudah memiliki riwayat penempatan atau penugasan sehingga tidak dapat dihapus.',
+                ]);
+            }
+
+            $lockedClass->delete();
+        });
 
         return to_route('admin.classes.index')->with('success', 'Data kelas berhasil dihapus.');
     }

@@ -20,6 +20,9 @@
                     <x-ui.button variant="secondary" type="button"
                         data-modal-open="activate-student">Aktifkan</x-ui.button>
                 @endif
+                @if ($canPermanentlyDelete)
+                    <x-ui.button variant="secondary" type="button" data-modal-open="delete-student">Hapus permanen</x-ui.button>
+                @endif
             </div>
         @endif
     </x-ui.page-heading>
@@ -29,6 +32,14 @@
     @if (session('success'))
         <div role="status" class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700">
             {{ session('success') }}</div>
+    @endif
+    @if ($errors->any())
+        <x-ui.error-state title="Tindakan belum dilakukan" :description="$errors->first()" />
+    @endif
+    @if ($canManageStudents && !$canPermanentlyDelete)
+        <div role="status" class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700">
+            Siswa memiliki riwayat kelas atau pelanggaran. Identitas tidak dapat dihapus permanen; gunakan tindakan nonaktifkan untuk mempertahankan histori.
+        </div>
     @endif
 
     <section class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
@@ -208,9 +219,22 @@
     @if ($canManageStudents && $student->status_siswa === 'aktif')
         <x-ui.modal id="deactivate-student" title="Nonaktifkan siswa?"
             description="Identitas dan semua riwayat kelas serta pelanggaran tetap disimpan.">
-            <form method="POST" action="{{ route('admin.students.destroy', $student) }}">@csrf @method('DELETE')<div
+            <form method="POST" action="{{ route('admin.students.status', $student) }}">@csrf @method('PATCH')
+                <input type="hidden" name="status_siswa" value="nonaktif"><div
                     class="flex justify-end gap-2"><x-ui.button variant="secondary" type="button"
                         data-modal-close>Batal</x-ui.button><x-ui.button type="submit">Nonaktifkan siswa</x-ui.button>
+                </div>
+            </form>
+        </x-ui.modal>
+    @endif
+
+    @if ($canManageStudents && $canPermanentlyDelete)
+        <x-ui.modal id="delete-student" title="Hapus siswa permanen?"
+            description="Siswa ini belum memiliki riwayat penempatan atau catatan pelanggaran. Data identitas akan dihapus permanen.">
+            <form method="POST" action="{{ route('admin.students.destroy', $student) }}">@csrf @method('DELETE')
+                <div class="flex justify-end gap-2">
+                    <x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button>
+                    <x-ui.button type="submit">Hapus permanen</x-ui.button>
                 </div>
             </form>
         </x-ui.modal>

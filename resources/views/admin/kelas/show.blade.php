@@ -14,6 +14,9 @@
         <div role="status" class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700">
             {{ session('success') }}</div>
     @endif
+    @if ($errors->has('kelas'))
+        <x-ui.error-state title="Kelas tidak dapat dihapus" :description="$errors->first('kelas')" />
+    @endif
     <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><x-ui.stat-card label="Tingkat" :value="$kelas->tingkat"
             note="Tingkat kelas" icon="grid" /><x-ui.stat-card label="Jurusan" :value="$kelas->jurusan ?: '—'"
             note="Sesuai data master" icon="document" /><x-ui.stat-card label="Penempatan aktif" :value="$kelas->active_placement_count"

@@ -36,4 +36,9 @@ class GuruPolicy
     {
         return $user->role === 'admin';
     }
+
+    public function delete(User $user, Guru $guru): bool
+    {
+        return $user->role === 'admin';
+    }
 }

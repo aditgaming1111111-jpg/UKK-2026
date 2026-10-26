@@ -13,6 +13,7 @@ use App\Models\Siswa;
 use App\Models\TahunAjaran;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 class RiwayatPelanggaranTest extends TestCase
@@ -87,6 +88,30 @@ class RiwayatPelanggaranTest extends TestCase
         $this->get(route('admin.audit-logs.index', [...$filters, 'page' => 2]))
             ->assertViewHas('logs', fn ($logs): bool => $logs->count() === 2 && $logs->total() === 12)
             ->assertSee('q=Admin%20Pagination');
+    }
+
+    public function test_student_violation_and_audit_log_have_no_permanent_delete_route_or_ui(): void
+    {
+        $context = $this->recordingContext();
+        $record = $this->createRecord($context);
+        $log = LogPelanggaran::factory()->for($record, 'catatanPelanggaran')
+            ->for($context['user'], 'pengguna')->create();
+        $administrator = User::factory()->create(['role' => 'admin']);
+
+        $this->assertFalse(Route::has('admin.student-violations.destroy'));
+        $this->assertFalse(Route::has('admin.audit-logs.destroy'));
+
+        $this->actingAs($administrator)->get(route('admin.student-violations.show', $record))
+            ->assertOk()
+            ->assertDontSee('Hapus permanen');
+        $this->get(route('admin.audit-logs.index'))->assertOk()->assertDontSee('Hapus permanen');
+
+        $noteDeleteResponse = $this->delete(route('admin.student-violations.show', $record));
+        $this->assertContains($noteDeleteResponse->getStatusCode(), [404, 405]);
+        $logDeleteResponse = $this->delete('/admin/log-pelanggaran/'.$log->id);
+        $this->assertContains($logDeleteResponse->getStatusCode(), [404, 405]);
+        $this->assertModelExists($record);
+        $this->assertModelExists($log);
     }
 
     public function test_all_teachers_can_view_full_history_and_other_authors_records_without_homeroom_assignment(): void

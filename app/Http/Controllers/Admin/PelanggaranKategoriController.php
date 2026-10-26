@@ -11,6 +11,7 @@ use App\Models\PelanggaranKategori;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class PelanggaranKategoriController extends Controller
@@ -85,8 +86,27 @@ class PelanggaranKategoriController extends Controller
         return to_route('admin.violation-categories.show', $pelanggaranKategori)->with('success', 'Kategori pelanggaran berhasil diperbarui.');
     }
 
+    public function destroy(PelanggaranKategori $pelanggaranKategori): RedirectResponse
+    {
+        Gate::authorize('delete', $pelanggaranKategori);
+
+        DB::transaction(static function () use ($pelanggaranKategori): void {
+            $lockedCategory = PelanggaranKategori::query()->whereKey($pelanggaranKategori->id)->lockForUpdate()->firstOrFail();
+
+            if ($lockedCategory->jenisPelanggaran()->exists()) {
+                throw ValidationException::withMessages([
+                    'pelanggaranKategori' => 'Kategori masih digunakan oleh jenis pelanggaran. Nonaktifkan kategori agar histori tetap terjaga.',
+                ]);
+            }
+
+            $lockedCategory->delete();
+        });
+
+        return to_route('admin.violation-categories.index')->with('success', 'Kategori tanpa jenis pelanggaran berhasil dihapus permanen.');
+    }
+
     /**
-     * Remove the specified resource from storage.
+     * Toggle the active status of the category.
      */
     public function toggleStatus(PelanggaranKategori $pelanggaranKategori): RedirectResponse
     {

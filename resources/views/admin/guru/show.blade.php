@@ -12,6 +12,9 @@
                 data-modal-open="deactivate-guru">Nonaktifkan</x-ui.button>@else<x-ui.button variant="secondary"
                     type="button" data-modal-open="activate-guru">Aktifkan kembali</x-ui.button>
             @endif
+            @if (!$hasHistory)
+                <x-ui.button variant="secondary" type="button" data-modal-open="delete-guru">Hapus permanen</x-ui.button>
+            @endif
         </div>
     </x-ui.page-heading>
 @endsection
@@ -23,6 +26,14 @@
     @endif
     @if ($errors->has('akun'))
         <x-ui.error-state title="Relasi akun perlu diperiksa" :description="$errors->first('akun')" />
+    @endif
+    @if ($errors->has('guru'))
+        <x-ui.error-state title="Guru tidak dapat dihapus" :description="$errors->first('guru')" />
+    @endif
+    @if ($hasHistory)
+        <div role="status" class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700">
+            Guru memiliki histori penugasan, catatan, atau aktivitas audit. Gunakan tindakan nonaktifkan agar data tersebut tetap tersimpan.
+        </div>
     @endif
 
     <section class="grid gap-5 xl:grid-cols-2">
@@ -128,7 +139,7 @@
     @if ($teacher->status_aktif)
         <x-ui.modal id="deactivate-guru" title="Nonaktifkan Guru?"
             description="Akun login tidak akan dapat digunakan selama Guru nonaktif. Relasi akun, penugasan, dan catatan pelanggaran tetap disimpan.">
-            <form method="POST" action="{{ route('admin.teachers.destroy', $teacher) }}">@csrf @method('DELETE')<div
+            <form method="POST" action="{{ route('admin.teachers.deactivate', $teacher) }}">@csrf @method('PATCH')<div
                     class="flex justify-end gap-2"><x-ui.button variant="secondary" type="button"
                         data-modal-close>Batal</x-ui.button><x-ui.button type="submit">Nonaktifkan Guru</x-ui.button></div>
             </form>
@@ -139,6 +150,18 @@
             <form method="POST" action="{{ route('admin.teachers.activate', $teacher) }}">@csrf @method('PATCH')<div
                     class="flex justify-end gap-2"><x-ui.button variant="secondary" type="button"
                         data-modal-close>Batal</x-ui.button><x-ui.button type="submit">Aktifkan Guru</x-ui.button></div>
+            </form>
+        </x-ui.modal>
+    @endif
+
+    @if (!$hasHistory)
+        <x-ui.modal id="delete-guru" title="Hapus Guru dan akun login?"
+            description="Guru ini belum memiliki penugasan, catatan pelanggaran, atau aktivitas audit. Identitas dan akun login akan dihapus permanen.">
+            <form method="POST" action="{{ route('admin.teachers.destroy', $teacher) }}">@csrf @method('DELETE')
+                <div class="flex justify-end gap-2">
+                    <x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button>
+                    <x-ui.button type="submit">Hapus permanen</x-ui.button>
+                </div>
             </form>
         </x-ui.modal>
     @endif

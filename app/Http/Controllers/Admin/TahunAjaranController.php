@@ -9,7 +9,9 @@ use App\Http\Requests\Admin\UpdateTahunAjaranRequest;
 use App\Models\TahunAjaran;
 use App\Services\TahunAjaranManager;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class TahunAjaranController extends Controller
@@ -85,5 +87,24 @@ class TahunAjaranController extends Controller
         $manager->update($tahunAjaran, $request->validated());
 
         return to_route('admin.academic-years.show', $tahunAjaran)->with('success', 'Pengaturan tahun ajaran berhasil diperbarui.');
+    }
+
+    public function destroy(TahunAjaran $tahunAjaran): RedirectResponse
+    {
+        Gate::authorize('delete', $tahunAjaran);
+
+        DB::transaction(static function () use ($tahunAjaran): void {
+            $lockedYear = TahunAjaran::query()->whereKey($tahunAjaran->id)->lockForUpdate()->firstOrFail();
+
+            if ($lockedYear->penempatanSiswa()->exists() || $lockedYear->penugasanWaliKelas()->exists()) {
+                throw ValidationException::withMessages([
+                    'tahun_ajaran' => 'Tahun ajaran sudah memiliki riwayat penempatan siswa atau penugasan wali kelas sehingga tidak dapat dihapus.',
+                ]);
+            }
+
+            $lockedYear->delete();
+        });
+
+        return to_route('admin.academic-years.index')->with('success', 'Tahun ajaran tanpa riwayat berhasil dihapus permanen.');
     }
 }

@@ -3,9 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\Guru;
+use App\Models\Kelas;
 use App\Models\Pelanggaran;
 use App\Models\PelanggaranKategori;
 use App\Models\PelanggaranSiswa;
+use App\Models\Siswa;
+use App\Models\TahunAjaran;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -42,6 +45,23 @@ class PelanggaranMasterManagementTest extends TestCase
         ])->assertRedirect(route('admin.violation-categories.show', $category));
 
         $this->assertDatabaseHas('t_pelanggaran_kategori', ['id' => $category->id, 'nama_kategori' => 'Kedisiplinan Siswa']);
+    }
+
+    public function test_category_can_be_deleted_only_when_it_has_no_violation_types(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $unusedCategory = PelanggaranKategori::factory()->create();
+        $usedCategory = PelanggaranKategori::factory()->create();
+        $violation = Pelanggaran::factory()->for($usedCategory, 'kategori')->create();
+
+        $this->actingAs($administrator)->delete(route('admin.violation-categories.destroy', $usedCategory))
+            ->assertSessionHasErrors('pelanggaranKategori');
+        $this->assertModelExists($usedCategory);
+        $this->assertModelExists($violation);
+
+        $this->delete(route('admin.violation-categories.destroy', $unusedCategory))
+            ->assertRedirect(route('admin.violation-categories.index'));
+        $this->assertModelMissing($unusedCategory);
     }
 
     public function test_category_directory_paginates_ten_records(): void
@@ -98,6 +118,64 @@ class PelanggaranMasterManagementTest extends TestCase
         $this->assertDatabaseHas('t_pelanggaran', ['id' => $violation->id, 'status_aktif' => false]);
         $this->patch(route('admin.violations.status', $violation))->assertRedirect(route('admin.violations.show', $violation));
         $this->assertDatabaseHas('t_pelanggaran', ['id' => $violation->id, 'status_aktif' => true]);
+    }
+
+    public function test_violation_type_can_be_deleted_only_when_no_student_note_references_it(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $unusedViolation = Pelanggaran::factory()->create();
+        $usedViolation = Pelanggaran::factory()->create();
+        $note = PelanggaranSiswa::factory()->for($usedViolation, 'pelanggaran')->create();
+
+        $this->actingAs($administrator)->delete(route('admin.violations.destroy', $usedViolation))
+            ->assertSessionHasErrors('pelanggaran');
+        $this->assertModelExists($usedViolation);
+        $this->assertModelExists($note);
+        $this->assertSame($note->poin_saat_dicatat, $note->fresh()->poin_saat_dicatat);
+
+        $this->delete(route('admin.violations.destroy', $unusedViolation))
+            ->assertRedirect(route('admin.violations.index'));
+        $this->assertModelMissing($unusedViolation);
+    }
+
+    public function test_teacher_cannot_delete_master_records(): void
+    {
+        $teacher = Guru::factory()->create();
+        $category = PelanggaranKategori::factory()->create();
+        $violation = Pelanggaran::factory()->for($category, 'kategori')->create();
+
+        $this->actingAs($teacher->user)
+            ->delete(route('admin.violation-categories.destroy', $category))
+            ->assertForbidden();
+        $this->delete(route('admin.violations.destroy', $violation))->assertForbidden();
+
+        $this->assertModelExists($category);
+        $this->assertModelExists($violation);
+    }
+
+    public function test_teacher_cannot_delete_any_admin_managed_record(): void
+    {
+        $teacher = Guru::factory()->create();
+        $student = Siswa::factory()->create();
+        $class = Kelas::factory()->create();
+        $year = TahunAjaran::factory()->create();
+        $teacherIdentity = Guru::factory()->create();
+        $category = PelanggaranKategori::factory()->create();
+        $violation = Pelanggaran::factory()->for($category, 'kategori')->create();
+
+        $this->actingAs($teacher->user)->delete(route('admin.students.destroy', $student))->assertForbidden();
+        $this->delete(route('admin.teachers.destroy', $teacherIdentity))->assertForbidden();
+        $this->delete(route('admin.classes.destroy', $class))->assertForbidden();
+        $this->delete(route('admin.academic-years.destroy', $year))->assertForbidden();
+        $this->delete(route('admin.violation-categories.destroy', $category))->assertForbidden();
+        $this->delete(route('admin.violations.destroy', $violation))->assertForbidden();
+
+        $this->assertModelExists($student);
+        $this->assertModelExists($teacherIdentity);
+        $this->assertModelExists($class);
+        $this->assertModelExists($year);
+        $this->assertModelExists($category);
+        $this->assertModelExists($violation);
     }
 
     public function test_duplicate_code_and_invalid_points_are_rejected(): void

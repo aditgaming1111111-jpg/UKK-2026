@@ -56,11 +56,36 @@ class SiswaManagementTest extends TestCase
         $year = TahunAjaran::factory()->create();
         $placement = KelasSiswa::factory()->for($student, 'siswa')->for($class, 'kelas')->for($year, 'tahunAjaran')->create();
 
-        $this->actingAs($administrator)->delete(route('admin.students.destroy', $student))
+        $this->actingAs($administrator)->patch(route('admin.students.status', $student), ['status_siswa' => 'nonaktif'])
             ->assertRedirect(route('admin.students.show', $student));
 
         $this->assertDatabaseHas('t_siswa', ['id' => $student->id, 'status_siswa' => 'nonaktif']);
         $this->assertDatabaseHas('t_kelas_siswa', ['id' => $placement->id, 'siswa_id' => $student->id]);
+    }
+
+    public function test_admin_can_permanently_delete_a_student_without_history(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $student = Siswa::factory()->create();
+
+        $this->actingAs($administrator)->delete(route('admin.students.destroy', $student))
+            ->assertRedirect(route('admin.students.index'))
+            ->assertSessionHas('success');
+
+        $this->assertModelMissing($student);
+    }
+
+    public function test_student_with_history_cannot_be_permanently_deleted(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $student = Siswa::factory()->create();
+        $placement = KelasSiswa::factory()->create(['siswa_id' => $student->id]);
+
+        $this->actingAs($administrator)->delete(route('admin.students.destroy', $student))
+            ->assertSessionHasErrors('siswa');
+
+        $this->assertModelExists($student);
+        $this->assertModelExists($placement);
     }
 
     public function test_duplicate_nisn_is_rejected_with_an_indonesian_validation_message(): void

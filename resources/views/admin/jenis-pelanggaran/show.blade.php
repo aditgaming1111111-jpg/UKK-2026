@@ -5,14 +5,14 @@
     ['label' => $pelanggaran->kode],
 ]" />@endsection
 @section('page-heading')<x-ui.page-heading title="{{ $pelanggaran->nama_pelanggaran }}"
-        description="Kode {{ $pelanggaran->kode }} · {{ $pelanggaran->kategori->nama_kategori }}"><x-ui.button
-        variant="secondary" :href="route('admin.violations.edit', $pelanggaran)">Edit jenis</x-ui.button></x-ui.page-heading>@endsection
+        description="Kode {{ $pelanggaran->kode }} · {{ $pelanggaran->kategori->nama_kategori }}"><div class="flex flex-wrap gap-2"><x-ui.button
+        variant="secondary" :href="route('admin.violations.edit', $pelanggaran)">Edit jenis</x-ui.button>@if($pelanggaran->catatan_siswa_count === 0)<x-ui.button variant="secondary" type="button" data-modal-open="delete-violation">Hapus jenis</x-ui.button>@endif</div></x-ui.page-heading>@endsection
 @section('content')
     @if (session('success'))
         <x-ui.toast>{{ session('success') }}</x-ui.toast>
     @endif
     @if ($errors->any())
-        <x-ui.error-state title="Status belum diubah" :description="$errors->first()" />
+        <x-ui.error-state title="Tindakan belum dilakukan" :description="$errors->first()" />
     @endif
     <x-ui.card>
         <div class="flex flex-wrap items-start justify-between gap-4">
@@ -56,6 +56,9 @@
         <p class="mt-5 border-t border-gray-100 pt-4 text-xs text-gray-500">
             Nilai pada catatan lama tetap menggunakan kolom poin saat dicatat, meskipun poin master berubah.
         </p>
+        @if ($pelanggaran->catatan_siswa_count > 0)
+            <p class="mt-3 text-sm text-gray-500">Jenis ini sudah digunakan pada catatan siswa. Nonaktifkan agar histori dan snapshot poin tetap terjaga.</p>
+        @endif
         <x-ui.modal id="violation-status-confirmation" :title="$pelanggaran->status_aktif ? 'Nonaktifkan jenis pelanggaran?' : 'Aktifkan jenis pelanggaran?'" :description="$pelanggaran->status_aktif
             ? 'Catatan lama tetap tersimpan.'
             : 'Jenis ini tersedia untuk pencatatan baru.'">
@@ -66,6 +69,13 @@
                 </x-ui.button>
             </div>
         </x-ui.modal>
+        @if ($pelanggaran->catatan_siswa_count === 0)
+            <x-ui.modal id="delete-violation" title="Hapus jenis pelanggaran?" description="Jenis ini belum digunakan pada catatan siswa.">
+                <form method="POST" action="{{ route('admin.violations.destroy', $pelanggaran) }}">@csrf @method('DELETE')
+                    <div class="flex justify-end gap-2"><x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button><x-ui.button type="submit">Hapus permanen</x-ui.button></div>
+                </form>
+            </x-ui.modal>
+        @endif
     </x-ui.card>
     <x-ui.card :padding="false">
         <div class="border-b border-gray-200 px-5 py-4">

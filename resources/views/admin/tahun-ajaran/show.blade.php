@@ -6,7 +6,12 @@
 
 @section('page-heading')
     <x-ui.page-heading :title="$academicYear->nama_tahun_ajaran" description="Periode akademik dan riwayat yang terkait.">
-        <x-ui.button variant="secondary" :href="route('admin.academic-years.edit', $academicYear)">Edit periode</x-ui.button>
+        <div class="flex flex-wrap gap-2">
+            <x-ui.button variant="secondary" :href="route('admin.academic-years.edit', $academicYear)">Edit periode</x-ui.button>
+            @if ($academicYear->penempatan_siswa_count === 0 && $academicYear->penugasan_wali_kelas_count === 0)
+                <x-ui.button variant="secondary" type="button" data-modal-open="delete-academic-year">Hapus tahun ajaran</x-ui.button>
+            @endif
+        </div>
     </x-ui.page-heading>
 @endsection
 
@@ -14,6 +19,9 @@
     <div class="space-y-6">
         @if (session('success'))
             <x-ui.toast>{{ session('success') }}</x-ui.toast>
+        @endif
+        @if ($errors->has('tahun_ajaran'))
+            <x-ui.error-state title="Tahun ajaran tidak dapat dihapus" :description="$errors->first('tahun_ajaran')" />
         @endif
 
         <x-ui.card>
@@ -35,5 +43,20 @@
         </section>
 
         <p class="text-sm text-gray-600">Riwayat penempatan dan penugasan tetap tersimpan saat status atau periode diperbarui.</p>
+        @if ($academicYear->penempatan_siswa_count > 0 || $academicYear->penugasan_wali_kelas_count > 0)
+            <p class="text-sm text-gray-600">Tahun ajaran ini memiliki riwayat dan tidak dapat dihapus permanen.</p>
+        @endif
+
+        @if ($academicYear->penempatan_siswa_count === 0 && $academicYear->penugasan_wali_kelas_count === 0)
+            <x-ui.modal id="delete-academic-year" title="Hapus tahun ajaran?"
+                description="Tahun ajaran ini belum digunakan pada penempatan siswa atau penugasan wali kelas.">
+                <form method="POST" action="{{ route('admin.academic-years.destroy', $academicYear) }}">@csrf @method('DELETE')
+                    <div class="flex justify-end gap-2">
+                        <x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button>
+                        <x-ui.button type="submit">Hapus tahun ajaran</x-ui.button>
+                    </div>
+                </form>
+            </x-ui.modal>
+        @endif
     </div>
 @endsection

@@ -16,6 +16,7 @@ use App\Services\SiswaReadService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class SiswaController extends Controller
@@ -61,6 +62,7 @@ class SiswaController extends Controller
         return view('siswa.show', array_merge([
             'student' => $siswa,
             'canManageStudents' => true,
+            'canPermanentlyDelete' => ! $siswa->penempatanKelas()->exists() && ! $siswa->catatanPelanggaran()->exists(),
             'classes' => Kelas::query()->orderBy('tingkat')->orderBy('nama_kelas')->get(),
             'academicYears' => TahunAjaran::query()->orderByDesc('tanggal_mulai')->get(),
         ], $siswaReadService->detail($siswa)));
@@ -91,19 +93,21 @@ class SiswaController extends Controller
      */
     public function destroy(Siswa $siswa): RedirectResponse
     {
-        Gate::authorize('deactivate', $siswa);
-
-        if ($siswa->status_siswa === 'nonaktif') {
-            return to_route('admin.students.show', $siswa)->with('success', 'Siswa sudah berstatus nonaktif.');
-        }
+        Gate::authorize('delete', $siswa);
 
         DB::transaction(static function () use ($siswa): void {
-            Siswa::query()->whereKey($siswa->id)->lockForUpdate()->firstOrFail()->update([
-                'status_siswa' => 'nonaktif',
-            ]);
+            $lockedStudent = Siswa::query()->whereKey($siswa->id)->lockForUpdate()->firstOrFail();
+
+            if ($lockedStudent->penempatanKelas()->exists() || $lockedStudent->catatanPelanggaran()->exists()) {
+                throw ValidationException::withMessages([
+                    'siswa' => 'Siswa memiliki riwayat kelas atau pelanggaran sehingga tidak dapat dihapus permanen. Nonaktifkan siswa untuk mempertahankan riwayat.',
+                ]);
+            }
+
+            $lockedStudent->delete();
         });
 
-        return to_route('admin.students.show', $siswa)->with('success', 'Siswa dinonaktifkan. Riwayat siswa tetap tersimpan.');
+        return to_route('admin.students.index')->with('success', 'Data siswa tanpa riwayat berhasil dihapus permanen.');
     }
 
     public function updateStatus(UpdateSiswaStatusRequest $request, Siswa $siswa): RedirectResponse

@@ -8,6 +8,7 @@ use App\Models\KelasSiswa;
 use App\Models\Siswa;
 use App\Models\TahunAjaran;
 use App\Models\User;
+use App\Models\WaliKelas;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -47,6 +48,30 @@ class KelasManagementTest extends TestCase
 
         $this->delete(route('admin.classes.destroy', $kelas))->assertSessionHasErrors('kelas');
         $this->assertDatabaseHas('t_kelas', ['id' => $kelas->id]);
+    }
+
+    public function test_admin_can_delete_a_class_without_references(): void
+    {
+        $this->actingAs(User::factory()->state(['role' => 'admin'])->create());
+        $kelas = Kelas::factory()->create();
+
+        $this->delete(route('admin.classes.destroy', $kelas))
+            ->assertRedirect(route('admin.classes.index'))
+            ->assertSessionHas('success');
+
+        $this->assertModelMissing($kelas);
+    }
+
+    public function test_class_with_homeroom_assignment_history_cannot_be_deleted(): void
+    {
+        $administrator = User::factory()->state(['role' => 'admin'])->create();
+        $kelas = Kelas::factory()->create();
+        WaliKelas::factory()->for($kelas, 'kelas')->create();
+
+        $this->actingAs($administrator)->delete(route('admin.classes.destroy', $kelas))
+            ->assertSessionHasErrors('kelas');
+
+        $this->assertModelExists($kelas);
     }
 
     public function test_class_directory_shows_at_most_ten_records_per_page(): void

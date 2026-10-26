@@ -33,22 +33,20 @@ Route::prefix('admin')
         Route::post('siswa/{siswa}/penempatan', [SiswaController::class, 'storePlacement'])->name('students.placements.store');
         Route::resource('guru', GuruController::class)->parameters(['guru' => 'guru'])->except(['destroy'])->names('teachers');
         Route::delete('guru/{guru}', [GuruController::class, 'destroy'])->name('teachers.destroy');
+        Route::patch('guru/{guru}/nonaktifkan', [GuruController::class, 'deactivate'])->name('teachers.deactivate');
         Route::put('guru/{guru}/akun', [GuruController::class, 'updateAccount'])->name('teachers.account.update');
         Route::patch('guru/{guru}/aktifkan', [GuruController::class, 'activate'])->name('teachers.activate');
         Route::resource('kelas', KelasController::class)->parameters(['kelas' => 'kelas'])->names('classes');
         Route::resource('tahun-ajaran', TahunAjaranController::class)
             ->parameters(['tahun-ajaran' => 'tahunAjaran'])
-            ->except(['destroy'])
             ->names('academic-years');
         Route::resource('kategori-pelanggaran', PelanggaranKategoriController::class)
             ->parameters(['kategori-pelanggaran' => 'pelanggaranKategori'])
-            ->except(['destroy'])
             ->names('violation-categories');
         Route::patch('kategori-pelanggaran/{pelanggaranKategori}/status', [PelanggaranKategoriController::class, 'toggleStatus'])
             ->name('violation-categories.status');
         Route::resource('jenis-pelanggaran', PelanggaranController::class)
             ->parameters(['jenis-pelanggaran' => 'pelanggaran'])
-            ->except(['destroy'])
             ->names('violations');
         Route::patch('jenis-pelanggaran/{pelanggaran}/status', [PelanggaranController::class, 'toggleStatus'])
             ->name('violations.status');

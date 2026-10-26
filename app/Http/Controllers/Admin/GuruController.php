@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\StoreGuruRequest;
 use App\Http\Requests\Admin\UpdateGuruAccountRequest;
 use App\Http\Requests\Admin\UpdateGuruRequest;
 use App\Models\Guru;
+use App\Models\LogPelanggaran;
 use App\Models\User;
 use App\Services\GuruDirectory;
 use Illuminate\Http\RedirectResponse;
@@ -73,8 +74,11 @@ class GuruController extends Controller
     {
         Gate::authorize('view', $guru);
         $guru->load(['user:id,nama,email,role', 'waliKelas.tahunAjaran:id,nama_tahun_ajaran', 'waliKelas.kelas:id,nama_kelas']);
+        $hasHistory = $guru->waliKelas()->exists()
+            || $guru->catatanPelanggaran()->exists()
+            || LogPelanggaran::query()->where('user_id', $guru->user_id)->exists();
 
-        return view('admin.guru.show', ['teacher' => $guru]);
+        return view('admin.guru.show', ['teacher' => $guru, 'hasHistory' => $hasHistory]);
     }
 
     /**
@@ -126,11 +130,34 @@ class GuruController extends Controller
      */
     public function destroy(Guru $guru): RedirectResponse
     {
-        Gate::authorize('changeStatus', $guru);
+        Gate::authorize('delete', $guru);
 
         DB::transaction(function () use ($guru): void {
             $lockedGuru = Guru::query()->whereKey($guru->id)->lockForUpdate()->firstOrFail();
-            $lockedGuru->update(['status_aktif' => false]);
+            $user = User::query()->whereKey($lockedGuru->user_id)->lockForUpdate()->firstOrFail();
+
+            if ($lockedGuru->waliKelas()->exists()
+                || $lockedGuru->catatanPelanggaran()->exists()
+                || LogPelanggaran::query()->where('user_id', $user->id)->exists()) {
+                throw ValidationException::withMessages([
+                    'guru' => 'Guru memiliki riwayat penugasan, catatan, atau aktivitas audit sehingga tidak dapat dihapus permanen. Nonaktifkan Guru untuk mempertahankan riwayat.',
+                ]);
+            }
+
+            $lockedGuru->delete();
+            $user->delete();
+        });
+
+        return to_route('admin.teachers.index')
+            ->with('success', 'Data Guru dan akun login tanpa riwayat berhasil dihapus permanen.');
+    }
+
+    public function deactivate(Guru $guru): RedirectResponse
+    {
+        Gate::authorize('changeStatus', $guru);
+
+        DB::transaction(function () use ($guru): void {
+            Guru::query()->whereKey($guru->id)->lockForUpdate()->firstOrFail()->update(['status_aktif' => false]);
         });
 
         return to_route('admin.teachers.show', $guru)

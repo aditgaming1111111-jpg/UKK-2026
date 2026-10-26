@@ -128,8 +128,27 @@ class PelanggaranController extends Controller
         return to_route('admin.violations.show', $pelanggaran)->with('success', 'Jenis pelanggaran berhasil diperbarui. Poin pada catatan lama tetap menggunakan snapshot saat pencatatan.');
     }
 
+    public function destroy(Pelanggaran $pelanggaran): RedirectResponse
+    {
+        Gate::authorize('delete', $pelanggaran);
+
+        DB::transaction(static function () use ($pelanggaran): void {
+            $lockedViolation = Pelanggaran::query()->whereKey($pelanggaran->id)->lockForUpdate()->firstOrFail();
+
+            if ($lockedViolation->catatanSiswa()->exists()) {
+                throw ValidationException::withMessages([
+                    'pelanggaran' => 'Jenis pelanggaran sudah digunakan pada catatan siswa. Nonaktifkan jenis ini agar histori dan snapshot poin tetap terjaga.',
+                ]);
+            }
+
+            $lockedViolation->delete();
+        });
+
+        return to_route('admin.violations.index')->with('success', 'Jenis pelanggaran tanpa catatan siswa berhasil dihapus permanen.');
+    }
+
     /**
-     * Remove the specified resource from storage.
+     * Toggle the active status of the violation type.
      */
     public function toggleStatus(Pelanggaran $pelanggaran): RedirectResponse
     {

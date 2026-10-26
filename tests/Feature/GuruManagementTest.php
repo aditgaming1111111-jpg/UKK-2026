@@ -12,6 +12,7 @@ use App\Models\PelanggaranSiswa;
 use App\Models\Siswa;
 use App\Models\TahunAjaran;
 use App\Models\User;
+use App\Models\WaliKelas;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -206,7 +207,7 @@ class GuruManagementTest extends TestCase
         $log = LogPelanggaran::factory()->for($note, 'catatanPelanggaran')->for($administrator, 'pengguna')->create();
         $userId = $teacher->user_id;
 
-        $this->actingAs($administrator)->delete(route('admin.teachers.destroy', $teacher))
+        $this->actingAs($administrator)->patch(route('admin.teachers.deactivate', $teacher))
             ->assertRedirect(route('admin.teachers.show', $teacher));
 
         $this->assertDatabaseHas('t_guru', ['id' => $teacher->id, 'status_aktif' => false, 'user_id' => $userId]);
@@ -220,6 +221,50 @@ class GuruManagementTest extends TestCase
             'password' => 'password',
         ])->assertSessionHasErrors('email');
         $this->assertGuest();
+    }
+
+    public function test_admin_can_permanently_delete_a_teacher_without_history_and_the_linked_user(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $teacher = Guru::factory()->create();
+        $user = $teacher->user;
+
+        $this->actingAs($administrator)->delete(route('admin.teachers.destroy', $teacher))
+            ->assertRedirect(route('admin.teachers.index'))
+            ->assertSessionHas('success');
+
+        $this->assertModelMissing($teacher);
+        $this->assertModelMissing($user);
+    }
+
+    public function test_teacher_with_history_cannot_be_permanently_deleted(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $teacher = Guru::factory()->create();
+        $class = Kelas::factory()->create();
+        $year = TahunAjaran::factory()->create();
+        WaliKelas::factory()->for($teacher, 'guru')->for($class, 'kelas')->for($year, 'tahunAjaran')->create();
+
+        $this->actingAs($administrator)->delete(route('admin.teachers.destroy', $teacher))
+            ->assertSessionHasErrors('guru');
+
+        $this->assertModelExists($teacher);
+        $this->assertModelExists($teacher->user);
+        $this->assertDatabaseHas('t_wali_kelas', ['guru_id' => $teacher->id]);
+    }
+
+    public function test_teacher_account_with_audit_activity_cannot_be_permanently_deleted(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $teacher = Guru::factory()->create();
+        $record = PelanggaranSiswa::factory()->create();
+        LogPelanggaran::factory()->for($record, 'catatanPelanggaran')->for($teacher->user, 'pengguna')->create();
+
+        $this->actingAs($administrator)->delete(route('admin.teachers.destroy', $teacher))
+            ->assertSessionHasErrors('guru');
+
+        $this->assertModelExists($teacher);
+        $this->assertModelExists($teacher->user);
     }
 
     public function test_admin_can_list_search_filter_and_paginate_teachers(): void

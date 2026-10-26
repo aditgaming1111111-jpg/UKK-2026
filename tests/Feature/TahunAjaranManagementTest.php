@@ -3,8 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\Guru;
+use App\Models\Kelas;
+use App\Models\KelasSiswa;
+use App\Models\Siswa;
 use App\Models\TahunAjaran;
 use App\Models\User;
+use App\Models\WaliKelas;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -74,6 +78,39 @@ class TahunAjaranManagementTest extends TestCase
 
         $this->get(route('admin.academic-years.index', ['page' => 2]))
             ->assertViewHas('academicYears', fn ($years): bool => $years->count() === 1 && $years->total() === 11);
+    }
+
+    public function test_admin_can_delete_an_academic_year_without_history(): void
+    {
+        $administrator = User::factory()->state(['role' => 'admin'])->create();
+        $year = TahunAjaran::factory()->create();
+
+        $this->actingAs($administrator)->delete(route('admin.academic-years.destroy', $year))
+            ->assertRedirect(route('admin.academic-years.index'))
+            ->assertSessionHas('success');
+
+        $this->assertModelMissing($year);
+    }
+
+    public function test_academic_year_with_placement_or_assignment_history_cannot_be_deleted(): void
+    {
+        $administrator = User::factory()->state(['role' => 'admin'])->create();
+        $year = TahunAjaran::factory()->create();
+        $class = Kelas::factory()->create();
+        $student = Siswa::factory()->create();
+        KelasSiswa::factory()->for($student, 'siswa')->for($class, 'kelas')->for($year, 'tahunAjaran')->create();
+
+        $this->actingAs($administrator)->delete(route('admin.academic-years.destroy', $year))
+            ->assertSessionHasErrors('tahun_ajaran');
+
+        $this->assertModelExists($year);
+        $this->assertDatabaseHas('t_kelas_siswa', ['tahun_ajaran_id' => $year->id]);
+
+        $yearWithoutPlacement = TahunAjaran::factory()->create();
+        WaliKelas::factory()->for(Guru::factory(), 'guru')->for($class, 'kelas')->for($yearWithoutPlacement, 'tahunAjaran')->create();
+        $this->delete(route('admin.academic-years.destroy', $yearWithoutPlacement))
+            ->assertSessionHasErrors('tahun_ajaran');
+        $this->assertModelExists($yearWithoutPlacement);
     }
 
     public function test_unchanged_academic_year_update_shows_success_notification(): void
