@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Guru;
 use App\Models\Kelas;
+use App\Models\LogAktivitas;
 use App\Models\Pelanggaran;
 use App\Models\PelanggaranKategori;
 use App\Models\PelanggaranSiswa;
@@ -45,6 +46,7 @@ class PelanggaranMasterManagementTest extends TestCase
         ])->assertRedirect(route('admin.violation-categories.show', $category));
 
         $this->assertDatabaseHas('t_pelanggaran_kategori', ['id' => $category->id, 'nama_kategori' => 'Kedisiplinan Siswa']);
+        $this->assertSame(2, LogAktivitas::query()->where('user_id', $admin->id)->count());
     }
 
     public function test_category_can_be_deleted_only_when_it_has_no_violation_types(): void

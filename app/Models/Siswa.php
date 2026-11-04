@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
-#[Fillable(['nisn', 'nama', 'jenis_kelamin', 'alamat', 'tahun_masuk', 'status_siswa'])]
+#[Fillable(['nis', 'nisn', 'nama', 'jenis_kelamin', 'tanggal_lahir', 'alamat', 'tahun_masuk', 'status_siswa'])]
 class Siswa extends Model
 {
     /** @use HasFactory<SiswaFactory> */
@@ -18,7 +18,10 @@ class Siswa extends Model
 
     protected function casts(): array
     {
-        return ['tahun_masuk' => 'integer'];
+        return [
+            'tahun_masuk' => 'integer',
+            'tanggal_lahir' => 'date',
+        ];
     }
 
     public function penempatanKelas(): HasMany

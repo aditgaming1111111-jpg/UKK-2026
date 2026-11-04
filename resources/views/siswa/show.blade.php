@@ -52,6 +52,10 @@
             </div>
             <dl class="mt-5 grid gap-x-6 gap-y-4 sm:grid-cols-2">
                 <div>
+                    <dt class="text-xs font-medium uppercase tracking-wide text-gray-500">NIS</dt>
+                    <dd class="mt-1 text-sm font-semibold text-gray-900">{{ $student->nis ?? 'Belum diisi' }}</dd>
+                </div>
+                <div>
                     <dt class="text-xs font-medium uppercase tracking-wide text-gray-500">NISN</dt>
                     <dd class="mt-1 text-sm font-semibold text-gray-900">{{ $student->nisn }}</dd>
                 </div>
@@ -59,6 +63,10 @@
                     <dt class="text-xs font-medium uppercase tracking-wide text-gray-500">Jenis kelamin</dt>
                     <dd class="mt-1 text-sm text-gray-800">{{ $student->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan' }}
                     </dd>
+                </div>
+                <div>
+                    <dt class="text-xs font-medium uppercase tracking-wide text-gray-500">Tanggal lahir</dt>
+                    <dd class="mt-1 text-sm text-gray-800">{{ $student->tanggal_lahir?->format('d/m/Y') ?? 'Belum diisi' }}</dd>
                 </div>
                 <div>
                     <dt class="text-xs font-medium uppercase tracking-wide text-gray-500">Tahun masuk</dt>

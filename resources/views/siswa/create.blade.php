@@ -7,7 +7,7 @@
 @endsection
 
 @section('page-heading')
-    <x-ui.page-heading title="Tambah Siswa" description="Buat identitas siswa. NISN akan menjadi identitas tetap siswa." />
+    <x-ui.page-heading title="Tambah Siswa" description="Buat identitas siswa. NIS dan NISN menjadi identitas tetap siswa." />
 @endsection
 
 @section('content')

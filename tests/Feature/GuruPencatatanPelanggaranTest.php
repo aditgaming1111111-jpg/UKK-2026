@@ -62,6 +62,10 @@ class GuruPencatatanPelanggaranTest extends TestCase
             'aksi' => 'tambah',
         ]);
         $this->assertSame(1, LogPelanggaran::query()->count());
+        $this->assertDatabaseHas('t_log_aktivitas', [
+            'user_id' => $teacherUser->id,
+            'aktivitas' => 'Pelanggaran dicatat',
+        ]);
     }
 
     public function test_invalid_fields_are_rejected_without_creating_a_record_or_log(): void

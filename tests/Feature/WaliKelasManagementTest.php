@@ -16,7 +16,8 @@ class WaliKelasManagementTest extends TestCase
 
     public function test_admin_can_replace_active_assignment_and_previous_record_is_preserved(): void
     {
-        $this->actingAs(User::factory()->state(['role' => 'admin'])->create());
+        $administrator = User::factory()->state(['role' => 'admin'])->create();
+        $this->actingAs($administrator);
         $class = Kelas::factory()->create();
         $firstYear = TahunAjaran::factory()->create([
             'nama_tahun_ajaran' => '2025/2026',
@@ -55,6 +56,10 @@ class WaliKelasManagementTest extends TestCase
         $this->assertDatabaseHas('t_wali_kelas', ['id' => $previous->id, 'tanggal_selesai' => '2026-06-30 00:00:00', 'status_aktif' => false]);
         $this->assertDatabaseHas('t_wali_kelas', ['guru_id' => $nextTeacher->id, 'kelas_id' => $class->id, 'status_aktif' => true]);
         $this->assertDatabaseCount('t_wali_kelas', 2);
+        $this->assertDatabaseHas('t_log_aktivitas', [
+            'user_id' => $administrator->id,
+            'aktivitas' => 'Wali kelas ditugaskan',
+        ]);
     }
 
     public function test_overlapping_assignment_is_rejected_without_changing_previous_record(): void
@@ -114,5 +119,70 @@ class WaliKelasManagementTest extends TestCase
 
         $this->get(route('admin.homeroom-teachers.index', ['page' => 2]))
             ->assertViewHas('assignments', fn ($assignments): bool => $assignments->count() === 1 && $assignments->total() === 11);
+    }
+
+    public function test_assignment_status_filters_are_qualified_and_preserved_with_other_filters_and_pagination(): void
+    {
+        $administrator = User::factory()->state(['role' => 'admin'])->create();
+        $class = Kelas::factory()->create(['nama_kelas' => 'XI RPL 2']);
+        $otherClass = Kelas::factory()->create(['nama_kelas' => 'X RPL 1']);
+        $year = TahunAjaran::factory()->create([
+            'nama_tahun_ajaran' => '2026/2027',
+            'status_aktif' => true,
+        ]);
+        $inactiveYear = TahunAjaran::factory()->create([
+            'nama_tahun_ajaran' => '2025/2026',
+            'status_aktif' => false,
+        ]);
+
+        $activeAssignment = WaliKelas::factory()->for($class, 'kelas')->for($inactiveYear, 'tahunAjaran')->create([
+            'status_aktif' => true,
+            'tanggal_selesai' => null,
+        ]);
+        $completedByDate = WaliKelas::factory()->for($class, 'kelas')->for($year, 'tahunAjaran')->create([
+            'status_aktif' => true,
+            'tanggal_selesai' => '2026-10-01',
+        ]);
+        $completedByStatus = WaliKelas::factory()->for($class, 'kelas')->for($year, 'tahunAjaran')->create([
+            'status_aktif' => false,
+            'tanggal_selesai' => null,
+        ]);
+        WaliKelas::factory()->for($otherClass, 'kelas')->for($inactiveYear, 'tahunAjaran')->create([
+            'status_aktif' => false,
+            'tanggal_selesai' => '2026-06-30',
+        ]);
+        WaliKelas::factory()->count(11)->for($class, 'kelas')->for($year, 'tahunAjaran')->create([
+            'status_aktif' => false,
+            'tanggal_selesai' => '2026-10-02',
+        ]);
+
+        $this->actingAs($administrator)->get(route('admin.homeroom-teachers.index'))
+            ->assertOk()
+            ->assertViewHas('assignments', fn ($assignments): bool => $assignments->total() === 15);
+
+        $this->get(route('admin.homeroom-teachers.index', ['status' => 'aktif']))
+            ->assertOk()
+            ->assertViewHas('assignments', fn ($assignments): bool => $assignments->total() === 1
+                && $assignments->getCollection()->first()->is($activeAssignment));
+
+        $filters = [
+            'status' => 'selesai',
+            'tahun_ajaran_id' => $year->id,
+            'kelas_id' => $class->id,
+        ];
+        $firstPage = $this->get(route('admin.homeroom-teachers.index', $filters));
+        $firstPage->assertOk()
+            ->assertViewHas('assignments', fn ($assignments): bool => $assignments->count() === 10
+                && $assignments->total() === 13)
+            ->assertSee('status=selesai')
+            ->assertSee('tahun_ajaran_id='.$year->id)
+            ->assertSee('kelas_id='.$class->id);
+
+        $this->get(route('admin.homeroom-teachers.index', [...$filters, 'page' => 2]))
+            ->assertOk()
+            ->assertViewHas('assignments', fn ($assignments): bool => $assignments->count() === 3
+                && $assignments->total() === 13
+                && $assignments->getCollection()->contains(fn (WaliKelas $assignment): bool => $assignment->is($completedByDate))
+                && $assignments->getCollection()->contains(fn (WaliKelas $assignment): bool => $assignment->is($completedByStatus)));
     }
 }

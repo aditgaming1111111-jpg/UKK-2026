@@ -4,12 +4,12 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\GuruController;
 use App\Http\Controllers\Admin\KelasController;
 use App\Http\Controllers\Admin\LaporanController;
+use App\Http\Controllers\Admin\LogAktivitasController;
 use App\Http\Controllers\Admin\PelanggaranController;
 use App\Http\Controllers\Admin\PelanggaranKategoriController;
 use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Admin\TahunAjaranController;
 use App\Http\Controllers\Admin\WaliKelasController;
-use App\Http\Controllers\LogPelanggaranController;
 use App\Http\Controllers\RiwayatPelanggaranController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,7 +27,7 @@ Route::prefix('admin')
             ->names('student-violations');
         Route::patch('data-pelanggaran/{pelanggaranSiswa}/batal', [RiwayatPelanggaranController::class, 'cancel'])
             ->name('student-violations.cancel');
-        Route::get('log-pelanggaran', [LogPelanggaranController::class, 'index'])->name('audit-logs.index');
+        Route::get('log-pelanggaran', [LogAktivitasController::class, 'index'])->name('audit-logs.index');
         Route::resource('siswa', SiswaController::class)->parameters(['siswa' => 'siswa'])->names('students');
         Route::patch('siswa/{siswa}/status', [SiswaController::class, 'updateStatus'])->name('students.status');
         Route::post('siswa/{siswa}/penempatan', [SiswaController::class, 'storePlacement'])->name('students.placements.store');

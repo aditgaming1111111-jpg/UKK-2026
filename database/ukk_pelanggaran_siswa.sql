@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Oct 20, 2026 at 12:58 PM
+-- Generation Time: Nov 04, 2026 at 03:22 PM
 -- Server version: 8.4.3
 -- PHP Version: 8.3.30
 
@@ -32,20 +32,6 @@ CREATE TABLE `cache` (
   `value` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `expiration` bigint NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `cache`
---
-
-INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
-('sekolahku-cache-818cb4847ce323a3aa5cc5587b165e84dcc60a71', 'i:1;', 1792073405),
-('sekolahku-cache-818cb4847ce323a3aa5cc5587b165e84dcc60a71:timer', 'i:1792073405;', 1792073405),
-('sekolahku-cache-9fb7e9d5af1dbc37c9464e14407f3a9299f9bce6', 'i:1;', 1792498856),
-('sekolahku-cache-9fb7e9d5af1dbc37c9464e14407f3a9299f9bce6:timer', 'i:1792498856;', 1792498856),
-('sekolahku-cache-bb2926e45c06ec8262bb785a3aae4dd2ffaca6d2', 'i:1;', 1792069644),
-('sekolahku-cache-bb2926e45c06ec8262bb785a3aae4dd2ffaca6d2:timer', 'i:1792069644;', 1792069644),
-('sekolahku-cache-fc26eb645d3edf739579e766ba23e8f5291583bb', 'i:1;', 1791991221),
-('sekolahku-cache-fc26eb645d3edf739579e766ba23e8f5291583bb:timer', 'i:1791991221;', 1791991221);
 
 -- --------------------------------------------------------
 
@@ -132,7 +118,9 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (3, '0001_01_01_000002_create_jobs_table', 1),
 (4, '2026_10_01_121847_migrate_users_to_t_users_and_create_t_guru_table', 1),
 (5, '2026_10_01_132222_create_sekolahku_core_tables', 1),
-(6, '2026_10_01_155432_add_unique_index_to_t_pelanggaran_kode', 1);
+(6, '2026_10_01_155432_add_unique_index_to_t_pelanggaran_kode', 1),
+(7, '2026_11_04_113055_add_nis_and_tanggal_lahir_to_t_siswa_table', 1),
+(8, '2026_11_04_115330_create_t_log_aktivitas_table', 1);
 
 -- --------------------------------------------------------
 
@@ -166,7 +154,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('WhekWjycCkP8Od9pOF6iBMhn5UMrIwjOqbfxxGvG', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJKMVlaRElUN3AxUU5yNWxhZUVOSHhneEFpSVM3SUtWNmRmWXJHUVU2IiwiX2ZsYXNoIjp7Im5ldyI6W10sIm9sZCI6W119LCJfcHJldmlvdXMiOnsidXJsIjoiaHR0cDpcL1wvbG9jYWxob3N0OjgwMDBcL2FkbWluIiwicm91dGUiOiJhZG1pbi5kYXNoYm9hcmQifSwibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiOjEsInBhc3N3b3JkX2hhc2hfd2ViIjoiNmMzNGM2N2I4ZTc4YTgxNDhlNjBmNTMzOTllNzA5ZDA5N2Q0NGMxNWExZDM4ZWQyOTkwZDcwMDdhMWM1YWE3NyJ9', 1792501085);
+('uuAu9xXIXbP5PeqeFCjzhpHVn8lfTfMIu9gcPebY', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiIyc1JzeUVJczdaSW1lWkZlTWk0WGRlRVJlSGdYQm9CbFg4ZXQxQUdvIiwiX3ByZXZpb3VzIjp7InVybCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDAwXC9hZG1pblwvc2lzd2FcLzc1Iiwicm91dGUiOiJhZG1pbi5zdHVkZW50cy5zaG93In0sIl9mbGFzaCI6eyJvbGQiOltdLCJuZXciOltdfSwibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiOjEsInBhc3N3b3JkX2hhc2hfd2ViIjoiMTg0OWE2YzEzYmVhMmZlOTc4ODhiNjUxMzMzZmY2YTIyZDVjMTA2YmNkMGQ4NjE2MGNmZGQzZGM0NWJjNjJmNCJ9', 1793805744);
 
 -- --------------------------------------------------------
 
@@ -190,9 +178,62 @@ CREATE TABLE `t_guru` (
 --
 
 INSERT INTO `t_guru` (`id`, `nip`, `nama`, `email`, `status_aktif`, `user_id`, `created_at`, `updated_at`) VALUES
-(1, '1980010120260001', 'Anton Saputra', 'anton@sekolahku.com', 1, 2, '2026-10-14 07:47:00', '2026-10-14 08:16:53'),
-(2, '123456789123456789', 'Surya Santoso', 'surya@sekolahku.com', 1, 3, '2026-10-20 04:49:05', '2026-10-20 04:49:05'),
-(3, '123456780000000017', 'Andi Saputra', 'andisaputra@sekolahku.com', 1, 4, '2026-10-20 05:19:42', '2026-10-20 05:19:42');
+(1, '1980010120260001', 'Anton', 'anton@sekolahku.com', 1, 2, '2026-11-04 07:59:23', '2026-11-04 07:59:23'),
+(2, '202600000000000001', 'Wawan Kurniawan, S.Pd.I', 'wawankurniawan@sekolahku.com', 1, 3, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(3, '202600000000000002', 'Ai Nuryaidah, S.Pd', 'ainuryaidah@sekolahku.com', 1, 4, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(4, '202600000000000003', 'Maya Permata Endah, S. Pd', 'mayapermataendah@sekolahku.com', 1, 5, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(5, '202600000000000004', 'Dody Jaenudin, S.Pd.', 'dodyjaenudin@sekolahku.com', 1, 6, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(6, '202600000000000005', 'Dedi Kardiman, S. Pd', 'dedikardiman@sekolahku.com', 1, 7, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(7, '202600000000000006', 'Uca Musa Yusenda, S.Pd', 'ucamusayusenda@sekolahku.com', 1, 8, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(8, '202600000000000007', 'Drs. Ahmad Nur Mukhlis', 'ahmadnurmukhlis@sekolahku.com', 1, 9, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(9, '202600000000000008', 'Drs. Heri', 'heri@sekolahku.com', 1, 10, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(10, '202600000000000009', 'Asep Bastaman', 'asepbastaman@sekolahku.com', 1, 11, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(11, '202600000000000010', 'H. Encep Maemun, S.T., M.Pd', 'encepmaemun@sekolahku.com', 1, 12, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(12, '202600000000000011', 'Opik', 'opik@sekolahku.com', 1, 13, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(13, '202600000000000012', 'Ida Farida, S. Pd', 'idafarida@sekolahku.com', 1, 14, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(14, '202600000000000013', 'Idah Mahmudah, S.Pd', 'idahmahmudah@sekolahku.com', 1, 15, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(15, '202600000000000014', 'Drs. Muhamad Ali', 'muhamadali@sekolahku.com', 1, 16, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(16, '202600000000000015', 'Helmi Ali Akbar, S.Pd.I', 'helmialiakbar@sekolahku.com', 1, 17, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(17, '202600000000000016', 'Syeni Suswarini, S.Pd', 'syenisuswarini@sekolahku.com', 1, 18, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(18, '202600000000000017', 'Wiwid Yulianti, S.Pd', 'wiwidyulianti@sekolahku.com', 1, 19, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(19, '202600000000000018', 'Ansor Muhajir, S.T', 'ansormuhajir@sekolahku.com', 1, 20, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(20, '202600000000000019', 'Ogi Gaosun Gias, S.Pd.I', 'ogigaosungias@sekolahku.com', 1, 21, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(21, '202600000000000020', 'Sandi Mulyana, S.Pd', 'sandimulyana@sekolahku.com', 1, 22, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(22, '202600000000000021', 'Erna Suryani, S.Pd', 'ernasuryani@sekolahku.com', 1, 23, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(23, '202600000000000022', 'Ai Wahidah, S.Ag', 'aiwahidah@sekolahku.com', 1, 24, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(24, '202600000000000023', 'Chandra Aditya Yusup, S.Pd', 'chandraadityayusup@sekolahku.com', 1, 25, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(25, '202600000000000024', 'Arif Kusmawan, S.Pd', 'arifkusmawan@sekolahku.com', 1, 26, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(26, '202600000000000025', 'Asep Taufiq Hidayat, S.Kom', 'aseptaufiqhidayat@sekolahku.com', 1, 27, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(27, '202600000000000026', 'Rendy Ichsan Kusumah, S.T', 'rendyichsankusumah@sekolahku.com', 1, 28, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(28, '202600000000000027', 'Feri Rahmawan, S.Pd', 'ferirahmawan@sekolahku.com', 1, 29, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(29, '202600000000000028', 'Ari Sandriana, S.Kom', 'arisandriana@sekolahku.com', 1, 30, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(30, '202600000000000029', 'Yaneu Nurdian, S.Pd., M.Pd', 'yaneunurdian@sekolahku.com', 1, 31, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(31, '202600000000000030', 'Ucu Muhammad Khoer N, S.Pd', 'ucumuhammadkhoern@sekolahku.com', 1, 32, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(32, '202600000000000031', 'Mira Dwi Rahmawati, S.Ag', 'miradwirahmawati@sekolahku.com', 1, 33, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(33, '202600000000000032', 'Aldi Maulana, S.Pd', 'aldimaulana@sekolahku.com', 1, 34, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(34, '202600000000000033', 'Eli Rosliah, S.Pd', 'elirosliah@sekolahku.com', 1, 35, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(35, '202600000000000034', 'Isni Nur Fitriani, S.Pd', 'isninurfitriani@sekolahku.com', 1, 36, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(36, '202600000000000035', 'Aanisah Putri Nur Aini, S.Pd', 'aanisahputrinuraini@sekolahku.com', 1, 37, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(37, '202600000000000036', 'Yusi Luthfiani, S.Sos.I', 'yusiluthfiani@sekolahku.com', 1, 38, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(38, '202600000000000037', 'Lilis Rustandy Mawardi, S.Pd., M.Pd', 'lilisrustandymawardi@sekolahku.com', 1, 39, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(39, '202600000000000038', 'Yusrin Noer Sabrina, S.Pd', 'yusrinnoersabrina@sekolahku.com', 1, 40, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(40, '202600000000000039', 'Senny Indayani, S.Pd', 'sennyindayani@sekolahku.com', 1, 41, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(41, '202600000000000040', 'Ilma Amalia, S.Pd', 'ilmaamalia@sekolahku.com', 1, 42, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(42, '202600000000000041', 'Alvira Sofwatunnisa, S.Pd', 'alvirasofwatunnisa@sekolahku.com', 1, 43, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(43, '202600000000000042', 'Risna Andriyani, S.Pd', 'risnaandriyani@sekolahku.com', 1, 44, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(44, '202600000000000043', 'Dra. Tintin Noerhayati', 'tintinnoerhayati@sekolahku.com', 1, 45, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(45, '202600000000000044', 'Rizkia Fahira, S.Pd', 'rizkiafahira@sekolahku.com', 1, 46, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(46, '202600000000000045', 'Frasetio', 'frasetio@sekolahku.com', 1, 47, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(47, '202600000000000046', 'Ratnaningsih Hatil Aeni, S.Pd.', 'ratnaningshhatilaeni@sekolahku.com', 1, 48, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(48, '202600000000000047', 'Dheny Darajatul Hasani, S.Pd.', 'dhenydarajatulhasani@sekolahku.com', 1, 49, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(49, '202600000000000048', 'Fahrullah, S.Pd', 'fahrullah@sekolahku.com', 1, 50, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(50, '202600000000000049', 'Aan Andriana, S.T', 'aanandriana@sekolahku.com', 1, 51, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(51, '202600000000000050', 'Fitri Fauziah, S.T', 'fitrifauziah@sekolahku.com', 1, 52, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(52, '202600000000000051', 'Nida Aulia, S.Pd', 'nidaaulia@sekolahku.com', 1, 53, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(53, '202600000000000052', 'Sri Nurrizki Putri Krisnadi, S.Pd', 'srinurrizkiputrikrisnadi@sekolahku.com', 1, 54, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(54, '202600000000000053', 'Riesy Putri Navia, S.Kom', 'riesyputrinavia@sekolahku.com', 1, 55, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(55, '202600000000000054', 'Rurry Febriani Maryadi, S.Pd', 'rurryfebrianimaryadi@sekolahku.com', 1, 56, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(56, '202600000000000055', 'Irvan Rizal, S.Pd', 'irvanrizal@sekolahku.com', 1, 57, '2026-11-04 15:01:22', '2026-11-04 15:01:22');
 
 -- --------------------------------------------------------
 
@@ -214,8 +255,8 @@ CREATE TABLE `t_kelas` (
 --
 
 INSERT INTO `t_kelas` (`id`, `nama_kelas`, `tingkat`, `jurusan`, `created_at`, `updated_at`) VALUES
-(1, 'X RPL 1', '10', 'RPL', '2026-10-14 08:03:01', '2026-10-14 08:03:01'),
-(2, 'X RPL 2', '10', 'RPL', '2026-10-20 04:51:16', '2026-10-20 04:51:16');
+(1, 'XII RPL 1', '12', 'Rekayasa Perangkat Lunak', '2026-11-04 08:03:36', '2026-11-04 08:03:36'),
+(2, 'XII RPL 2', '12', 'Rekayasa Perangkat Lunak', '2026-11-04 08:03:52', '2026-11-04 08:03:52');
 
 -- --------------------------------------------------------
 
@@ -240,18 +281,48 @@ CREATE TABLE `t_kelas_siswa` (
 --
 
 INSERT INTO `t_kelas_siswa` (`id`, `siswa_id`, `kelas_id`, `tahun_ajaran_id`, `tanggal_mulai`, `tanggal_selesai`, `status_aktif`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 1, '2026-07-01', NULL, 1, '2026-10-14 08:04:42', '2026-10-14 08:04:42'),
-(2, 2, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:21:19', '2026-10-19 06:21:19'),
-(3, 4, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:28:14', '2026-10-19 06:28:14'),
-(4, 3, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:28:36', '2026-10-19 06:28:36'),
-(5, 10, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:28:57', '2026-10-19 06:28:57'),
-(6, 7, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:29:17', '2026-10-19 06:29:17'),
-(7, 6, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:29:37', '2026-10-19 06:29:37'),
-(8, 8, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:29:57', '2026-10-19 06:29:57'),
-(9, 11, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:30:16', '2026-10-19 06:30:16'),
-(10, 9, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:30:38', '2026-10-19 06:30:38'),
-(11, 5, 1, 1, '2026-07-01', NULL, 1, '2026-10-19 06:30:57', '2026-10-19 06:30:57'),
-(12, 12, 2, 1, '2026-07-01', NULL, 1, '2026-10-20 04:53:47', '2026-10-20 04:53:47');
+(1, 1, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 08:10:57', '2026-11-04 08:10:57'),
+(2, 2, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 08:11:16', '2026-11-04 08:11:16'),
+(3, 27, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 08:11:35', '2026-11-04 08:11:35'),
+(4, 75, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 08:22:23', '2026-11-04 08:22:23');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `t_log_aktivitas`
+--
+
+CREATE TABLE `t_log_aktivitas` (
+  `id` bigint UNSIGNED NOT NULL,
+  `user_id` bigint UNSIGNED NOT NULL,
+  `aktivitas` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `deskripsi` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` text COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `t_log_aktivitas`
+--
+
+INSERT INTO `t_log_aktivitas` (`id`, `user_id`, `aktivitas`, `deskripsi`, `ip_address`, `user_agent`, `created_at`) VALUES
+(1, 1, 'Login', 'Pengguna berhasil masuk sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 07:59:54'),
+(2, 1, 'Kelas ditambahkan', 'Data kelas ID #1 berhasil ditambahkan.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 08:03:36'),
+(3, 1, 'Kelas ditambahkan', 'Data kelas ID #2 berhasil ditambahkan.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 08:03:52'),
+(4, 1, 'Tahun ajaran ditambahkan', 'Periode tahun ajaran ID #1 berhasil ditambahkan.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 08:04:43'),
+(5, 1, 'Wali kelas ditugaskan', 'Penugasan wali kelas ID #1 berhasil dibuat.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 08:05:11'),
+(6, 1, 'Wali kelas ditugaskan', 'Penugasan wali kelas ID #2 berhasil dibuat.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 08:05:38'),
+(7, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #1 dicatat dengan ID #1.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 08:10:58'),
+(8, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #2 dicatat dengan ID #2.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 08:11:16'),
+(9, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #27 dicatat dengan ID #3.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 08:11:35'),
+(10, 1, 'Status siswa diubah', 'Status siswa ID #27 diubah menjadi nonaktif.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 08:12:28'),
+(11, 1, 'Status siswa diubah', 'Status siswa ID #27 diubah menjadi aktif.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 08:12:36'),
+(12, 1, 'Siswa diperbarui', 'Data siswa ID #1 berhasil diperbarui.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 08:21:07'),
+(13, 1, 'Siswa diperbarui', 'Data siswa ID #1 berhasil diperbarui.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 08:21:17'),
+(14, 1, 'Siswa diperbarui', 'Data siswa ID #2 berhasil diperbarui.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 08:21:33'),
+(15, 1, 'Siswa diperbarui', 'Data siswa ID #27 berhasil diperbarui.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 08:21:49'),
+(16, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #75 dicatat dengan ID #4.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 08:22:23');
 
 -- --------------------------------------------------------
 
@@ -269,18 +340,6 @@ CREATE TABLE `t_log_pelanggaran` (
   `alasan` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `t_log_pelanggaran`
---
-
-INSERT INTO `t_log_pelanggaran` (`id`, `pelanggaran_siswa_id`, `user_id`, `aksi`, `data_sebelum`, `data_sesudah`, `alasan`, `created_at`) VALUES
-(1, 1, 2, 'tambah', NULL, '{\"kelas_siswa_id\":1,\"pelanggaran_id\":1,\"guru_id\":1,\"tanggal_pelanggaran\":\"2026-10-14 00:00:00\",\"tanggal_dicatat\":\"2026-10-14 15:12:15\",\"poin_saat_dicatat\":5,\"keterangan\":\"Andi datang terlambat saat jam masuk sekolah\",\"tindakan\":null,\"status\":\"aktif\",\"updated_at\":\"2026-10-14 15:12:15\",\"created_at\":\"2026-10-14 15:12:15\",\"id\":1}', 'Pencatatan awal', '2026-10-14 08:12:15'),
-(2, 1, 2, 'edit', '{\"id\":1,\"kelas_siswa_id\":1,\"pelanggaran_id\":1,\"guru_id\":1,\"tanggal_pelanggaran\":\"2026-10-14\",\"tanggal_dicatat\":\"2026-10-14 15:12:15\",\"poin_saat_dicatat\":5,\"keterangan\":\"Andi datang terlambat saat jam masuk sekolah\",\"tindakan\":null,\"status\":\"aktif\",\"created_at\":\"2026-10-14 15:12:15\",\"updated_at\":\"2026-10-14 15:12:15\"}', '{\"id\":1,\"kelas_siswa_id\":1,\"pelanggaran_id\":1,\"guru_id\":1,\"tanggal_pelanggaran\":\"2026-10-14 00:00:00\",\"tanggal_dicatat\":\"2026-10-14 15:12:15\",\"poin_saat_dicatat\":5,\"keterangan\":\"Andi datang terlambat saat jam masuk sekolah. Sudah diberikan teguran oleh guru piket.\",\"tindakan\":null,\"status\":\"aktif\",\"created_at\":\"2026-10-14 15:12:15\",\"updated_at\":\"2026-10-14 15:30:48\"}', 'TEST', '2026-10-14 08:30:48'),
-(3, 2, 2, 'tambah', NULL, '{\"kelas_siswa_id\":5,\"pelanggaran_id\":1,\"guru_id\":1,\"tanggal_pelanggaran\":\"2026-10-19 00:00:00\",\"tanggal_dicatat\":\"2026-10-19 13:59:42\",\"poin_saat_dicatat\":5,\"keterangan\":\"Terlambat masuk sekolah 15 menit\",\"tindakan\":\"Membaca 10 surah pendek\",\"status\":\"aktif\",\"updated_at\":\"2026-10-19 13:59:42\",\"created_at\":\"2026-10-19 13:59:42\",\"id\":2}', 'Pencatatan awal', '2026-10-19 06:59:42'),
-(4, 3, 2, 'tambah', NULL, '{\"kelas_siswa_id\":3,\"pelanggaran_id\":1,\"guru_id\":1,\"tanggal_pelanggaran\":\"2026-10-15 00:00:00\",\"tanggal_dicatat\":\"2026-10-19 14:00:31\",\"poin_saat_dicatat\":5,\"keterangan\":\"Terlambat datang ke sekolah\",\"tindakan\":\"Membersihkan lapangan\",\"status\":\"aktif\",\"updated_at\":\"2026-10-19 14:00:31\",\"created_at\":\"2026-10-19 14:00:31\",\"id\":3}', 'Pencatatan awal', '2026-10-19 07:00:31'),
-(5, 4, 2, 'tambah', NULL, '{\"kelas_siswa_id\":1,\"pelanggaran_id\":1,\"guru_id\":1,\"tanggal_pelanggaran\":\"2026-10-07 00:00:00\",\"tanggal_dicatat\":\"2026-10-19 14:01:43\",\"poin_saat_dicatat\":5,\"keterangan\":\"Terlambat datang ke sekolah 1 jam\",\"tindakan\":\"membaca al quran\",\"status\":\"aktif\",\"updated_at\":\"2026-10-19 14:01:43\",\"created_at\":\"2026-10-19 14:01:43\",\"id\":4}', 'Pencatatan awal', '2026-10-19 07:01:43'),
-(6, 4, 2, 'batal', '{\"id\":4,\"kelas_siswa_id\":1,\"pelanggaran_id\":1,\"guru_id\":1,\"tanggal_pelanggaran\":\"2026-10-07\",\"tanggal_dicatat\":\"2026-10-19 14:01:43\",\"poin_saat_dicatat\":5,\"keterangan\":\"Terlambat datang ke sekolah 1 jam\",\"tindakan\":\"membaca al quran\",\"status\":\"aktif\",\"created_at\":\"2026-10-19 14:01:43\",\"updated_at\":\"2026-10-19 14:01:43\"}', '{\"id\":4,\"kelas_siswa_id\":1,\"pelanggaran_id\":1,\"guru_id\":1,\"tanggal_pelanggaran\":\"2026-10-07\",\"tanggal_dicatat\":\"2026-10-19 14:01:43\",\"poin_saat_dicatat\":5,\"keterangan\":\"Terlambat datang ke sekolah 1 jam\",\"tindakan\":\"membaca al quran\",\"status\":\"dibatalkan\",\"created_at\":\"2026-10-19 14:01:43\",\"updated_at\":\"2026-10-19 14:02:39\"}', 'Sakit pulang dari rumah sakit, Datang ke sekolah', '2026-10-19 07:02:39');
 
 -- --------------------------------------------------------
 
@@ -305,7 +364,31 @@ CREATE TABLE `t_pelanggaran` (
 --
 
 INSERT INTO `t_pelanggaran` (`id`, `kategori_id`, `kode`, `nama_pelanggaran`, `deskripsi`, `poin`, `status_aktif`, `created_at`, `updated_at`) VALUES
-(1, 1, 'PLG-001', 'Terlambat datang ke sekolah', 'Siswa datang ke sekolah melewati waktu masuk yang telah ditetapkan tanpa alasan yang dapat diterima oleh pihak sekolah.', 5, 1, '2026-10-14 08:10:14', '2026-10-14 08:10:14');
+(1, 1, 'PLG001', 'Terlambat datang ke sekolah', 'Siswa datang melewati waktu masuk sekolah.', 5, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(2, 1, 'PLG002', 'Tidak mengikuti upacara', 'Siswa tidak mengikuti upacara tanpa alasan yang jelas.', 5, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(3, 1, 'PLG003', 'Tidak mengikuti kegiatan sekolah', 'Siswa tidak mengikuti kegiatan wajib sekolah.', 10, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(4, 1, 'PLG004', 'Membolos pelajaran', 'Siswa meninggalkan atau tidak mengikuti pelajaran tanpa izin.', 10, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(5, 1, 'PLG005', 'Meninggalkan sekolah tanpa izin', 'Siswa keluar dari lingkungan sekolah tanpa izin.', 15, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(6, 2, 'PLG006', 'Tidak memakai atribut lengkap', 'Siswa tidak menggunakan atribut sekolah secara lengkap.', 5, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(7, 2, 'PLG007', 'Seragam tidak sesuai ketentuan', 'Siswa menggunakan seragam yang tidak sesuai aturan.', 5, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(8, 2, 'PLG008', 'Rambut tidak sesuai aturan', 'Penampilan rambut siswa tidak sesuai ketentuan sekolah.', 10, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(9, 2, 'PLG009', 'Memakai aksesoris berlebihan', 'Siswa menggunakan aksesoris yang tidak diperbolehkan.', 10, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(10, 2, 'PLG010', 'Mengubah model seragam sekolah', 'Siswa mengubah bentuk atau model seragam sekolah.', 15, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(11, 3, 'PLG011', 'Membuat kegaduhan di kelas', 'Siswa membuat keributan yang mengganggu kegiatan belajar.', 5, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(12, 3, 'PLG012', 'Tidak mengikuti aturan kelas', 'Siswa melanggar peraturan yang berlaku di kelas.', 5, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(13, 3, 'PLG013', 'Membawa barang yang dilarang', 'Siswa membawa barang yang tidak diperbolehkan sekolah.', 10, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(14, 3, 'PLG014', 'Mengganggu kegiatan belajar', 'Siswa mengganggu proses pembelajaran.', 10, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(15, 3, 'PLG015', 'Berkelahi di lingkungan sekolah', 'Siswa terlibat perkelahian di lingkungan sekolah.', 15, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(16, 4, 'PLG016', 'Berkata tidak sopan', 'Siswa menggunakan perkataan yang tidak pantas.', 5, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(17, 4, 'PLG017', 'Tidak menghormati guru', 'Siswa menunjukkan sikap tidak hormat kepada guru.', 10, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(18, 4, 'PLG018', 'Mengejek teman', 'Siswa mengejek atau menghina teman.', 10, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(19, 4, 'PLG019', 'Melakukan perundungan', 'Siswa melakukan tindakan perundungan terhadap orang lain.', 15, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(20, 4, 'PLG020', 'Mengancam atau mengintimidasi teman', 'Siswa mengancam atau mengintimidasi teman.', 15, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(21, 5, 'PLG021', 'Membuang sampah sembarangan', 'Siswa membuang sampah tidak pada tempatnya.', 5, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(22, 5, 'PLG022', 'Tidak melaksanakan piket', 'Siswa tidak melaksanakan tugas piket kelas.', 5, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(23, 5, 'PLG023', 'Mencoret meja atau kursi', 'Siswa mencoret fasilitas meja atau kursi sekolah.', 10, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(24, 5, 'PLG024', 'Merusak fasilitas kebersihan', 'Siswa merusak fasilitas kebersihan sekolah.', 10, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(25, 5, 'PLG025', 'Merusak fasilitas sekolah', 'Siswa merusak fasilitas milik sekolah.', 15, 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53');
 
 -- --------------------------------------------------------
 
@@ -327,7 +410,11 @@ CREATE TABLE `t_pelanggaran_kategori` (
 --
 
 INSERT INTO `t_pelanggaran_kategori` (`id`, `nama_kategori`, `deskripsi`, `status_aktif`, `created_at`, `updated_at`) VALUES
-(1, 'Kedisiplinan', 'Ketidakpatuhan siswa terhadap tata tertib dan aturan kedisiplinan sekolah.', 1, '2026-10-14 08:08:58', '2026-10-14 08:08:58');
+(1, 'Kedisiplinan', 'Pelanggaran terhadap aturan waktu dan kedisiplinan siswa.', 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(2, 'Kerapian', 'Pelanggaran terkait penampilan dan atribut sekolah.', 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(3, 'Ketertiban', 'Pelanggaran terhadap ketentuan dan tata tertib sekolah.', 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(4, 'Etika dan Sopan Santun', 'Pelanggaran terhadap norma, etika, dan sikap siswa.', 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53'),
+(5, 'Kebersihan dan Lingkungan', 'Pelanggaran terkait kebersihan dan kelestarian lingkungan sekolah.', 1, '2026-11-04 15:02:53', '2026-11-04 15:02:53');
 
 -- --------------------------------------------------------
 
@@ -350,16 +437,6 @@ CREATE TABLE `t_pelanggaran_siswa` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `t_pelanggaran_siswa`
---
-
-INSERT INTO `t_pelanggaran_siswa` (`id`, `kelas_siswa_id`, `pelanggaran_id`, `guru_id`, `tanggal_pelanggaran`, `tanggal_dicatat`, `poin_saat_dicatat`, `keterangan`, `tindakan`, `status`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 1, '2026-10-14', '2026-10-14 15:12:15', 5, 'Andi datang terlambat saat jam masuk sekolah. Sudah diberikan teguran oleh guru piket.', NULL, 'aktif', '2026-10-14 08:12:15', '2026-10-14 08:30:48'),
-(2, 5, 1, 1, '2026-10-19', '2026-10-19 13:59:42', 5, 'Terlambat masuk sekolah 15 menit', 'Membaca 10 surah pendek', 'aktif', '2026-10-19 06:59:42', '2026-10-19 06:59:42'),
-(3, 3, 1, 1, '2026-10-15', '2026-10-19 14:00:31', 5, 'Terlambat datang ke sekolah', 'Membersihkan lapangan', 'aktif', '2026-10-19 07:00:31', '2026-10-19 07:00:31'),
-(4, 1, 1, 1, '2026-10-07', '2026-10-19 14:01:43', 5, 'Terlambat datang ke sekolah 1 jam', 'membaca al quran', 'dibatalkan', '2026-10-19 07:01:43', '2026-10-19 07:02:39');
-
 -- --------------------------------------------------------
 
 --
@@ -375,26 +452,66 @@ CREATE TABLE `t_siswa` (
   `tahun_masuk` smallint UNSIGNED NOT NULL,
   `status_siswa` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'aktif',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `nis` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `tanggal_lahir` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `t_siswa`
 --
 
-INSERT INTO `t_siswa` (`id`, `nisn`, `nama`, `jenis_kelamin`, `alamat`, `tahun_masuk`, `status_siswa`, `created_at`, `updated_at`) VALUES
-(1, '0061234567', 'Andi Saputra', 'L', 'Jl. Melati No. 10, Tasikmalaya', 2026, 'aktif', '2026-10-14 08:03:48', '2026-10-14 08:03:48'),
-(2, '0987612345', 'Sri Lestari', 'P', 'Tasikmalaya', 2026, 'aktif', '2026-10-19 06:20:39', '2026-10-19 06:20:39'),
-(3, '0000000001', 'Andi Santoso', 'L', 'Tasikamalaya', 2026, 'aktif', '2026-10-19 06:22:08', '2026-10-19 06:22:08'),
-(4, '0000000002', 'Ali Syahbana', 'L', 'Cilolohan', 2026, 'aktif', '2026-10-19 06:22:40', '2026-10-19 06:22:40'),
-(5, '0000000003', 'Zahru Fikri', 'L', 'Kawalu', 2026, 'aktif', '2026-10-19 06:23:08', '2026-10-19 06:23:08'),
-(6, '0000000004', 'Nazril Ilham', 'L', 'Ciberem', 2026, 'aktif', '2026-10-19 06:23:33', '2026-10-19 06:23:33'),
-(7, '0000000005', 'Fitri indah', 'P', 'Tasikmalaya', 2026, 'aktif', '2026-10-19 06:24:02', '2026-10-19 06:24:02'),
-(8, '0000000006', 'Nijar Saputra', 'L', 'Ciamis', 2026, 'aktif', '2026-10-19 06:24:31', '2026-10-19 06:24:31'),
-(9, '0000000007', 'Sofi Nurjanah', 'P', 'Tasikamalaya', 2026, 'aktif', '2026-10-19 06:25:58', '2026-10-19 06:25:58'),
-(10, '0000000008', 'Arfa belingham', 'P', 'Tasimalaya', 2026, 'aktif', '2026-10-19 06:26:20', '2026-10-19 06:26:20'),
-(11, '0000000009', 'Ressa Juiansayah', 'L', 'Cilolohan', 2026, 'aktif', '2026-10-19 06:26:51', '2026-10-19 06:26:51'),
-(12, '0000000078', 'Abdul somad', 'L', 'Tasik', 2026, 'aktif', '2026-10-20 04:53:35', '2026-10-20 04:53:35');
+INSERT INTO `t_siswa` (`id`, `nisn`, `nama`, `jenis_kelamin`, `alamat`, `tahun_masuk`, `status_siswa`, `created_at`, `updated_at`, `nis`, `tanggal_lahir`) VALUES
+(1, '0000000001', 'ADITTIA NUR LANTIP', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-04 15:10:12', '2026-11-04 08:21:17', '2024000001', '2008-01-15'),
+(2, '0000000002', 'AGNIA ROSYA NOERILLAH', 'P', 'Tasikmalaya', 2026, 'aktif', '2026-11-04 15:10:12', '2026-11-04 08:21:33', '2024000002', '2008-03-22'),
+(27, '0000000027', 'ALFIN RAHADIAN', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-04 15:10:12', '2026-11-04 08:21:49', '2024000027', '2009-01-12'),
+(51, '0000000003', 'ANISA AMIRULLA', 'P', 'Jl. Tentara Pelajar, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000003', '2008-05-10'),
+(52, '0000000004', 'ARADEA KANDI', 'P', 'Jl. RE Martadinata, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000004', '2008-07-19'),
+(53, '0000000005', 'ARFA DIESA OKMALELIZA', 'P', 'Jl. Sutisna Senjaya, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000005', '2008-09-12'),
+(54, '0000000006', 'FITRI NUR SYAMI', 'P', 'Jl. Paseh, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000006', '2008-11-25'),
+(55, '0000000007', 'JUNITA PUTRI NUR RAHMAN', 'P', 'Jl. Mitra Batik, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000007', '2008-02-08'),
+(56, '0000000008', 'MOHAMMAD ATALARIK ALI SYAHBANA', 'L', 'Jl. Perintis Kemerdekaan, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000008', '2008-04-17'),
+(57, '0000000009', 'MUHAMAD FAHRIL FAHRUROZI', 'L', 'Jl. Gunung Sabeulah, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000009', '2008-06-29'),
+(58, '0000000010', 'MUHAMMAD ADNAN SYAEFUL ISLAMI', 'L', 'Jl. Letnan Harun, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000010', '2008-08-13'),
+(59, '0000000011', 'MUHAMMAD ZAHRU AQILA FIKRI', 'L', 'Jl. BKR, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000011', '2008-10-21'),
+(60, '0000000012', 'NADIA ZULFA SORAYA', 'P', 'Jl. Cieunteung, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000012', '2008-12-05'),
+(61, '0000000013', 'NAZRIL ILHAM', 'L', 'Jl. Siliwangi, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000013', '2008-01-28'),
+(62, '0000000014', 'PUSPITA DEWI', 'P', 'Jl. Gobras, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000014', '2008-03-14'),
+(63, '0000000015', 'RAKHA MUHAMMAD HAYKAL', 'L', 'Jl. Indihiang, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000015', '2008-05-26'),
+(64, '0000000016', 'RANI MEILANI', 'P', 'Jl. Mangkubumi, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000016', '2008-07-07'),
+(65, '0000000017', 'REIHAN MUZAKI', 'L', 'Jl. Tamansari, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000017', '2008-09-30'),
+(66, '0000000018', 'RESA JULIANSAH', 'L', 'Jl. Kawalu, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000018', '2008-11-11'),
+(67, '0000000019', 'RIZKI PERMATA SUGIANTO', 'L', 'Jl. Cibeureum, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000019', '2008-02-19'),
+(68, '0000000020', 'SAHIRA FIRAJ', 'P', 'Jl. Cipedes, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000020', '2008-04-03'),
+(69, '0000000021', 'SENDI MARDIAN', 'L', 'Jl. Awipari, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000021', '2008-06-16'),
+(70, '0000000022', 'SHAHAIDAN NIZZAR', 'L', 'Jl. Sukarindik, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000022', '2008-08-27'),
+(71, '0000000023', 'SHERLY SATRIANI', 'P', 'Jl. Sukamulya, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000023', '2008-10-09'),
+(72, '0000000024', 'SOFI NURJANAH', 'P', 'Jl. Mulyasari, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000024', '2008-12-18'),
+(73, '0000000025', 'SURAIYA SALSABILA AZZAHRA', 'P', 'Jl. Cikalang, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000025', '2009-02-12'),
+(74, '0000000026', 'TONI ANTONIO', 'L', 'Jl. Sukaraja, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000026', '2009-04-24'),
+(75, '0000000028', 'ALISA RAMADHANI', 'P', 'Jl. Sambongpari, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000028', '2009-02-18'),
+(76, '0000000029', 'AMA AURA LIVIA', 'P', 'Jl. Sukamaju, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000029', '2009-03-21'),
+(77, '0000000030', 'ANIS KHOERUNNISA NUR RAMADANI', 'P', 'Jl. Cibunigeulis, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000030', '2009-04-15'),
+(78, '0000000031', 'AZMIL AMIRA', 'P', 'Jl. Parakannyasag, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000031', '2009-05-09'),
+(79, '0000000032', 'AZRIL AKBAR FAWJI ABDILLAH', 'L', 'Jl. Cibeureum, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000032', '2009-06-24'),
+(80, '0000000033', 'ERLANGGA SAPUTRA HIDAYAT', 'L', 'Jl. Bantarsari, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000033', '2009-07-11'),
+(81, '0000000034', 'HILMA HUMMA TUNNAJAH', 'P', 'Jl. Sukaraja, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000034', '2009-08-19'),
+(82, '0000000035', 'ILMA NAJYA', 'P', 'Jl. Setiajaya, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000035', '2009-09-13'),
+(83, '0000000036', 'JULIANA DHARMA PANGESTU', 'P', 'Jl. Sukahurip, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000036', '2009-10-22'),
+(84, '0000000037', 'KAYLA NUR FADILAH', 'P', 'Jl. Cikadongdong, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000037', '2009-11-16'),
+(85, '0000000038', 'MOZA DINA NABILLAH', 'P', 'Jl. Cintaraja, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000038', '2009-12-05'),
+(86, '0000000039', 'MUHAMAD ALFARIZI', 'L', 'Jl. Mangkubumi, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000039', '2009-01-27'),
+(87, '0000000040', 'MUHAMAD FAHRIN ADAM', 'L', 'Jl. Urug, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000040', '2009-02-14'),
+(88, '0000000041', 'MUHAMMAD ZIDANE MAULANA', 'L', 'Jl. Kawalu, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000041', '2009-03-08'),
+(89, '0000000042', 'MUHAMMAD ZULFAN NURALFANSYAH', 'L', 'Jl. Cibeuti, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000042', '2009-04-26'),
+(90, '0000000043', 'NATIYA NUR AZKIYA', 'P', 'Jl. Sukagalih, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000043', '2009-05-17'),
+(91, '0000000044', 'NOVITA PUSPITASARI', 'P', 'Jl. Leuwidahu, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000044', '2009-06-12'),
+(92, '0000000045', 'NUCKY ANDREAS FEBRIAN', 'L', 'Jl. Sukamaju, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000045', '2009-07-23'),
+(93, '0000000046', 'RADITYA JETI PRASETYA', 'L', 'Jl. Awipari, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000046', '2009-08-07'),
+(94, '0000000047', 'RANGGA RAMADIYANTO NURHAKIM', 'L', 'Jl. Cibunigeulis, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000047', '2009-09-25'),
+(95, '0000000048', 'RISQI MUHAMAD IHWANI', 'L', 'Jl. Setiamulya, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000048', '2009-10-14'),
+(96, '0000000049', 'SALWA SABILATUL ZARKAH', 'P', 'Jl. Sukarindik, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000049', '2009-11-29'),
+(97, '0000000050', 'TAZKIA ZAHRA', 'P', 'Jl. Indihiang, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000050', '2009-12-19');
 
 -- --------------------------------------------------------
 
@@ -417,7 +534,7 @@ CREATE TABLE `t_tahun_ajaran` (
 --
 
 INSERT INTO `t_tahun_ajaran` (`id`, `nama_tahun_ajaran`, `tanggal_mulai`, `tanggal_selesai`, `status_aktif`, `created_at`, `updated_at`) VALUES
-(1, '2026/2027', '2026-07-01', '2027-06-30', 1, '2026-10-14 08:02:28', '2026-10-14 08:02:28');
+(1, '2026/2027', '2026-07-13', '2027-06-18', 1, '2026-11-04 08:04:43', '2026-11-04 08:04:43');
 
 -- --------------------------------------------------------
 
@@ -440,10 +557,63 @@ CREATE TABLE `t_users` (
 --
 
 INSERT INTO `t_users` (`id`, `nama`, `email`, `password`, `created_at`, `updated_at`, `role`) VALUES
-(1, 'Administrator SekolahKu', 'admin@sekolahku.com', '$2y$12$pxbv9apoz8s2DbfzJ9OW2OvxptH6X/rJ/xL1pMH6L5Jc/XcOli67.', '2026-10-14 07:47:00', '2026-10-14 08:18:31', 'admin'),
-(2, 'Anton Saputra', 'anton@sekolahku.com', '$2y$12$YYmP6kFFK0dUqLsxe3MrRO9b5ce1NmXCS/4s10lEeLdNEHUvnWr16', '2026-10-14 07:47:00', '2026-10-14 08:20:32', 'guru'),
-(3, 'Surya Santoso', 'surya@sekolahku.com', '$2y$12$0QGsZ.AmqOlMmWhy1zVxMOhUMRn1PNBq7omrIbUw1b8sdetBgYpgW', '2026-10-20 04:49:05', '2026-10-20 04:49:05', 'guru'),
-(4, 'Andi Saputra', 'andisaputra@sekolahku.com', '$2y$12$dFvrKoQpG5O.myuNX51HKeuZQ1Mcn3YrQyQcRPf3R98aENqhja4my', '2026-10-20 05:19:42', '2026-10-20 05:19:42', 'guru');
+(1, 'Administrator SekolahKu', 'admin@sekolahku.com', '$2y$12$6XT1uPdDIoaORCDVwJBqoeQmihFbS9PmvQk/cL/gTCYYfp7WqqaxS', '2026-11-04 07:59:23', '2026-11-04 07:59:23', 'admin'),
+(2, 'Anton', 'anton@sekolahku.com', '$2y$12$Fxj44CFt5I/yTbBTfNhTzOdn6372WlqoGK04Eygi5.RUadhtELA/6', '2026-11-04 07:59:23', '2026-11-04 07:59:23', 'guru'),
+(3, 'Wawan Kurniawan, S.Pd.I', 'wawankurniawan@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(4, 'Ai Nuryaidah, S.Pd', 'ainuryaidah@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(5, 'Maya Permata Endah, S. Pd', 'mayapermataendah@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(6, 'Dody Jaenudin, S.Pd.', 'dodyjaenudin@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(7, 'Dedi Kardiman, S. Pd', 'dedikardiman@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(8, 'Uca Musa Yusenda, S.Pd', 'ucamusayusenda@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(9, 'Drs. Ahmad Nur Mukhlis', 'ahmadnurmukhlis@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(10, 'Drs. Heri', 'heri@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(11, 'Asep Bastaman', 'asepbastaman@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(12, 'H. Encep Maemun, S.T., M.Pd', 'encepmaemun@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(13, 'Opik', 'opik@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(14, 'Ida Farida, S. Pd', 'idafarida@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(15, 'Idah Mahmudah, S.Pd', 'idahmahmudah@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(16, 'Drs. Muhamad Ali', 'muhamadali@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(17, 'Helmi Ali Akbar, S.Pd.I', 'helmialiakbar@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(18, 'Syeni Suswarini, S.Pd', 'syenisuswarini@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(19, 'Wiwid Yulianti, S.Pd', 'wiwidyulianti@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(20, 'Ansor Muhajir, S.T', 'ansormuhajir@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(21, 'Ogi Gaosun Gias, S.Pd.I', 'ogigaosungias@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(22, 'Sandi Mulyana, S.Pd', 'sandimulyana@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(23, 'Erna Suryani, S.Pd', 'ernasuryani@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(24, 'Ai Wahidah, S.Ag', 'aiwahidah@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(25, 'Chandra Aditya Yusup, S.Pd', 'chandraadityayusup@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(26, 'Arif Kusmawan, S.Pd', 'arifkusmawan@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(27, 'Asep Taufiq Hidayat, S.Kom', 'aseptaufiqhidayat@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(28, 'Rendy Ichsan Kusumah, S.T', 'rendyichsankusumah@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(29, 'Feri Rahmawan, S.Pd', 'ferirahmawan@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(30, 'Ari Sandriana, S.Kom', 'arisandriana@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(31, 'Yaneu Nurdian, S.Pd., M.Pd', 'yaneunurdian@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(32, 'Ucu Muhammad Khoer N, S.Pd', 'ucumuhammadkhoern@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(33, 'Mira Dwi Rahmawati, S.Ag', 'miradwirahmawati@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(34, 'Aldi Maulana, S.Pd', 'aldimaulana@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(35, 'Eli Rosliah, S.Pd', 'elirosliah@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(36, 'Isni Nur Fitriani, S.Pd', 'isninurfitriani@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(37, 'Aanisah Putri Nur Aini, S.Pd', 'aanisahputrinuraini@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(38, 'Yusi Luthfiani, S.Sos.I', 'yusiluthfiani@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(39, 'Lilis Rustandy Mawardi, S.Pd., M.Pd', 'lilisrustandymawardi@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(40, 'Yusrin Noer Sabrina, S.Pd', 'yusrinnoersabrina@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(41, 'Senny Indayani, S.Pd', 'sennyindayani@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(42, 'Ilma Amalia, S.Pd', 'ilmaamalia@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(43, 'Alvira Sofwatunnisa, S.Pd', 'alvirasofwatunnisa@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(44, 'Risna Andriyani, S.Pd', 'risnaandriyani@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(45, 'Dra. Tintin Noerhayati', 'tintinnoerhayati@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(46, 'Rizkia Fahira, S.Pd', 'rizkiafahira@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(47, 'Frasetio', 'frasetio@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(48, 'Ratnaningsih Hatil Aeni, S.Pd.', 'ratnaningshhatilaeni@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(49, 'Dheny Darajatul Hasani, S.Pd.', 'dhenydarajatulhasani@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(50, 'Fahrullah, S.Pd', 'fahrullah@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(51, 'Aan Andriana, S.T', 'aanandriana@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(52, 'Fitri Fauziah, S.T', 'fitrifauziah@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(53, 'Nida Aulia, S.Pd', 'nidaaulia@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(54, 'Sri Nurrizki Putri Krisnadi, S.Pd', 'srinurrizkiputrikrisnadi@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(55, 'Riesy Putri Navia, S.Kom', 'riesyputrinavia@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(56, 'Rurry Febriani Maryadi, S.Pd', 'rurryfebrianimaryadi@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(57, 'Irvan Rizal, S.Pd', 'irvanrizal@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru');
 
 -- --------------------------------------------------------
 
@@ -468,7 +638,8 @@ CREATE TABLE `t_wali_kelas` (
 --
 
 INSERT INTO `t_wali_kelas` (`id`, `guru_id`, `kelas_id`, `tahun_ajaran_id`, `tanggal_mulai`, `tanggal_selesai`, `status_aktif`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 1, '2026-07-01', NULL, 1, '2026-10-15 06:05:58', '2026-10-15 06:05:58');
+(1, 29, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 08:05:11', '2026-11-04 08:05:11'),
+(2, 33, 2, 1, '2027-06-18', NULL, 1, '2026-11-04 08:05:38', '2026-11-04 08:05:38');
 
 --
 -- Indexes for dumped tables
@@ -553,6 +724,14 @@ ALTER TABLE `t_kelas_siswa`
   ADD KEY `t_kelas_siswa_kelas_id_tahun_ajaran_id_index` (`kelas_id`,`tahun_ajaran_id`);
 
 --
+-- Indexes for table `t_log_aktivitas`
+--
+ALTER TABLE `t_log_aktivitas`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `t_log_aktivitas_created_idx` (`created_at`,`id`),
+  ADD KEY `t_log_aktivitas_user_created_idx` (`user_id`,`created_at`);
+
+--
 -- Indexes for table `t_log_pelanggaran`
 --
 ALTER TABLE `t_log_pelanggaran`
@@ -589,7 +768,8 @@ ALTER TABLE `t_pelanggaran_siswa`
 --
 ALTER TABLE `t_siswa`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `t_siswa_nisn_unique` (`nisn`);
+  ADD UNIQUE KEY `t_siswa_nisn_unique` (`nisn`),
+  ADD UNIQUE KEY `t_siswa_nis_unique` (`nis`);
 
 --
 -- Indexes for table `t_tahun_ajaran`
@@ -633,13 +813,13 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `t_guru`
 --
 ALTER TABLE `t_guru`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT for table `t_kelas`
@@ -651,37 +831,43 @@ ALTER TABLE `t_kelas`
 -- AUTO_INCREMENT for table `t_kelas_siswa`
 --
 ALTER TABLE `t_kelas_siswa`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `t_log_aktivitas`
+--
+ALTER TABLE `t_log_aktivitas`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `t_log_pelanggaran`
 --
 ALTER TABLE `t_log_pelanggaran`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `t_pelanggaran`
 --
 ALTER TABLE `t_pelanggaran`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `t_pelanggaran_kategori`
 --
 ALTER TABLE `t_pelanggaran_kategori`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `t_pelanggaran_siswa`
 --
 ALTER TABLE `t_pelanggaran_siswa`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `t_siswa`
 --
 ALTER TABLE `t_siswa`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
 
 --
 -- AUTO_INCREMENT for table `t_tahun_ajaran`
@@ -693,13 +879,13 @@ ALTER TABLE `t_tahun_ajaran`
 -- AUTO_INCREMENT for table `t_users`
 --
 ALTER TABLE `t_users`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
 
 --
 -- AUTO_INCREMENT for table `t_wali_kelas`
 --
 ALTER TABLE `t_wali_kelas`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables
@@ -718,6 +904,12 @@ ALTER TABLE `t_kelas_siswa`
   ADD CONSTRAINT `t_kelas_siswa_kelas_id_foreign` FOREIGN KEY (`kelas_id`) REFERENCES `t_kelas` (`id`) ON DELETE RESTRICT,
   ADD CONSTRAINT `t_kelas_siswa_siswa_id_foreign` FOREIGN KEY (`siswa_id`) REFERENCES `t_siswa` (`id`) ON DELETE RESTRICT,
   ADD CONSTRAINT `t_kelas_siswa_tahun_ajaran_id_foreign` FOREIGN KEY (`tahun_ajaran_id`) REFERENCES `t_tahun_ajaran` (`id`) ON DELETE RESTRICT;
+
+--
+-- Constraints for table `t_log_aktivitas`
+--
+ALTER TABLE `t_log_aktivitas`
+  ADD CONSTRAINT `t_log_aktivitas_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `t_users` (`id`) ON DELETE RESTRICT;
 
 --
 -- Constraints for table `t_log_pelanggaran`

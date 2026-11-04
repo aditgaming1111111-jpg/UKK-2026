@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Guru;
 use App\Models\Kelas;
 use App\Models\KelasSiswa;
+use App\Models\LogAktivitas;
 use App\Models\LogPelanggaran;
 use App\Models\Pelanggaran;
 use App\Models\PelanggaranKategori;
@@ -75,10 +76,13 @@ class RiwayatPelanggaranTest extends TestCase
         $context = $this->recordingContext();
         $record = $this->createRecord($context);
         $administrator = User::factory()->create(['role' => 'admin', 'nama' => 'Admin Pagination']);
-        LogPelanggaran::factory()->count(12)
-            ->for($record, 'catatanPelanggaran')
-            ->for($administrator, 'pengguna')
-            ->create();
+        foreach (range(1, 12) as $index) {
+            LogAktivitas::query()->create([
+                'user_id' => $administrator->id,
+                'aktivitas' => 'Aktivitas paginasi '.$index,
+                'deskripsi' => 'Log Admin Pagination '.$index,
+            ]);
+        }
         $filters = ['q' => 'Admin Pagination'];
 
         $firstPage = $this->actingAs($administrator)->get(route('admin.audit-logs.index', $filters));
@@ -229,6 +233,10 @@ class RiwayatPelanggaranTest extends TestCase
         $this->assertSame($reason, $log->alasan);
         $this->assertSame($oldDescription, json_decode($log->data_sebelum, true, flags: JSON_THROW_ON_ERROR)['keterangan']);
         $this->assertSame('Keterangan hasil koreksi.', json_decode($log->data_sesudah, true, flags: JSON_THROW_ON_ERROR)['keterangan']);
+        $this->assertDatabaseHas('t_log_aktivitas', [
+            'user_id' => $context['user']->id,
+            'aktivitas' => 'Pelanggaran dikoreksi',
+        ]);
     }
 
     public function test_admin_can_correct_another_teachers_record_and_missing_reason_is_rejected(): void
@@ -257,6 +265,10 @@ class RiwayatPelanggaranTest extends TestCase
             'user_id' => $admin->id,
             'aksi' => 'edit',
             'alasan' => 'Koreksi berdasarkan dokumen sekolah.',
+        ]);
+        $this->assertDatabaseHas('t_log_aktivitas', [
+            'user_id' => $admin->id,
+            'aktivitas' => 'Pelanggaran dikoreksi',
         ]);
     }
 
@@ -299,6 +311,10 @@ class RiwayatPelanggaranTest extends TestCase
         $this->assertSame('Catatan ganda setelah pemeriksaan.', $cancelLog->alasan);
         $this->assertSame('aktif', json_decode($cancelLog->data_sebelum, true, flags: JSON_THROW_ON_ERROR)['status']);
         $this->assertSame('dibatalkan', json_decode($cancelLog->data_sesudah, true, flags: JSON_THROW_ON_ERROR)['status']);
+        $this->assertDatabaseHas('t_log_aktivitas', [
+            'user_id' => $admin->id,
+            'aktivitas' => 'Pelanggaran dibatalkan',
+        ]);
 
         $this->get(route('admin.dashboard', ['tahun_ajaran_id' => $context['year']->id]))
             ->assertViewHas('stats', fn (array $stats): bool => $stats['active_violations'] === 1 && $stats['active_points'] === 3);
@@ -336,6 +352,11 @@ class RiwayatPelanggaranTest extends TestCase
         $context = $this->recordingContext();
         $record = $this->createRecord($context);
         LogPelanggaran::factory()->for($record, 'catatanPelanggaran')->for($context['user'], 'pengguna')->create();
+        LogAktivitas::query()->create([
+            'user_id' => $context['user']->id,
+            'aktivitas' => 'Uji otorisasi log',
+            'deskripsi' => 'Aktivitas Guru untuk pengujian akses.',
+        ]);
         $admin = User::factory()->create(['role' => 'admin']);
 
         $this->get(route('admin.student-violations.index'))->assertRedirect(route('login'));
@@ -343,7 +364,7 @@ class RiwayatPelanggaranTest extends TestCase
         $this->actingAs($context['user'])->get(route('admin.audit-logs.index'))->assertForbidden();
         $this->actingAs($admin)->get(route('admin.audit-logs.index'))
             ->assertOk()
-            ->assertSee($context['student']->nama)
+            ->assertSee('Uji otorisasi log')
             ->assertDontSee('Hapus log');
         $this->assertSame(0, LogPelanggaran::query()->where('aksi', 'hapus')->count());
         $this->assertModelExists($record);

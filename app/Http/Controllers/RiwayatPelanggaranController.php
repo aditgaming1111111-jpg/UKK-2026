@@ -10,6 +10,7 @@ use App\Models\Kelas;
 use App\Models\Pelanggaran;
 use App\Models\PelanggaranSiswa;
 use App\Models\TahunAjaran;
+use App\Services\ActivityLogger;
 use App\Services\RiwayatPelanggaranService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
@@ -108,8 +109,10 @@ class RiwayatPelanggaranController extends Controller
         UpdatePelanggaranSiswaRequest $request,
         PelanggaranSiswa $pelanggaranSiswa,
         RiwayatPelanggaranService $service,
+        ActivityLogger $activityLogger,
     ): RedirectResponse {
         $record = $service->update($request->user(), $pelanggaranSiswa, $request->validated());
+        $activityLogger->record($request->user(), $request, 'Pelanggaran dikoreksi', 'Catatan pelanggaran siswa ID #'.$record->id.' dikoreksi; rincian perubahan tersedia di log pelanggaran.');
 
         return to_route($this->routePrefix($request->user()->role).'.show', $record)
             ->with('success', 'Catatan pelanggaran berhasil dikoreksi dan dicatat dalam log audit.');
@@ -119,8 +122,10 @@ class RiwayatPelanggaranController extends Controller
         CancelPelanggaranSiswaRequest $request,
         PelanggaranSiswa $pelanggaranSiswa,
         RiwayatPelanggaranService $service,
+        ActivityLogger $activityLogger,
     ): RedirectResponse {
         $record = $service->cancel($request->user(), $pelanggaranSiswa, $request->validated('alasan'));
+        $activityLogger->record($request->user(), $request, 'Pelanggaran dibatalkan', 'Catatan pelanggaran siswa ID #'.$record->id.' dibatalkan; alasan tersimpan pada log pelanggaran.');
 
         return to_route($this->routePrefix($request->user()->role).'.show', $record)
             ->with('success', 'Catatan pelanggaran dibatalkan. Riwayat dan log audit tetap tersimpan.');

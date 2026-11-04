@@ -18,7 +18,8 @@ class TahunAjaranManagementTest extends TestCase
 
     public function test_admin_can_create_and_activate_an_academic_year_without_removing_previous_year(): void
     {
-        $this->actingAs(User::factory()->state(['role' => 'admin'])->create());
+        $administrator = User::factory()->state(['role' => 'admin'])->create();
+        $this->actingAs($administrator);
         $previous = TahunAjaran::factory()->create([
             'nama_tahun_ajaran' => '2025/2026',
             'tanggal_mulai' => '2025-07-01',
@@ -40,6 +41,10 @@ class TahunAjaranManagementTest extends TestCase
         $this->assertDatabaseHas('t_tahun_ajaran', ['id' => $previous->id, 'status_aktif' => false]);
         $this->assertDatabaseHas('t_tahun_ajaran', ['nama_tahun_ajaran' => '2026/2027', 'status_aktif' => true]);
         $this->assertDatabaseCount('t_tahun_ajaran', 2);
+        $this->assertDatabaseHas('t_log_aktivitas', [
+            'user_id' => $administrator->id,
+            'aktivitas' => 'Tahun ajaran ditambahkan',
+        ]);
     }
 
     public function test_overlapping_academic_period_is_rejected_and_existing_history_remains(): void

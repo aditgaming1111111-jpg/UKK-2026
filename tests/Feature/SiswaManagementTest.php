@@ -30,9 +30,11 @@ class SiswaManagementTest extends TestCase
         $administrator = User::factory()->create(['role' => 'admin']);
 
         $response = $this->actingAs($administrator)->post(route('admin.students.store'), [
+            'nis' => '0123456789',
             'nisn' => '1234567890',
             'nama' => 'Ayu Lestari',
             'jenis_kelamin' => 'P',
+            'tanggal_lahir' => '2010-04-21',
             'alamat' => 'Jl. Merdeka',
             'tahun_masuk' => 2026,
         ]);
@@ -42,15 +44,26 @@ class SiswaManagementTest extends TestCase
         $this->assertModelExists($student);
 
         $response = $this->actingAs($administrator)->put(route('admin.students.update', $student), [
+            'nis' => '0123456789',
             'nisn' => '1234567890',
             'nama' => 'Ayu Lestari Putri',
             'jenis_kelamin' => 'P',
+            'tanggal_lahir' => '2010-04-21',
             'alamat' => 'Jl. Pendidikan',
             'tahun_masuk' => 2026,
         ]);
 
         $response->assertRedirect(route('admin.students.show', $student));
         $this->assertDatabaseHas('t_siswa', ['id' => $student->id, 'nama' => 'Ayu Lestari Putri']);
+        $this->assertDatabaseHas('t_siswa', ['id' => $student->id, 'nis' => '0123456789']);
+        $this->assertSame('2010-04-21', $student->fresh()->tanggal_lahir->toDateString());
+        $this->get(route('admin.students.show', $student))
+            ->assertSee('0123456789')
+            ->assertSee('21/04/2010');
+        $this->get(route('admin.students.create'))
+            ->assertSee('name="nis"', false)
+            ->assertSee('name="nisn"', false)
+            ->assertSee('name="tanggal_lahir"', false);
 
         $class = Kelas::factory()->create();
         $year = TahunAjaran::factory()->create();
@@ -96,6 +109,7 @@ class SiswaManagementTest extends TestCase
         $this->actingAs($administrator)
             ->from(route('admin.students.create'))
             ->post(route('admin.students.store'), [
+                'nis' => '2234567890',
                 'nisn' => '1234567890',
                 'nama' => 'Siswa Duplikat',
                 'jenis_kelamin' => 'L',
@@ -106,6 +120,139 @@ class SiswaManagementTest extends TestCase
         $this->assertDatabaseCount('t_siswa', 1);
     }
 
+    public function test_nis_requires_exactly_ten_ascii_digits_on_create_and_update(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $this->actingAs($administrator);
+        $validPayload = [
+            'nisn' => '1234567890',
+            'nama' => 'Siswa Validasi NIS',
+            'jenis_kelamin' => 'L',
+            'tahun_masuk' => 2026,
+        ];
+
+        $this->post(route('admin.students.store'), $validPayload)
+            ->assertSessionHasErrors(['nis' => 'NIS wajib diisi.']);
+
+        foreach (['123456789', '12345678901', '12345abcde'] as $invalidNis) {
+            $this->from(route('admin.students.create'))->post(route('admin.students.store'), [
+                ...$validPayload,
+                'nis' => $invalidNis,
+            ])->assertSessionHasErrors(['nis' => 'NIS harus terdiri dari tepat 10 digit angka (0–9).']);
+        }
+
+        $student = Siswa::factory()->create(['nis' => '0123456789']);
+        $this->put(route('admin.students.update', $student), [
+            ...$validPayload,
+            'nisn' => $student->nisn,
+        ])->assertSessionHasErrors(['nis' => 'NIS wajib diisi.']);
+
+        foreach (['123456789', '12345678901', '12345abcde'] as $invalidNis) {
+            $this->from(route('admin.students.edit', $student))->put(route('admin.students.update', $student), [
+                ...$validPayload,
+                'nis' => $invalidNis,
+            ])->assertSessionHasErrors(['nis' => 'NIS harus terdiri dari tepat 10 digit angka (0–9).']);
+        }
+    }
+
+    public function test_duplicate_nis_is_rejected_on_create_and_update(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $firstStudent = Siswa::factory()->create(['nis' => '0123456789']);
+        $secondStudent = Siswa::factory()->create(['nis' => '9876543210']);
+        $this->actingAs($administrator);
+
+        $this->post(route('admin.students.store'), [
+            'nis' => $firstStudent->nis,
+            'nisn' => '5555555555',
+            'nama' => 'NIS Duplikat',
+            'jenis_kelamin' => 'L',
+            'tahun_masuk' => 2026,
+        ])->assertSessionHasErrors(['nis' => 'NIS sudah terdaftar.']);
+
+        $this->put(route('admin.students.update', $secondStudent), [
+            'nis' => $firstStudent->nis,
+            'nisn' => $secondStudent->nisn,
+            'nama' => $secondStudent->nama,
+            'jenis_kelamin' => $secondStudent->jenis_kelamin,
+            'tahun_masuk' => $secondStudent->tahun_masuk,
+        ])->assertSessionHasErrors(['nis' => 'NIS sudah terdaftar.']);
+
+        $this->assertDatabaseCount('t_siswa', 2);
+        $this->assertDatabaseHas('t_siswa', ['id' => $secondStudent->id, 'nis' => '9876543210']);
+    }
+
+    public function test_nis_and_nisn_can_match_across_or_within_student_records(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $this->actingAs($administrator);
+
+        $this->post(route('admin.students.store'), [
+            'nis' => '0123456789',
+            'nisn' => '1111111111',
+            'nama' => 'Identitas Sama',
+            'jenis_kelamin' => 'L',
+            'tahun_masuk' => 2026,
+        ])->assertRedirect();
+
+        $this->post(route('admin.students.store'), [
+            'nis' => '2222222222',
+            'nisn' => '0123456789',
+            'nama' => 'Identitas Silang',
+            'jenis_kelamin' => 'P',
+            'tahun_masuk' => 2026,
+        ])->assertRedirect();
+
+        $this->post(route('admin.students.store'), [
+            'nis' => '3333333333',
+            'nisn' => '3333333333',
+            'nama' => 'Identitas Dalam Satu Siswa',
+            'jenis_kelamin' => 'L',
+            'tahun_masuk' => 2026,
+        ])->assertRedirect();
+
+        $this->assertDatabaseCount('t_siswa', 3);
+    }
+
+    public function test_nisn_requires_exactly_ten_ascii_digits_on_create_and_update(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $this->actingAs($administrator);
+        $validPayload = [
+            'nis' => '1234567890',
+            'nama' => 'Siswa Validasi NISN',
+            'jenis_kelamin' => 'L',
+            'tahun_masuk' => 2026,
+        ];
+
+        foreach (['123456789', '12345678901', '12345abcde'] as $invalidNisn) {
+            $this->from(route('admin.students.create'))->post(route('admin.students.store'), [
+                ...$validPayload,
+                'nisn' => $invalidNisn,
+            ])->assertSessionHasErrors(['nisn' => 'NISN harus terdiri dari tepat 10 digit angka (0–9).']);
+        }
+
+        $student = Siswa::factory()->create(['nisn' => '9876543210']);
+        foreach (['123456789', '12345678901', '12345abcde'] as $invalidNisn) {
+            $this->from(route('admin.students.edit', $student))->put(route('admin.students.update', $student), [
+                ...$validPayload,
+                'nis' => $student->nis,
+                'nisn' => $invalidNisn,
+            ])->assertSessionHasErrors(['nisn' => 'NISN harus terdiri dari tepat 10 digit angka (0–9).']);
+        }
+    }
+
+    public function test_legacy_student_can_remain_without_nis_or_birth_date(): void
+    {
+        $legacyStudent = Siswa::factory()->create(['nis' => null, 'tanggal_lahir' => null]);
+
+        $this->assertDatabaseHas('t_siswa', [
+            'id' => $legacyStudent->id,
+            'nis' => null,
+            'tanggal_lahir' => null,
+        ]);
+    }
+
     public function test_student_name_is_limited_to_one_hundred_characters_on_create_and_update(): void
     {
         $administrator = User::factory()->create(['role' => 'admin']);
@@ -113,6 +260,7 @@ class SiswaManagementTest extends TestCase
         $name = str_repeat('S', 100);
 
         $this->post(route('admin.students.store'), [
+            'nis' => '1111111111',
             'nisn' => '1234567890',
             'nama' => $name,
             'jenis_kelamin' => 'L',
@@ -123,6 +271,7 @@ class SiswaManagementTest extends TestCase
         $this->assertSame($name, $student->nama);
 
         $this->from(route('admin.students.create'))->post(route('admin.students.store'), [
+            'nis' => '1111111112',
             'nisn' => '1234567891',
             'nama' => str_repeat('S', 101),
             'jenis_kelamin' => 'L',
@@ -130,6 +279,7 @@ class SiswaManagementTest extends TestCase
         ])->assertSessionHasErrors(['nama' => 'Nama siswa maksimal 100 karakter.']);
 
         $this->from(route('admin.students.edit', $student))->put(route('admin.students.update', $student), [
+            'nis' => $student->nis,
             'nisn' => $student->nisn,
             'nama' => str_repeat('S', 101),
             'jenis_kelamin' => 'L',
@@ -137,6 +287,7 @@ class SiswaManagementTest extends TestCase
         ])->assertSessionHasErrors(['nama' => 'Nama siswa maksimal 100 karakter.']);
 
         $this->put(route('admin.students.update', $student), [
+            'nis' => $student->nis,
             'nisn' => $student->nisn,
             'nama' => $name,
             'jenis_kelamin' => 'L',
@@ -311,7 +462,7 @@ class SiswaManagementTest extends TestCase
     public function test_admin_can_search_and_filter_students_by_current_class_level_major_and_status(): void
     {
         $administrator = User::factory()->create(['role' => 'admin']);
-        $student = Siswa::factory()->create(['nisn' => '9876543210', 'nama' => 'Nadia Utami']);
+        $student = Siswa::factory()->create(['nis' => '0987654321', 'nisn' => '9876543210', 'nama' => 'Nadia Utami']);
         $class = Kelas::factory()->create(['nama_kelas' => 'XI RPL 1', 'tingkat' => 'XI', 'jurusan' => 'RPL']);
         $year = TahunAjaran::factory()->create();
         KelasSiswa::factory()->for($student, 'siswa')->for($class, 'kelas')->for($year, 'tahunAjaran')->create();
@@ -323,6 +474,11 @@ class SiswaManagementTest extends TestCase
             'jurusan' => 'RPL',
             'status' => 'aktif',
         ]))->assertOk()->assertSee('Nadia Utami')->assertSee('XI RPL 1');
+
+        $this->get(route('admin.students.index', ['q' => $student->nis]))
+            ->assertOk()
+            ->assertSee('Nadia Utami')
+            ->assertSee('0987654321');
 
         $this->actingAs($administrator)->get(route('admin.students.index', ['q' => 'tidak ada']))
             ->assertOk()

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\User;
+use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,7 +26,7 @@ class AuthenticatedSessionController extends Controller
         return view('auth.login');
     }
 
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request, ActivityLogger $activityLogger): RedirectResponse
     {
         $email = Str::lower(trim($request->validated('email')));
         $rateLimitKey = sha1($email.'|'.$request->ip());
@@ -59,12 +60,17 @@ class AuthenticatedSessionController extends Controller
 
         /** @var User $user */
         $user = Auth::user();
+        $activityLogger->record($user, $request, 'Login', 'Pengguna berhasil masuk sebagai '.$user->role.'.');
 
         return to_route($user->dashboardRouteName());
     }
 
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request, ActivityLogger $activityLogger): RedirectResponse
     {
+        /** @var User $user */
+        $user = $request->user();
+        $activityLogger->record($user, $request, 'Logout', 'Pengguna keluar dari aplikasi sebagai '.$user->role.'.');
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

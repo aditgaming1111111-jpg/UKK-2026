@@ -8,7 +8,9 @@ use App\Http\Requests\Admin\StorePelanggaranRequest;
 use App\Http\Requests\Admin\UpdatePelanggaranRequest;
 use App\Models\Pelanggaran;
 use App\Models\PelanggaranKategori;
+use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
@@ -58,7 +60,7 @@ class PelanggaranController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePelanggaranRequest $request): RedirectResponse
+    public function store(StorePelanggaranRequest $request, ActivityLogger $activityLogger): RedirectResponse
     {
         $attributes = $request->validated();
         $violation = DB::transaction(function () use ($attributes): Pelanggaran {
@@ -70,6 +72,7 @@ class PelanggaranController extends Controller
 
             return $category->jenisPelanggaran()->create(collect($attributes)->except('kategori_id')->all());
         });
+        $activityLogger->record($request->user(), $request, 'Jenis pelanggaran ditambahkan', 'Jenis pelanggaran ID #'.$violation->id.' berhasil ditambahkan.');
 
         return to_route('admin.violations.show', $violation)->with('success', 'Jenis pelanggaran berhasil ditambahkan.');
     }
@@ -110,7 +113,7 @@ class PelanggaranController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePelanggaranRequest $request, Pelanggaran $pelanggaran): RedirectResponse
+    public function update(UpdatePelanggaranRequest $request, Pelanggaran $pelanggaran, ActivityLogger $activityLogger): RedirectResponse
     {
         $attributes = $request->validated();
 
@@ -124,11 +127,12 @@ class PelanggaranController extends Controller
 
             $lockedViolation->update($attributes);
         });
+        $activityLogger->record($request->user(), $request, 'Jenis pelanggaran diperbarui', 'Data jenis pelanggaran ID #'.$pelanggaran->id.' diperbarui. Snapshot poin pada catatan lama tidak berubah.');
 
         return to_route('admin.violations.show', $pelanggaran)->with('success', 'Jenis pelanggaran berhasil diperbarui. Poin pada catatan lama tetap menggunakan snapshot saat pencatatan.');
     }
 
-    public function destroy(Pelanggaran $pelanggaran): RedirectResponse
+    public function destroy(Pelanggaran $pelanggaran, Request $request, ActivityLogger $activityLogger): RedirectResponse
     {
         Gate::authorize('delete', $pelanggaran);
 
@@ -143,6 +147,7 @@ class PelanggaranController extends Controller
 
             $lockedViolation->delete();
         });
+        $activityLogger->record($request->user(), $request, 'Jenis pelanggaran dihapus', 'Jenis pelanggaran ID #'.$pelanggaran->id.' tanpa catatan terkait berhasil dihapus.');
 
         return to_route('admin.violations.index')->with('success', 'Jenis pelanggaran tanpa catatan siswa berhasil dihapus permanen.');
     }
@@ -150,7 +155,7 @@ class PelanggaranController extends Controller
     /**
      * Toggle the active status of the violation type.
      */
-    public function toggleStatus(Pelanggaran $pelanggaran): RedirectResponse
+    public function toggleStatus(Pelanggaran $pelanggaran, Request $request, ActivityLogger $activityLogger): RedirectResponse
     {
         Gate::authorize('update', $pelanggaran);
 
@@ -165,6 +170,7 @@ class PelanggaranController extends Controller
 
             $lockedViolation->update(['status_aktif' => $isActivating]);
         });
+        $activityLogger->record($request->user(), $request, 'Status jenis pelanggaran diubah', 'Status jenis pelanggaran ID #'.$pelanggaran->id.' diubah menjadi '.($pelanggaran->fresh()->status_aktif ? 'aktif' : 'nonaktif').'.');
 
         return to_route('admin.violations.show', $pelanggaran)->with('success', $pelanggaran->fresh()->status_aktif
             ? 'Jenis pelanggaran diaktifkan.'

@@ -11,9 +11,11 @@ use App\Http\Requests\Admin\UpdateSiswaStatusRequest;
 use App\Models\Kelas;
 use App\Models\Siswa;
 use App\Models\TahunAjaran;
+use App\Services\ActivityLogger;
 use App\Services\SiswaPenempatanService;
 use App\Services\SiswaReadService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
@@ -47,9 +49,10 @@ class SiswaController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreSiswaRequest $request): RedirectResponse
+    public function store(StoreSiswaRequest $request, ActivityLogger $activityLogger): RedirectResponse
     {
         $siswa = Siswa::query()->create($request->validated());
+        $activityLogger->record($request->user(), $request, 'Siswa ditambahkan', 'Identitas siswa ID #'.$siswa->id.' berhasil ditambahkan.');
 
         return to_route('admin.students.show', $siswa)->with('success', 'Data siswa berhasil ditambahkan.');
     }
@@ -81,9 +84,10 @@ class SiswaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateSiswaRequest $request, Siswa $siswa): RedirectResponse
+    public function update(UpdateSiswaRequest $request, Siswa $siswa, ActivityLogger $activityLogger): RedirectResponse
     {
         $siswa->update($request->validated());
+        $activityLogger->record($request->user(), $request, 'Siswa diperbarui', 'Data siswa ID #'.$siswa->id.' berhasil diperbarui.');
 
         return to_route('admin.students.show', $siswa)->with('success', 'Data siswa berhasil diperbarui.');
     }
@@ -91,7 +95,7 @@ class SiswaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Siswa $siswa): RedirectResponse
+    public function destroy(Siswa $siswa, Request $request, ActivityLogger $activityLogger): RedirectResponse
     {
         Gate::authorize('delete', $siswa);
 
@@ -106,11 +110,12 @@ class SiswaController extends Controller
 
             $lockedStudent->delete();
         });
+        $activityLogger->record($request->user(), $request, 'Siswa dihapus', 'Identitas siswa ID #'.$siswa->id.' tanpa histori berhasil dihapus.');
 
         return to_route('admin.students.index')->with('success', 'Data siswa tanpa riwayat berhasil dihapus permanen.');
     }
 
-    public function updateStatus(UpdateSiswaStatusRequest $request, Siswa $siswa): RedirectResponse
+    public function updateStatus(UpdateSiswaStatusRequest $request, Siswa $siswa, ActivityLogger $activityLogger): RedirectResponse
     {
         $status = $request->validated('status_siswa');
 
@@ -119,6 +124,7 @@ class SiswaController extends Controller
                 'status_siswa' => $status,
             ]);
         });
+        $activityLogger->record($request->user(), $request, 'Status siswa diubah', 'Status siswa ID #'.$siswa->id.' diubah menjadi '.$status.'.');
 
         $message = $status === 'aktif'
             ? 'Siswa berhasil diaktifkan. Riwayat siswa tetap tersimpan.'
@@ -131,8 +137,10 @@ class SiswaController extends Controller
         StorePenempatanKelasRequest $request,
         Siswa $siswa,
         SiswaPenempatanService $siswaPenempatanService,
+        ActivityLogger $activityLogger,
     ): RedirectResponse {
-        $siswaPenempatanService->assign($siswa, $request->validated());
+        $placement = $siswaPenempatanService->assign($siswa, $request->validated());
+        $activityLogger->record($request->user(), $request, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #'.$siswa->id.' dicatat dengan ID #'.$placement->id.'.');
 
         return to_route('admin.students.show', $siswa)->with('success', 'Penempatan kelas berhasil disimpan.');
     }

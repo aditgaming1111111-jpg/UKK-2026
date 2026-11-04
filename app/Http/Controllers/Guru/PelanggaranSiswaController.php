@@ -8,6 +8,7 @@ use App\Http\Requests\Guru\StorePelanggaranSiswaRequest;
 use App\Models\KelasSiswa;
 use App\Models\Pelanggaran;
 use App\Models\PelanggaranKategori;
+use App\Services\ActivityLogger;
 use App\Services\PencatatanPelanggaranService;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
@@ -76,9 +77,10 @@ class PelanggaranSiswaController extends Controller
         ])->values());
     }
 
-    public function store(StorePelanggaranSiswaRequest $request, PencatatanPelanggaranService $service): RedirectResponse
+    public function store(StorePelanggaranSiswaRequest $request, PencatatanPelanggaranService $service, ActivityLogger $activityLogger): RedirectResponse
     {
         $record = $service->record($request->user(), $request->validated());
+        $activityLogger->record($request->user(), $request, 'Pelanggaran dicatat', 'Catatan pelanggaran siswa ID #'.$record->id.' berhasil dibuat.');
         $student = $record->penempatanKelas->siswa;
 
         return redirect()

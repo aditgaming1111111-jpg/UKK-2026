@@ -10,6 +10,7 @@ use App\Models\Guru;
 use App\Models\Kelas;
 use App\Models\TahunAjaran;
 use App\Models\WaliKelas;
+use App\Services\ActivityLogger;
 use App\Services\WaliKelasAssignmentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
@@ -29,9 +30,9 @@ class WaliKelasController extends Controller
             }))
             ->when($filters['kelas_id'] ?? null, static fn ($query, int|string $classId) => $query->where('kelas_id', $classId))
             ->when($filters['tahun_ajaran_id'] ?? null, static fn ($query, int|string $yearId) => $query->where('tahun_ajaran_id', $yearId))
-            ->when(($filters['status'] ?? null) === 'aktif', static fn ($query) => $query->where('status_aktif', true)->whereNull('tanggal_selesai'))
+            ->when(($filters['status'] ?? null) === 'aktif', static fn ($query) => $query->where('t_wali_kelas.status_aktif', true)->whereNull('t_wali_kelas.tanggal_selesai'))
             ->when(($filters['status'] ?? null) === 'selesai', static fn ($query) => $query->where(static function ($statusQuery): void {
-                $statusQuery->where('status_aktif', false)->orWhereNotNull('tanggal_selesai');
+                $statusQuery->where('t_wali_kelas.status_aktif', false)->orWhereNotNull('t_wali_kelas.tanggal_selesai');
             }))
             ->join('t_tahun_ajaran', 't_tahun_ajaran.id', '=', 't_wali_kelas.tahun_ajaran_id')
             ->select('t_wali_kelas.*')
@@ -60,9 +61,10 @@ class WaliKelasController extends Controller
         ]);
     }
 
-    public function store(StoreWaliKelasRequest $request, WaliKelasAssignmentService $service): RedirectResponse
+    public function store(StoreWaliKelasRequest $request, WaliKelasAssignmentService $service, ActivityLogger $activityLogger): RedirectResponse
     {
         $assignment = $service->assign($request->validated());
+        $activityLogger->record($request->user(), $request, 'Wali kelas ditugaskan', 'Penugasan wali kelas ID #'.$assignment->id.' berhasil dibuat.');
 
         return to_route('admin.homeroom-teachers.show', $assignment)->with('success', 'Penugasan wali kelas berhasil disimpan.');
     }
@@ -79,8 +81,10 @@ class WaliKelasController extends Controller
         CloseWaliKelasRequest $request,
         WaliKelas $waliKelas,
         WaliKelasAssignmentService $service,
+        ActivityLogger $activityLogger,
     ): RedirectResponse {
         $service->close($waliKelas, $request->validated('tanggal_selesai'));
+        $activityLogger->record($request->user(), $request, 'Penugasan wali kelas diakhiri', 'Penugasan wali kelas ID #'.$waliKelas->id.' berhasil diakhiri.');
 
         return to_route('admin.homeroom-teachers.show', $waliKelas)->with('success', 'Penugasan wali kelas diakhiri; riwayat tetap tersimpan.');
     }

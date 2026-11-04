@@ -8,7 +8,9 @@ use App\Http\Requests\Admin\StorePelanggaranKategoriRequest;
 use App\Http\Requests\Admin\UpdatePelanggaranKategoriRequest;
 use App\Models\Pelanggaran;
 use App\Models\PelanggaranKategori;
+use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
@@ -47,9 +49,10 @@ class PelanggaranKategoriController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePelanggaranKategoriRequest $request): RedirectResponse
+    public function store(StorePelanggaranKategoriRequest $request, ActivityLogger $activityLogger): RedirectResponse
     {
         $category = PelanggaranKategori::query()->create($request->validated());
+        $activityLogger->record($request->user(), $request, 'Kategori pelanggaran ditambahkan', 'Kategori pelanggaran ID #'.$category->id.' berhasil ditambahkan.');
 
         return to_route('admin.violation-categories.show', $category)->with('success', 'Kategori pelanggaran berhasil ditambahkan.');
     }
@@ -79,14 +82,15 @@ class PelanggaranKategoriController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePelanggaranKategoriRequest $request, PelanggaranKategori $pelanggaranKategori): RedirectResponse
+    public function update(UpdatePelanggaranKategoriRequest $request, PelanggaranKategori $pelanggaranKategori, ActivityLogger $activityLogger): RedirectResponse
     {
         $pelanggaranKategori->update($request->validated());
+        $activityLogger->record($request->user(), $request, 'Kategori pelanggaran diperbarui', 'Kategori pelanggaran ID #'.$pelanggaranKategori->id.' berhasil diperbarui.');
 
         return to_route('admin.violation-categories.show', $pelanggaranKategori)->with('success', 'Kategori pelanggaran berhasil diperbarui.');
     }
 
-    public function destroy(PelanggaranKategori $pelanggaranKategori): RedirectResponse
+    public function destroy(PelanggaranKategori $pelanggaranKategori, Request $request, ActivityLogger $activityLogger): RedirectResponse
     {
         Gate::authorize('delete', $pelanggaranKategori);
 
@@ -101,6 +105,7 @@ class PelanggaranKategoriController extends Controller
 
             $lockedCategory->delete();
         });
+        $activityLogger->record($request->user(), $request, 'Kategori pelanggaran dihapus', 'Kategori pelanggaran ID #'.$pelanggaranKategori->id.' tanpa jenis terkait berhasil dihapus.');
 
         return to_route('admin.violation-categories.index')->with('success', 'Kategori tanpa jenis pelanggaran berhasil dihapus permanen.');
     }
@@ -108,7 +113,7 @@ class PelanggaranKategoriController extends Controller
     /**
      * Toggle the active status of the category.
      */
-    public function toggleStatus(PelanggaranKategori $pelanggaranKategori): RedirectResponse
+    public function toggleStatus(PelanggaranKategori $pelanggaranKategori, Request $request, ActivityLogger $activityLogger): RedirectResponse
     {
         Gate::authorize('update', $pelanggaranKategori);
 
@@ -121,6 +126,7 @@ class PelanggaranKategoriController extends Controller
                 Pelanggaran::query()->where('kategori_id', $category->id)->where('status_aktif', true)->update(['status_aktif' => false]);
             }
         });
+        $activityLogger->record($request->user(), $request, 'Status kategori pelanggaran diubah', 'Status kategori pelanggaran ID #'.$pelanggaranKategori->id.' diubah menjadi '.($pelanggaranKategori->fresh()->status_aktif ? 'aktif' : 'nonaktif').'.');
 
         return to_route('admin.violation-categories.show', $pelanggaranKategori)->with('success', $pelanggaranKategori->fresh()->status_aktif
             ? 'Kategori diaktifkan kembali. Jenis pelanggaran tetap berstatus masing-masing.'

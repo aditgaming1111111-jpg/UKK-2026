@@ -18,7 +18,8 @@ class KelasManagementTest extends TestCase
 
     public function test_admin_can_create_search_and_update_class(): void
     {
-        $this->actingAs(User::factory()->state(['role' => 'admin'])->create());
+        $administrator = User::factory()->state(['role' => 'admin'])->create();
+        $this->actingAs($administrator);
 
         $this->post(route('admin.classes.store'), ['nama_kelas' => 'VII A', 'tingkat' => 'VII', 'jurusan' => null])
             ->assertRedirect();
@@ -29,6 +30,8 @@ class KelasManagementTest extends TestCase
         $this->put(route('admin.classes.update', $kelas), ['nama_kelas' => 'VII B', 'tingkat' => 'VII', 'jurusan' => null])
             ->assertRedirect(route('admin.classes.show', $kelas));
         $this->assertDatabaseHas('t_kelas', ['id' => $kelas->id, 'nama_kelas' => 'VII B']);
+        $this->assertDatabaseHas('t_log_aktivitas', ['user_id' => $administrator->id, 'aktivitas' => 'Kelas ditambahkan']);
+        $this->assertDatabaseHas('t_log_aktivitas', ['user_id' => $administrator->id, 'aktivitas' => 'Kelas diperbarui']);
     }
 
     public function test_class_with_placement_history_cannot_be_deleted(): void

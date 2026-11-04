@@ -18,9 +18,11 @@ class SiswaFactory extends Factory
     public function definition(): array
     {
         return [
+            'nis' => fake()->unique()->numerify('##########'),
             'nisn' => fake()->unique()->numerify('##########'),
             'nama' => fake()->name(),
             'jenis_kelamin' => fake()->randomElement(['L', 'P']),
+            'tanggal_lahir' => fake()->dateTimeBetween('-21 years', '-15 years')->format('Y-m-d'),
             'alamat' => fake()->address(),
             'tahun_masuk' => now()->year,
             'status_siswa' => 'aktif',

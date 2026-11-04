@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Guru;
 use App\Models\Kelas;
 use App\Models\KelasSiswa;
+use App\Models\LogAktivitas;
 use App\Models\LogPelanggaran;
 use App\Models\Pelanggaran;
 use App\Models\PelanggaranKategori;
@@ -49,6 +50,10 @@ class GuruManagementTest extends TestCase
         $this->assertTrue($teacher->user->is($user));
         $this->assertTrue($user->guru->is($teacher));
         $this->assertSame($teacher->email, $user->email);
+        $this->assertDatabaseHas('t_log_aktivitas', [
+            'user_id' => $administrator->id,
+            'aktivitas' => 'Guru ditambahkan',
+        ]);
     }
 
     public function test_teacher_name_is_limited_to_one_hundred_characters_on_create_and_update(): void
@@ -171,6 +176,10 @@ class GuruManagementTest extends TestCase
             'email' => 'updated.login@example.test',
             'role' => 'guru',
         ]);
+        $this->assertDatabaseHas('t_log_aktivitas', [
+            'user_id' => $administrator->id,
+            'aktivitas' => 'Data Guru diperbarui',
+        ]);
         $this->assertTrue($teacher->user->is($user));
         $this->assertTrue($user->guru->is($teacher));
     }
@@ -259,6 +268,11 @@ class GuruManagementTest extends TestCase
         $teacher = Guru::factory()->create();
         $record = PelanggaranSiswa::factory()->create();
         LogPelanggaran::factory()->for($record, 'catatanPelanggaran')->for($teacher->user, 'pengguna')->create();
+        LogAktivitas::query()->create([
+            'user_id' => $teacher->user_id,
+            'aktivitas' => 'Login',
+            'deskripsi' => 'Pengguna berhasil masuk sebagai guru.',
+        ]);
 
         $this->actingAs($administrator)->delete(route('admin.teachers.destroy', $teacher))
             ->assertSessionHasErrors('guru');

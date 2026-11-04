@@ -23,7 +23,7 @@
     <x-ui.card>
         <form method="GET" action="{{ route(auth()->user()->role . '.students.index') }}"
             class="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
-            <div class="sm:col-span-2"><x-ui.search placeholder="Cari NISN atau nama siswa" :value="$filters['q'] ?? null" /></div>
+            <div class="sm:col-span-2"><x-ui.search placeholder="Cari NIS, NISN, atau nama siswa" :value="$filters['q'] ?? null" /></div>
             <label class="space-y-1.5"><span class="block text-sm font-medium text-gray-700">Kelas</span><select
                     name="kelas_id"
                     class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-gray-500 focus:ring-2 focus:ring-gray-200">
@@ -69,6 +69,7 @@
                 <thead class="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
                     <tr>
                         <th class="px-5 py-3 font-medium">Siswa</th>
+                        <th class="px-5 py-3 font-medium">NIS</th>
                         <th class="px-5 py-3 font-medium">NISN</th>
                         <th class="px-5 py-3 font-medium">Kelas saat ini</th>
                         <th class="px-5 py-3 font-medium">Status</th>
@@ -84,6 +85,7 @@
                                 <p class="mt-1 text-xs text-gray-500">
                                     {{ $student->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan' }}</p>
                             </td>
+                            <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-700">{{ $student->nis ?? '—' }}</td>
                             <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-700">{{ $student->nisn }}</td>
                             <td class="px-5 py-4 text-sm text-gray-700">
                                 {{ $currentPlacement?->kelas?->nama_kelas ?? 'Belum ditempatkan' }}@if ($currentPlacement?->kelas)

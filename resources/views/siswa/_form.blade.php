@@ -1,6 +1,11 @@
 @csrf
 <div class="grid gap-5 sm:grid-cols-2">
-    <x-ui.input label="NISN" name="nisn" inputmode="numeric" maxlength="10" :value="$student->nisn ?? null" required />
+    <x-ui.input label="NIS" name="nis" inputmode="numeric" maxlength="10" pattern="[0-9]{10}"
+        title="Masukkan tepat 10 digit angka." oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)"
+        :value="$student->nis ?? null" required />
+    <x-ui.input label="NISN" name="nisn" inputmode="numeric" maxlength="10" pattern="[0-9]{10}"
+        title="Masukkan tepat 10 digit angka." oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)"
+        :value="$student->nisn ?? null" required />
     <x-ui.input label="Nama lengkap" name="nama" :value="$student->nama ?? null" required />
     <label class="space-y-1.5"><span class="block text-sm font-medium text-gray-700">Jenis kelamin <span
                 class="text-gray-500">*</span></span><select name="jenis_kelamin" required
@@ -9,6 +14,8 @@
             <option value="L" @selected(old('jenis_kelamin', $student->jenis_kelamin ?? '') === 'L')>Laki-laki</option>
             <option value="P" @selected(old('jenis_kelamin', $student->jenis_kelamin ?? '') === 'P')>Perempuan</option>
         </select><x-ui.form-error name="jenis_kelamin" /></label>
+    <x-ui.input label="Tanggal lahir" name="tanggal_lahir" type="date"
+        :value="isset($student) ? $student->tanggal_lahir?->format('Y-m-d') : null" />
     <x-ui.input label="Tahun masuk" name="tahun_masuk" type="number" min="1900" max="2100" :value="$student->tahun_masuk ?? now()->year"
         required />
     <div class="sm:col-span-2"><x-ui.textarea label="Alamat" name="alamat"

@@ -25,7 +25,7 @@ class SiswaReadService
         $major = $filters['jurusan'] ?? null;
 
         return Siswa::query()
-            ->select(['id', 'nisn', 'nama', 'jenis_kelamin', 'status_siswa'])
+            ->select(['id', 'nis', 'nisn', 'nama', 'jenis_kelamin', 'status_siswa'])
             ->with(['penempatanKelas' => static fn (Relation $query): Relation => $query
                 ->select(['id', 'siswa_id', 'kelas_id', 'status_aktif', 'tanggal_selesai'])
                 ->where('status_aktif', true)
@@ -33,7 +33,8 @@ class SiswaReadService
                 ->with('kelas:id,nama_kelas,tingkat,jurusan')])
             ->when($filters['q'] ?? null, static fn (Builder $query, string $search): Builder => $query
                 ->where(static function (Builder $searchQuery) use ($search): void {
-                    $searchQuery->where('nisn', 'like', '%'.$search.'%')
+                    $searchQuery->where('nis', 'like', '%'.$search.'%')
+                        ->orWhere('nisn', 'like', '%'.$search.'%')
                         ->orWhere('nama', 'like', '%'.$search.'%');
                 }))
             ->when($filters['status'] ?? null, static fn (Builder $query, string $status): Builder => $query

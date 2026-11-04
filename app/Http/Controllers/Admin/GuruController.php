@@ -8,10 +8,13 @@ use App\Http\Requests\Admin\StoreGuruRequest;
 use App\Http\Requests\Admin\UpdateGuruAccountRequest;
 use App\Http\Requests\Admin\UpdateGuruRequest;
 use App\Models\Guru;
+use App\Models\LogAktivitas;
 use App\Models\LogPelanggaran;
 use App\Models\User;
+use App\Services\ActivityLogger;
 use App\Services\GuruDirectory;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
@@ -44,7 +47,7 @@ class GuruController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreGuruRequest $request): RedirectResponse
+    public function store(StoreGuruRequest $request, ActivityLogger $activityLogger): RedirectResponse
     {
         $data = $request->validated();
 
@@ -63,6 +66,7 @@ class GuruController extends Controller
                 'status_aktif' => true,
             ]);
         });
+        $activityLogger->record($request->user(), $request, 'Guru ditambahkan', 'Identitas Guru ID #'.$guru->id.' dan akun login berhasil dibuat.');
 
         return to_route('admin.teachers.show', $guru)->with('success', 'Data Guru berhasil ditambahkan.');
     }
@@ -94,7 +98,7 @@ class GuruController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateGuruRequest $request, Guru $guru): RedirectResponse
+    public function update(UpdateGuruRequest $request, Guru $guru, ActivityLogger $activityLogger): RedirectResponse
     {
         $data = $request->validated();
 
@@ -121,6 +125,7 @@ class GuruController extends Controller
                 ]);
             }
         });
+        $activityLogger->record($request->user(), $request, 'Data Guru diperbarui', 'Identitas Guru ID #'.$guru->id.' berhasil diperbarui.');
 
         return to_route('admin.teachers.show', $guru)->with('success', 'Identitas Guru berhasil diperbarui.');
     }
@@ -128,7 +133,7 @@ class GuruController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Guru $guru): RedirectResponse
+    public function destroy(Guru $guru, Request $request, ActivityLogger $activityLogger): RedirectResponse
     {
         Gate::authorize('delete', $guru);
 
@@ -138,33 +143,36 @@ class GuruController extends Controller
 
             if ($lockedGuru->waliKelas()->exists()
                 || $lockedGuru->catatanPelanggaran()->exists()
-                || LogPelanggaran::query()->where('user_id', $user->id)->exists()) {
+                || LogPelanggaran::query()->where('user_id', $user->id)->exists()
+                || LogAktivitas::query()->where('user_id', $user->id)->exists()) {
                 throw ValidationException::withMessages([
-                    'guru' => 'Guru memiliki riwayat penugasan, catatan, atau aktivitas audit sehingga tidak dapat dihapus permanen. Nonaktifkan Guru untuk mempertahankan riwayat.',
+                    'guru' => 'Guru memiliki riwayat penugasan, catatan, atau aktivitas sehingga tidak dapat dihapus permanen. Nonaktifkan Guru untuk mempertahankan riwayat.',
                 ]);
             }
 
             $lockedGuru->delete();
             $user->delete();
         });
+        $activityLogger->record($request->user(), $request, 'Guru dihapus', 'Identitas Guru ID #'.$guru->id.' tanpa histori berhasil dihapus.');
 
         return to_route('admin.teachers.index')
             ->with('success', 'Data Guru dan akun login tanpa riwayat berhasil dihapus permanen.');
     }
 
-    public function deactivate(Guru $guru): RedirectResponse
+    public function deactivate(Guru $guru, Request $request, ActivityLogger $activityLogger): RedirectResponse
     {
         Gate::authorize('changeStatus', $guru);
 
         DB::transaction(function () use ($guru): void {
             Guru::query()->whereKey($guru->id)->lockForUpdate()->firstOrFail()->update(['status_aktif' => false]);
         });
+        $activityLogger->record($request->user(), $request, 'Guru dinonaktifkan', 'Guru ID #'.$guru->id.' berhasil dinonaktifkan.');
 
         return to_route('admin.teachers.show', $guru)
             ->with('success', 'Guru dinonaktifkan. Akun login, penugasan, dan seluruh histori tetap tersimpan.');
     }
 
-    public function updateAccount(UpdateGuruAccountRequest $request, Guru $guru): RedirectResponse
+    public function updateAccount(UpdateGuruAccountRequest $request, Guru $guru, ActivityLogger $activityLogger): RedirectResponse
     {
         $data = $request->validated();
 
@@ -193,17 +201,19 @@ class GuruController extends Controller
             $user->nama = $lockedGuru->nama;
             $user->save();
         });
+        $activityLogger->record($request->user(), $request, 'Akun Guru diperbarui', 'Pengaturan akun Guru ID #'.$guru->id.' diperbarui tanpa mencatat data kredensial.');
 
         return to_route('admin.teachers.show', $guru)->with('success', 'Pengaturan akun login berhasil diperbarui.');
     }
 
-    public function activate(Guru $guru): RedirectResponse
+    public function activate(Guru $guru, Request $request, ActivityLogger $activityLogger): RedirectResponse
     {
         Gate::authorize('changeStatus', $guru);
 
         DB::transaction(function () use ($guru): void {
             Guru::query()->whereKey($guru->id)->lockForUpdate()->firstOrFail()->update(['status_aktif' => true]);
         });
+        $activityLogger->record($request->user(), $request, 'Guru diaktifkan', 'Guru ID #'.$guru->id.' berhasil diaktifkan.');
 
         return to_route('admin.teachers.show', $guru)->with('success', 'Guru dan akun login yang terhubung berhasil diaktifkan.');
     }

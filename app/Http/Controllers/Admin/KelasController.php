@@ -10,6 +10,7 @@ use App\Models\Kelas;
 use App\Models\KelasSiswa;
 use App\Models\TahunAjaran;
 use App\Models\WaliKelas;
+use App\Services\ActivityLogger;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -65,9 +66,10 @@ class KelasController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreKelasRequest $request): RedirectResponse
+    public function store(StoreKelasRequest $request, ActivityLogger $activityLogger): RedirectResponse
     {
         $kelas = Kelas::query()->create($request->validated());
+        $activityLogger->record($request->user(), $request, 'Kelas ditambahkan', 'Data kelas ID #'.$kelas->id.' berhasil ditambahkan.');
 
         return to_route('admin.classes.show', $kelas)->with('success', 'Data kelas berhasil ditambahkan.');
     }
@@ -121,9 +123,10 @@ class KelasController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateKelasRequest $request, Kelas $kelas): RedirectResponse
+    public function update(UpdateKelasRequest $request, Kelas $kelas, ActivityLogger $activityLogger): RedirectResponse
     {
         $kelas->update($request->validated());
+        $activityLogger->record($request->user(), $request, 'Kelas diperbarui', 'Data kelas ID #'.$kelas->id.' berhasil diperbarui.');
 
         return to_route('admin.classes.show', $kelas)->with('success', 'Data kelas berhasil diperbarui.');
     }
@@ -131,7 +134,7 @@ class KelasController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Kelas $kelas): RedirectResponse
+    public function destroy(Kelas $kelas, Request $request, ActivityLogger $activityLogger): RedirectResponse
     {
         Gate::authorize('delete', $kelas);
 
@@ -147,6 +150,7 @@ class KelasController extends Controller
 
             $lockedClass->delete();
         });
+        $activityLogger->record($request->user(), $request, 'Kelas dihapus', 'Data kelas ID #'.$kelas->id.' tanpa histori berhasil dihapus.');
 
         return to_route('admin.classes.index')->with('success', 'Data kelas berhasil dihapus.');
     }

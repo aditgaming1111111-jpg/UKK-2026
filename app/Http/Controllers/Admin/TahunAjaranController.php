@@ -7,8 +7,10 @@ use App\Http\Requests\Admin\StoreTahunAjaranRequest;
 use App\Http\Requests\Admin\TahunAjaranIndexRequest;
 use App\Http\Requests\Admin\UpdateTahunAjaranRequest;
 use App\Models\TahunAjaran;
+use App\Services\ActivityLogger;
 use App\Services\TahunAjaranManager;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
@@ -48,9 +50,10 @@ class TahunAjaranController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreTahunAjaranRequest $request, TahunAjaranManager $manager): RedirectResponse
+    public function store(StoreTahunAjaranRequest $request, TahunAjaranManager $manager, ActivityLogger $activityLogger): RedirectResponse
     {
         $academicYear = $manager->create($request->validated());
+        $activityLogger->record($request->user(), $request, 'Tahun ajaran ditambahkan', 'Periode tahun ajaran ID #'.$academicYear->id.' berhasil ditambahkan.');
 
         return to_route('admin.academic-years.show', $academicYear)->with('success', 'Tahun ajaran berhasil ditambahkan.');
     }
@@ -83,13 +86,15 @@ class TahunAjaranController extends Controller
         UpdateTahunAjaranRequest $request,
         TahunAjaran $tahunAjaran,
         TahunAjaranManager $manager,
+        ActivityLogger $activityLogger,
     ): RedirectResponse {
         $manager->update($tahunAjaran, $request->validated());
+        $activityLogger->record($request->user(), $request, 'Tahun ajaran diperbarui', 'Pengaturan tahun ajaran ID #'.$tahunAjaran->id.' berhasil diperbarui.');
 
         return to_route('admin.academic-years.show', $tahunAjaran)->with('success', 'Pengaturan tahun ajaran berhasil diperbarui.');
     }
 
-    public function destroy(TahunAjaran $tahunAjaran): RedirectResponse
+    public function destroy(TahunAjaran $tahunAjaran, Request $request, ActivityLogger $activityLogger): RedirectResponse
     {
         Gate::authorize('delete', $tahunAjaran);
 
@@ -104,6 +109,7 @@ class TahunAjaranController extends Controller
 
             $lockedYear->delete();
         });
+        $activityLogger->record($request->user(), $request, 'Tahun ajaran dihapus', 'Tahun ajaran ID #'.$tahunAjaran->id.' tanpa histori berhasil dihapus.');
 
         return to_route('admin.academic-years.index')->with('success', 'Tahun ajaran tanpa riwayat berhasil dihapus permanen.');
     }
