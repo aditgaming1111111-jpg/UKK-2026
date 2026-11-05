@@ -19,7 +19,8 @@ class GuruFactory extends Factory
     public function definition(): array
     {
         return [
-            'nip' => fake()->unique()->numerify('##########'),
+            'nip' => fake()->unique()->numerify('##################'),
+            'status_kepegawaian' => 'PNS',
             'nama' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'status_aktif' => true,

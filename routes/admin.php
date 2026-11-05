@@ -31,6 +31,8 @@ Route::prefix('admin')
         Route::resource('siswa', SiswaController::class)->parameters(['siswa' => 'siswa'])->names('students');
         Route::patch('siswa/{siswa}/status', [SiswaController::class, 'updateStatus'])->name('students.status');
         Route::post('siswa/{siswa}/penempatan', [SiswaController::class, 'storePlacement'])->name('students.placements.store');
+        Route::patch('siswa/{siswa}/penempatan/{placementId}', [SiswaController::class, 'updatePlacement'])->name('students.placements.update');
+        Route::delete('siswa/{siswa}/penempatan/{placementId}', [SiswaController::class, 'destroyPlacement'])->name('students.placements.destroy');
         Route::resource('guru', GuruController::class)->parameters(['guru' => 'guru'])->except(['destroy'])->names('teachers');
         Route::delete('guru/{guru}', [GuruController::class, 'destroy'])->name('teachers.destroy');
         Route::patch('guru/{guru}/nonaktifkan', [GuruController::class, 'deactivate'])->name('teachers.deactivate');

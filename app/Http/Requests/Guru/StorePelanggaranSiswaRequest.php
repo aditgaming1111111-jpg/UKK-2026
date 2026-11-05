@@ -44,11 +44,17 @@ class StorePelanggaranSiswaRequest extends FormRequest
 
             $incidentDate = CarbonImmutable::parse($this->string('tanggal_pelanggaran')->toString())->startOfDay();
             $placement = KelasSiswa::query()
-                ->with('tahunAjaran:id,tanggal_mulai,tanggal_selesai')
+                ->with(['tahunAjaran:id,tanggal_mulai,tanggal_selesai', 'siswa:id,status_siswa'])
                 ->find($this->integer('kelas_siswa_id'));
 
-            if ($placement === null || $placement->tahunAjaran === null) {
+            if ($placement === null || $placement->tahunAjaran === null || $placement->siswa === null) {
                 $validator->errors()->add('kelas_siswa_id', 'Penempatan kelas siswa tidak ditemukan.');
+
+                return;
+            }
+
+            if ($placement->siswa->status_siswa !== 'aktif') {
+                $validator->errors()->add('kelas_siswa_id', 'Siswa tidak aktif dan tidak dapat menerima catatan pelanggaran baru.');
 
                 return;
             }

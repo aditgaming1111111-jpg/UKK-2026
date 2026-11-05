@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Nov 04, 2026 at 03:22 PM
+-- Generation Time: Nov 04, 2026 at 11:10 PM
 -- Server version: 8.4.3
 -- PHP Version: 8.3.30
 
@@ -120,7 +120,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (5, '2026_10_01_132222_create_sekolahku_core_tables', 1),
 (6, '2026_10_01_155432_add_unique_index_to_t_pelanggaran_kode', 1),
 (7, '2026_11_04_113055_add_nis_and_tanggal_lahir_to_t_siswa_table', 1),
-(8, '2026_11_04_115330_create_t_log_aktivitas_table', 1);
+(8, '2026_11_04_115330_create_t_log_aktivitas_table', 1),
+(9, '2026_11_05_103812_add_status_kepegawaian_to_t_guru_table', 2);
 
 -- --------------------------------------------------------
 
@@ -154,7 +155,8 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('uuAu9xXIXbP5PeqeFCjzhpHVn8lfTfMIu9gcPebY', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiIyc1JzeUVJczdaSW1lWkZlTWk0WGRlRVJlSGdYQm9CbFg4ZXQxQUdvIiwiX3ByZXZpb3VzIjp7InVybCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDAwXC9hZG1pblwvc2lzd2FcLzc1Iiwicm91dGUiOiJhZG1pbi5zdHVkZW50cy5zaG93In0sIl9mbGFzaCI6eyJvbGQiOltdLCJuZXciOltdfSwibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiOjEsInBhc3N3b3JkX2hhc2hfd2ViIjoiMTg0OWE2YzEzYmVhMmZlOTc4ODhiNjUxMzMzZmY2YTIyZDVjMTA2YmNkMGQ4NjE2MGNmZGQzZGM0NWJjNjJmNCJ9', 1793805744);
+('eLOy3uJNuZ6BjUMm0wp35bZMYqUaezYUQXDweO98', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJIT3ZEMXZLQjVsemdWSzFwTDl5WklQVFEwc05GVzdDVWxSMGZDakF1IiwiX3ByZXZpb3VzIjp7InVybCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDAwXC9sb2dpbiIsInJvdXRlIjoibG9naW4ifSwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119fQ==', 1793833786),
+('Yv2v2OpCWo6Ip7kJK6fNRDrHz9KDXIPi2XqYa6ZD', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJpN3JKdmd4NXNLN3U2NG5sVVpRc0xCaHFicFJEeExINDBMd3lCbVU0IiwiX2ZsYXNoIjp7Im5ldyI6W10sIm9sZCI6W119LCJfcHJldmlvdXMiOnsidXJsIjoiaHR0cDpcL1wvMTI3LjAuMC4xOjgwMDBcL2xvZ2luIiwicm91dGUiOiJsb2dpbiJ9fQ==', 1793833783);
 
 -- --------------------------------------------------------
 
@@ -164,7 +166,8 @@ INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, 
 
 CREATE TABLE `t_guru` (
   `id` bigint UNSIGNED NOT NULL,
-  `nip` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nip` varchar(18) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status_kepegawaian` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `nama` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `status_aktif` tinyint(1) NOT NULL DEFAULT '1',
@@ -177,63 +180,62 @@ CREATE TABLE `t_guru` (
 -- Dumping data for table `t_guru`
 --
 
-INSERT INTO `t_guru` (`id`, `nip`, `nama`, `email`, `status_aktif`, `user_id`, `created_at`, `updated_at`) VALUES
-(1, '1980010120260001', 'Anton', 'anton@sekolahku.com', 1, 2, '2026-11-04 07:59:23', '2026-11-04 07:59:23'),
-(2, '202600000000000001', 'Wawan Kurniawan, S.Pd.I', 'wawankurniawan@sekolahku.com', 1, 3, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(3, '202600000000000002', 'Ai Nuryaidah, S.Pd', 'ainuryaidah@sekolahku.com', 1, 4, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(4, '202600000000000003', 'Maya Permata Endah, S. Pd', 'mayapermataendah@sekolahku.com', 1, 5, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(5, '202600000000000004', 'Dody Jaenudin, S.Pd.', 'dodyjaenudin@sekolahku.com', 1, 6, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(6, '202600000000000005', 'Dedi Kardiman, S. Pd', 'dedikardiman@sekolahku.com', 1, 7, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(7, '202600000000000006', 'Uca Musa Yusenda, S.Pd', 'ucamusayusenda@sekolahku.com', 1, 8, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(8, '202600000000000007', 'Drs. Ahmad Nur Mukhlis', 'ahmadnurmukhlis@sekolahku.com', 1, 9, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(9, '202600000000000008', 'Drs. Heri', 'heri@sekolahku.com', 1, 10, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(10, '202600000000000009', 'Asep Bastaman', 'asepbastaman@sekolahku.com', 1, 11, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(11, '202600000000000010', 'H. Encep Maemun, S.T., M.Pd', 'encepmaemun@sekolahku.com', 1, 12, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(12, '202600000000000011', 'Opik', 'opik@sekolahku.com', 1, 13, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(13, '202600000000000012', 'Ida Farida, S. Pd', 'idafarida@sekolahku.com', 1, 14, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(14, '202600000000000013', 'Idah Mahmudah, S.Pd', 'idahmahmudah@sekolahku.com', 1, 15, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(15, '202600000000000014', 'Drs. Muhamad Ali', 'muhamadali@sekolahku.com', 1, 16, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(16, '202600000000000015', 'Helmi Ali Akbar, S.Pd.I', 'helmialiakbar@sekolahku.com', 1, 17, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(17, '202600000000000016', 'Syeni Suswarini, S.Pd', 'syenisuswarini@sekolahku.com', 1, 18, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(18, '202600000000000017', 'Wiwid Yulianti, S.Pd', 'wiwidyulianti@sekolahku.com', 1, 19, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(19, '202600000000000018', 'Ansor Muhajir, S.T', 'ansormuhajir@sekolahku.com', 1, 20, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(20, '202600000000000019', 'Ogi Gaosun Gias, S.Pd.I', 'ogigaosungias@sekolahku.com', 1, 21, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(21, '202600000000000020', 'Sandi Mulyana, S.Pd', 'sandimulyana@sekolahku.com', 1, 22, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(22, '202600000000000021', 'Erna Suryani, S.Pd', 'ernasuryani@sekolahku.com', 1, 23, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(23, '202600000000000022', 'Ai Wahidah, S.Ag', 'aiwahidah@sekolahku.com', 1, 24, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(24, '202600000000000023', 'Chandra Aditya Yusup, S.Pd', 'chandraadityayusup@sekolahku.com', 1, 25, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(25, '202600000000000024', 'Arif Kusmawan, S.Pd', 'arifkusmawan@sekolahku.com', 1, 26, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(26, '202600000000000025', 'Asep Taufiq Hidayat, S.Kom', 'aseptaufiqhidayat@sekolahku.com', 1, 27, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(27, '202600000000000026', 'Rendy Ichsan Kusumah, S.T', 'rendyichsankusumah@sekolahku.com', 1, 28, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(28, '202600000000000027', 'Feri Rahmawan, S.Pd', 'ferirahmawan@sekolahku.com', 1, 29, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(29, '202600000000000028', 'Ari Sandriana, S.Kom', 'arisandriana@sekolahku.com', 1, 30, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(30, '202600000000000029', 'Yaneu Nurdian, S.Pd., M.Pd', 'yaneunurdian@sekolahku.com', 1, 31, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(31, '202600000000000030', 'Ucu Muhammad Khoer N, S.Pd', 'ucumuhammadkhoern@sekolahku.com', 1, 32, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(32, '202600000000000031', 'Mira Dwi Rahmawati, S.Ag', 'miradwirahmawati@sekolahku.com', 1, 33, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(33, '202600000000000032', 'Aldi Maulana, S.Pd', 'aldimaulana@sekolahku.com', 1, 34, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(34, '202600000000000033', 'Eli Rosliah, S.Pd', 'elirosliah@sekolahku.com', 1, 35, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(35, '202600000000000034', 'Isni Nur Fitriani, S.Pd', 'isninurfitriani@sekolahku.com', 1, 36, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(36, '202600000000000035', 'Aanisah Putri Nur Aini, S.Pd', 'aanisahputrinuraini@sekolahku.com', 1, 37, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(37, '202600000000000036', 'Yusi Luthfiani, S.Sos.I', 'yusiluthfiani@sekolahku.com', 1, 38, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(38, '202600000000000037', 'Lilis Rustandy Mawardi, S.Pd., M.Pd', 'lilisrustandymawardi@sekolahku.com', 1, 39, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(39, '202600000000000038', 'Yusrin Noer Sabrina, S.Pd', 'yusrinnoersabrina@sekolahku.com', 1, 40, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(40, '202600000000000039', 'Senny Indayani, S.Pd', 'sennyindayani@sekolahku.com', 1, 41, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(41, '202600000000000040', 'Ilma Amalia, S.Pd', 'ilmaamalia@sekolahku.com', 1, 42, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(42, '202600000000000041', 'Alvira Sofwatunnisa, S.Pd', 'alvirasofwatunnisa@sekolahku.com', 1, 43, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(43, '202600000000000042', 'Risna Andriyani, S.Pd', 'risnaandriyani@sekolahku.com', 1, 44, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(44, '202600000000000043', 'Dra. Tintin Noerhayati', 'tintinnoerhayati@sekolahku.com', 1, 45, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(45, '202600000000000044', 'Rizkia Fahira, S.Pd', 'rizkiafahira@sekolahku.com', 1, 46, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(46, '202600000000000045', 'Frasetio', 'frasetio@sekolahku.com', 1, 47, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(47, '202600000000000046', 'Ratnaningsih Hatil Aeni, S.Pd.', 'ratnaningshhatilaeni@sekolahku.com', 1, 48, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(48, '202600000000000047', 'Dheny Darajatul Hasani, S.Pd.', 'dhenydarajatulhasani@sekolahku.com', 1, 49, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(49, '202600000000000048', 'Fahrullah, S.Pd', 'fahrullah@sekolahku.com', 1, 50, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(50, '202600000000000049', 'Aan Andriana, S.T', 'aanandriana@sekolahku.com', 1, 51, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(51, '202600000000000050', 'Fitri Fauziah, S.T', 'fitrifauziah@sekolahku.com', 1, 52, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(52, '202600000000000051', 'Nida Aulia, S.Pd', 'nidaaulia@sekolahku.com', 1, 53, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(53, '202600000000000052', 'Sri Nurrizki Putri Krisnadi, S.Pd', 'srinurrizkiputrikrisnadi@sekolahku.com', 1, 54, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(54, '202600000000000053', 'Riesy Putri Navia, S.Kom', 'riesyputrinavia@sekolahku.com', 1, 55, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(55, '202600000000000054', 'Rurry Febriani Maryadi, S.Pd', 'rurryfebrianimaryadi@sekolahku.com', 1, 56, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(56, '202600000000000055', 'Irvan Rizal, S.Pd', 'irvanrizal@sekolahku.com', 1, 57, '2026-11-04 15:01:22', '2026-11-04 15:01:22');
+INSERT INTO `t_guru` (`id`, `nip`, `status_kepegawaian`, `nama`, `email`, `status_aktif`, `user_id`, `created_at`, `updated_at`) VALUES
+(2, '202600000000000001', NULL, 'Wawan Kurniawan, S.Pd.I', 'wawankurniawan@sekolahku.com', 1, 3, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(3, '202600000000000002', NULL, 'Ai Nuryaidah, S.Pd', 'ainuryaidah@sekolahku.com', 1, 4, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(4, '202600000000000003', NULL, 'Maya Permata Endah, S. Pd', 'mayapermataendah@sekolahku.com', 1, 5, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(5, '202600000000000004', NULL, 'Dody Jaenudin, S.Pd.', 'dodyjaenudin@sekolahku.com', 1, 6, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(6, '202600000000000005', NULL, 'Dedi Kardiman, S. Pd', 'dedikardiman@sekolahku.com', 1, 7, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(7, '202600000000000006', NULL, 'Uca Musa Yusenda, S.Pd', 'ucamusayusenda@sekolahku.com', 1, 8, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(8, '202600000000000007', NULL, 'Drs. Ahmad Nur Mukhlis', 'ahmadnurmukhlis@sekolahku.com', 1, 9, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(9, '202600000000000008', NULL, 'Drs. Heri', 'heri@sekolahku.com', 1, 10, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(10, '202600000000000009', NULL, 'Asep Bastaman', 'asepbastaman@sekolahku.com', 1, 11, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(11, '202600000000000010', NULL, 'H. Encep Maemun, S.T., M.Pd', 'encepmaemun@sekolahku.com', 1, 12, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(12, '202600000000000011', NULL, 'Opik', 'opik@sekolahku.com', 1, 13, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(13, '202600000000000012', NULL, 'Ida Farida, S. Pd', 'idafarida@sekolahku.com', 1, 14, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(14, '202600000000000013', NULL, 'Idah Mahmudah, S.Pd', 'idahmahmudah@sekolahku.com', 1, 15, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(15, '202600000000000014', NULL, 'Drs. Muhamad Ali', 'muhamadali@sekolahku.com', 1, 16, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(16, '202600000000000015', NULL, 'Helmi Ali Akbar, S.Pd.I', 'helmialiakbar@sekolahku.com', 1, 17, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(17, '202600000000000016', NULL, 'Syeni Suswarini, S.Pd', 'syenisuswarini@sekolahku.com', 1, 18, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(18, '202600000000000017', NULL, 'Wiwid Yulianti, S.Pd', 'wiwidyulianti@sekolahku.com', 1, 19, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(19, '202600000000000018', NULL, 'Ansor Muhajir, S.T', 'ansormuhajir@sekolahku.com', 1, 20, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(20, '202600000000000019', NULL, 'Ogi Gaosun Gias, S.Pd.I', 'ogigaosungias@sekolahku.com', 1, 21, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(21, '202600000000000020', NULL, 'Sandi Mulyana, S.Pd', 'sandimulyana@sekolahku.com', 1, 22, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(22, '202600000000000021', NULL, 'Erna Suryani, S.Pd', 'ernasuryani@sekolahku.com', 1, 23, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(23, '202600000000000022', NULL, 'Ai Wahidah, S.Ag', 'aiwahidah@sekolahku.com', 1, 24, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(24, '202600000000000023', NULL, 'Chandra Aditya Yusup, S.Pd', 'chandraadityayusup@sekolahku.com', 1, 25, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(25, '202600000000000024', NULL, 'Arif Kusmawan, S.Pd', 'arifkusmawan@sekolahku.com', 1, 26, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(26, '202600000000000025', NULL, 'Asep Taufiq Hidayat, S.Kom', 'aseptaufiqhidayat@sekolahku.com', 1, 27, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(27, '202600000000000026', NULL, 'Rendy Ichsan Kusumah, S.T', 'rendyichsankusumah@sekolahku.com', 1, 28, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(28, '202600000000000027', NULL, 'Feri Rahmawan, S.Pd', 'ferirahmawan@sekolahku.com', 1, 29, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(29, '202600000000000028', NULL, 'Ari Sandriana, S.Kom', 'arisandriana@sekolahku.com', 1, 30, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(30, '202600000000000029', NULL, 'Yaneu Nurdian, S.Pd., M.Pd', 'yaneunurdian@sekolahku.com', 1, 31, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(31, '202600000000000030', NULL, 'Ucu Muhammad Khoer N, S.Pd', 'ucumuhammadkhoern@sekolahku.com', 1, 32, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(32, '202600000000000031', NULL, 'Mira Dwi Rahmawati, S.Ag', 'miradwirahmawati@sekolahku.com', 1, 33, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(33, '202600000000000032', NULL, 'Aldi Maulana, S.Pd', 'aldimaulana@sekolahku.com', 1, 34, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(34, '202600000000000033', NULL, 'Eli Rosliah, S.Pd', 'elirosliah@sekolahku.com', 1, 35, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(35, '202600000000000034', NULL, 'Isni Nur Fitriani, S.Pd', 'isninurfitriani@sekolahku.com', 1, 36, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(36, '202600000000000035', NULL, 'Aanisah Putri Nur Aini, S.Pd', 'aanisahputrinuraini@sekolahku.com', 1, 37, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(37, '202600000000000036', NULL, 'Yusi Luthfiani, S.Sos.I', 'yusiluthfiani@sekolahku.com', 1, 38, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(38, '202600000000000037', NULL, 'Lilis Rustandy Mawardi, S.Pd., M.Pd', 'lilisrustandymawardi@sekolahku.com', 1, 39, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(39, '202600000000000038', NULL, 'Yusrin Noer Sabrina, S.Pd', 'yusrinnoersabrina@sekolahku.com', 1, 40, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(40, '202600000000000039', NULL, 'Senny Indayani, S.Pd', 'sennyindayani@sekolahku.com', 1, 41, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(41, '202600000000000040', NULL, 'Ilma Amalia, S.Pd', 'ilmaamalia@sekolahku.com', 1, 42, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(42, '202600000000000041', NULL, 'Alvira Sofwatunnisa, S.Pd', 'alvirasofwatunnisa@sekolahku.com', 1, 43, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(43, '202600000000000042', NULL, 'Risna Andriyani, S.Pd', 'risnaandriyani@sekolahku.com', 1, 44, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(44, '202600000000000043', NULL, 'Dra. Tintin Noerhayati', 'tintinnoerhayati@sekolahku.com', 1, 45, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(45, '202600000000000044', NULL, 'Rizkia Fahira, S.Pd', 'rizkiafahira@sekolahku.com', 1, 46, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(46, '202600000000000045', NULL, 'Frasetio', 'frasetio@sekolahku.com', 1, 47, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(47, '202600000000000046', NULL, 'Ratnaningsih Hatil Aeni, S.Pd.', 'ratnaningshhatilaeni@sekolahku.com', 1, 48, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(48, '202600000000000047', NULL, 'Dheny Darajatul Hasani, S.Pd.', 'dhenydarajatulhasani@sekolahku.com', 1, 49, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(49, '202600000000000048', NULL, 'Fahrullah, S.Pd', 'fahrullah@sekolahku.com', 1, 50, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(50, '202600000000000049', NULL, 'Aan Andriana, S.T', 'aanandriana@sekolahku.com', 1, 51, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(51, '202600000000000050', NULL, 'Fitri Fauziah, S.T', 'fitrifauziah@sekolahku.com', 1, 52, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(52, '202600000000000051', NULL, 'Nida Aulia, S.Pd', 'nidaaulia@sekolahku.com', 1, 53, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(53, '202600000000000052', NULL, 'Sri Nurrizki Putri Krisnadi, S.Pd', 'srinurrizkiputrikrisnadi@sekolahku.com', 1, 54, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(54, '202600000000000053', NULL, 'Riesy Putri Navia, S.Kom', 'riesyputrinavia@sekolahku.com', 1, 55, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(55, '202600000000000054', NULL, 'Rurry Febriani Maryadi, S.Pd', 'rurryfebrianimaryadi@sekolahku.com', 1, 56, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(56, '202600000000000055', NULL, 'Irvan Rizal, S.Pd', 'irvanrizal@sekolahku.com', 1, 57, '2026-11-04 15:01:22', '2026-11-04 15:01:22');
 
 -- --------------------------------------------------------
 
@@ -284,7 +286,53 @@ INSERT INTO `t_kelas_siswa` (`id`, `siswa_id`, `kelas_id`, `tahun_ajaran_id`, `t
 (1, 1, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 08:10:57', '2026-11-04 08:10:57'),
 (2, 2, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 08:11:16', '2026-11-04 08:11:16'),
 (3, 27, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 08:11:35', '2026-11-04 08:11:35'),
-(4, 75, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 08:22:23', '2026-11-04 08:22:23');
+(4, 75, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 08:22:23', '2026-11-04 08:22:23'),
+(5, 76, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:44:19', '2026-11-04 15:44:19'),
+(6, 77, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:44:41', '2026-11-04 15:44:41'),
+(7, 51, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:44:59', '2026-11-04 15:44:59'),
+(8, 52, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:45:17', '2026-11-04 15:45:17'),
+(9, 53, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:46:00', '2026-11-04 15:46:00'),
+(10, 78, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:46:21', '2026-11-04 15:46:21'),
+(11, 79, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:46:42', '2026-11-04 15:46:42'),
+(12, 80, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:47:09', '2026-11-04 15:47:09'),
+(13, 54, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:47:35', '2026-11-04 15:47:35'),
+(14, 81, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:47:54', '2026-11-04 15:47:54'),
+(15, 82, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:48:19', '2026-11-04 15:48:19'),
+(16, 83, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:48:45', '2026-11-04 15:48:45'),
+(17, 55, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:49:04', '2026-11-04 15:49:04'),
+(18, 84, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:49:25', '2026-11-04 15:49:25'),
+(19, 56, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:49:42', '2026-11-04 15:49:42'),
+(20, 85, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:50:02', '2026-11-04 15:50:02'),
+(21, 86, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:50:23', '2026-11-04 15:50:23'),
+(22, 57, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:50:48', '2026-11-04 15:50:48'),
+(23, 87, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:51:07', '2026-11-04 15:51:07'),
+(24, 58, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:51:35', '2026-11-04 15:51:35'),
+(25, 59, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:51:56', '2026-11-04 15:51:56'),
+(26, 88, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:52:18', '2026-11-04 15:52:18'),
+(27, 89, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:52:39', '2026-11-04 15:52:39'),
+(28, 60, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:52:57', '2026-11-04 15:52:57'),
+(29, 90, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:53:14', '2026-11-04 15:53:14'),
+(30, 61, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:53:31', '2026-11-04 15:53:31'),
+(31, 91, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:53:50', '2026-11-04 15:53:50'),
+(32, 92, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:54:08', '2026-11-04 15:54:08'),
+(33, 62, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:54:29', '2026-11-04 15:54:29'),
+(34, 93, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:54:47', '2026-11-04 15:54:47'),
+(35, 63, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:55:03', '2026-11-04 15:55:03'),
+(36, 94, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:55:20', '2026-11-04 15:55:20'),
+(37, 64, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:55:38', '2026-11-04 15:55:38'),
+(38, 65, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:55:57', '2026-11-04 15:55:57'),
+(39, 66, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:56:13', '2026-11-04 15:56:13'),
+(40, 95, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:56:33', '2026-11-04 15:56:33'),
+(41, 67, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:56:55', '2026-11-04 15:56:55'),
+(42, 68, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:57:10', '2026-11-04 15:57:10'),
+(43, 96, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:57:28', '2026-11-04 15:57:28'),
+(44, 69, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:57:43', '2026-11-04 15:57:43'),
+(45, 70, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:57:58', '2026-11-04 15:57:58'),
+(46, 71, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:58:13', '2026-11-04 15:58:13'),
+(47, 72, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:58:30', '2026-11-04 15:58:30'),
+(48, 73, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:58:45', '2026-11-04 15:58:45'),
+(49, 97, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:59:04', '2026-11-04 15:59:04'),
+(50, 74, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:59:22', '2026-11-04 15:59:22');
 
 -- --------------------------------------------------------
 
@@ -322,7 +370,59 @@ INSERT INTO `t_log_aktivitas` (`id`, `user_id`, `aktivitas`, `deskripsi`, `ip_ad
 (13, 1, 'Siswa diperbarui', 'Data siswa ID #1 berhasil diperbarui.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 08:21:17'),
 (14, 1, 'Siswa diperbarui', 'Data siswa ID #2 berhasil diperbarui.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 08:21:33'),
 (15, 1, 'Siswa diperbarui', 'Data siswa ID #27 berhasil diperbarui.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 08:21:49'),
-(16, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #75 dicatat dengan ID #4.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 08:22:23');
+(16, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #75 dicatat dengan ID #4.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 08:22:23'),
+(17, 1, 'Login', 'Pengguna berhasil masuk sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:43:31'),
+(18, 1, 'Guru dihapus', 'Identitas Guru ID #1 tanpa histori berhasil dihapus.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:43:54'),
+(19, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #76 dicatat dengan ID #5.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:44:19'),
+(20, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #77 dicatat dengan ID #6.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:44:41'),
+(21, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #51 dicatat dengan ID #7.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:44:59'),
+(22, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #52 dicatat dengan ID #8.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:45:17'),
+(23, 1, 'Siswa diperbarui', 'Data siswa ID #52 berhasil diperbarui.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:45:25'),
+(24, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #53 dicatat dengan ID #9.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:46:00'),
+(25, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #78 dicatat dengan ID #10.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:46:21'),
+(26, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #79 dicatat dengan ID #11.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:46:42'),
+(27, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #80 dicatat dengan ID #12.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:47:09'),
+(28, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #54 dicatat dengan ID #13.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:47:35'),
+(29, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #81 dicatat dengan ID #14.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:47:54'),
+(30, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #82 dicatat dengan ID #15.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:48:19'),
+(31, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #83 dicatat dengan ID #16.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:48:45'),
+(32, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #55 dicatat dengan ID #17.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:49:04'),
+(33, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #84 dicatat dengan ID #18.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:49:25'),
+(34, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #56 dicatat dengan ID #19.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:49:42'),
+(35, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #85 dicatat dengan ID #20.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:50:02'),
+(36, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #86 dicatat dengan ID #21.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:50:23'),
+(37, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #57 dicatat dengan ID #22.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:50:48'),
+(38, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #87 dicatat dengan ID #23.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:51:07'),
+(39, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #58 dicatat dengan ID #24.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:51:35'),
+(40, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #59 dicatat dengan ID #25.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:51:56'),
+(41, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #88 dicatat dengan ID #26.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:52:18'),
+(42, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #89 dicatat dengan ID #27.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:52:39'),
+(43, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #60 dicatat dengan ID #28.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:52:57'),
+(44, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #90 dicatat dengan ID #29.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:53:14'),
+(45, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #61 dicatat dengan ID #30.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:53:31'),
+(46, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #91 dicatat dengan ID #31.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:53:50'),
+(47, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #92 dicatat dengan ID #32.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:54:08'),
+(48, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #62 dicatat dengan ID #33.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:54:29'),
+(49, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #93 dicatat dengan ID #34.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:54:47'),
+(50, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #63 dicatat dengan ID #35.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:55:03'),
+(51, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #94 dicatat dengan ID #36.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:55:20'),
+(52, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #64 dicatat dengan ID #37.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:55:38'),
+(53, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #65 dicatat dengan ID #38.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:55:57'),
+(54, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #66 dicatat dengan ID #39.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:56:13'),
+(55, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #95 dicatat dengan ID #40.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:56:33'),
+(56, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #67 dicatat dengan ID #41.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:56:55'),
+(57, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #68 dicatat dengan ID #42.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:57:10'),
+(58, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #96 dicatat dengan ID #43.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:57:28'),
+(59, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #69 dicatat dengan ID #44.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:57:43'),
+(60, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #70 dicatat dengan ID #45.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:57:58'),
+(61, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #71 dicatat dengan ID #46.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:58:13'),
+(62, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #72 dicatat dengan ID #47.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:58:30'),
+(63, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #73 dicatat dengan ID #48.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:58:45'),
+(64, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #97 dicatat dengan ID #49.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:59:04'),
+(65, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #74 dicatat dengan ID #50.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:59:22'),
+(66, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 16:07:10'),
+(67, 30, 'Login', 'Pengguna berhasil masuk sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 16:07:27'),
+(68, 30, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 16:09:43');
 
 -- --------------------------------------------------------
 
@@ -466,7 +566,7 @@ INSERT INTO `t_siswa` (`id`, `nisn`, `nama`, `jenis_kelamin`, `alamat`, `tahun_m
 (2, '0000000002', 'AGNIA ROSYA NOERILLAH', 'P', 'Tasikmalaya', 2026, 'aktif', '2026-11-04 15:10:12', '2026-11-04 08:21:33', '2024000002', '2008-03-22'),
 (27, '0000000027', 'ALFIN RAHADIAN', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-04 15:10:12', '2026-11-04 08:21:49', '2024000027', '2009-01-12'),
 (51, '0000000003', 'ANISA AMIRULLA', 'P', 'Jl. Tentara Pelajar, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000003', '2008-05-10'),
-(52, '0000000004', 'ARADEA KANDI', 'P', 'Jl. RE Martadinata, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000004', '2008-07-19'),
+(52, '0000000004', 'ARADEA KANDI', 'L', 'Jl. RE Martadinata, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:45:25', '2024000004', '2008-07-19'),
 (53, '0000000005', 'ARFA DIESA OKMALELIZA', 'P', 'Jl. Sutisna Senjaya, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000005', '2008-09-12'),
 (54, '0000000006', 'FITRI NUR SYAMI', 'P', 'Jl. Paseh, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000006', '2008-11-25'),
 (55, '0000000007', 'JUNITA PUTRI NUR RAHMAN', 'P', 'Jl. Mitra Batik, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000007', '2008-02-08'),
@@ -558,7 +658,6 @@ CREATE TABLE `t_users` (
 
 INSERT INTO `t_users` (`id`, `nama`, `email`, `password`, `created_at`, `updated_at`, `role`) VALUES
 (1, 'Administrator SekolahKu', 'admin@sekolahku.com', '$2y$12$6XT1uPdDIoaORCDVwJBqoeQmihFbS9PmvQk/cL/gTCYYfp7WqqaxS', '2026-11-04 07:59:23', '2026-11-04 07:59:23', 'admin'),
-(2, 'Anton', 'anton@sekolahku.com', '$2y$12$Fxj44CFt5I/yTbBTfNhTzOdn6372WlqoGK04Eygi5.RUadhtELA/6', '2026-11-04 07:59:23', '2026-11-04 07:59:23', 'guru'),
 (3, 'Wawan Kurniawan, S.Pd.I', 'wawankurniawan@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (4, 'Ai Nuryaidah, S.Pd', 'ainuryaidah@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (5, 'Maya Permata Endah, S. Pd', 'mayapermataendah@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
@@ -586,7 +685,7 @@ INSERT INTO `t_users` (`id`, `nama`, `email`, `password`, `created_at`, `updated
 (27, 'Asep Taufiq Hidayat, S.Kom', 'aseptaufiqhidayat@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (28, 'Rendy Ichsan Kusumah, S.T', 'rendyichsankusumah@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (29, 'Feri Rahmawan, S.Pd', 'ferirahmawan@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
-(30, 'Ari Sandriana, S.Kom', 'arisandriana@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(30, 'Ari Sandriana, S.Kom', 'arisandriana@sekolahku.com', '$2y$12$FbTLavHo4hBqO7ldagghhuWD/bqz2hXLO2V3fJN8OOyy6hvBdE8je', '2026-11-04 15:01:22', '2026-11-04 16:07:27', 'guru'),
 (31, 'Yaneu Nurdian, S.Pd., M.Pd', 'yaneunurdian@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (32, 'Ucu Muhammad Khoer N, S.Pd', 'ucumuhammadkhoern@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (33, 'Mira Dwi Rahmawati, S.Ag', 'miradwirahmawati@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
@@ -813,13 +912,13 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `t_guru`
 --
 ALTER TABLE `t_guru`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT for table `t_kelas`
@@ -831,13 +930,13 @@ ALTER TABLE `t_kelas`
 -- AUTO_INCREMENT for table `t_kelas_siswa`
 --
 ALTER TABLE `t_kelas_siswa`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT for table `t_log_aktivitas`
 --
 ALTER TABLE `t_log_aktivitas`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
 
 --
 -- AUTO_INCREMENT for table `t_log_pelanggaran`
@@ -849,7 +948,7 @@ ALTER TABLE `t_log_pelanggaran`
 -- AUTO_INCREMENT for table `t_pelanggaran`
 --
 ALTER TABLE `t_pelanggaran`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `t_pelanggaran_kategori`
@@ -879,7 +978,7 @@ ALTER TABLE `t_tahun_ajaran`
 -- AUTO_INCREMENT for table `t_users`
 --
 ALTER TABLE `t_users`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT for table `t_wali_kelas`

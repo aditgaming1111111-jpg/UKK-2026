@@ -57,6 +57,9 @@
                     <option value="">Semua status</option>
                     <option value="aktif" @selected(($filters['status'] ?? '') === 'aktif')>Aktif</option>
                     <option value="nonaktif" @selected(($filters['status'] ?? '') === 'nonaktif')>Nonaktif</option>
+                    <option value="pindah" @selected(($filters['status'] ?? '') === 'pindah')>Pindah</option>
+                    <option value="keluar" @selected(($filters['status'] ?? '') === 'keluar')>Keluar</option>
+                    <option value="lulus" @selected(($filters['status'] ?? '') === 'lulus')>Lulus</option>
                 </select></label>
             <div class="flex items-end gap-2"><x-ui.button type="submit">Terapkan</x-ui.button><x-ui.button
                     variant="secondary" :href="route(auth()->user()->role . '.students.index')">Reset</x-ui.button></div>

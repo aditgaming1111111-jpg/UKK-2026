@@ -16,9 +16,12 @@
                 @if ($student->status_siswa === 'aktif')
                     <x-ui.button variant="secondary" type="button"
                         data-modal-open="deactivate-student">Nonaktifkan</x-ui.button>
-                @else
+                @elseif ($student->status_siswa === 'nonaktif')
                     <x-ui.button variant="secondary" type="button"
                         data-modal-open="activate-student">Aktifkan</x-ui.button>
+                @endif
+                @if ($canGraduate)
+                    <x-ui.button variant="secondary" type="button" data-modal-open="graduate-student">Tandai lulus</x-ui.button>
                 @endif
                 @if ($canPermanentlyDelete)
                     <x-ui.button variant="secondary" type="button" data-modal-open="delete-student">Hapus permanen</x-ui.button>
@@ -38,7 +41,12 @@
     @endif
     @if ($canManageStudents && !$canPermanentlyDelete)
         <div role="status" class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700">
-            Siswa memiliki riwayat kelas atau pelanggaran. Identitas tidak dapat dihapus permanen; gunakan tindakan nonaktifkan untuk mempertahankan histori.
+            Siswa memiliki riwayat kelas atau pelanggaran. Identitas tidak dapat dihapus permanen agar arsip dan histori tetap tersimpan.
+        </div>
+    @endif
+    @if ($canManageStudents && $student->status_siswa === 'lulus')
+        <div role="status" class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700">
+            Siswa ini tersimpan sebagai arsip alumni. Riwayat kelas, wali kelas, dan pelanggaran tetap dipertahankan.
         </div>
     @endif
 
@@ -116,10 +124,22 @@
                             <th class="px-4 py-3 font-medium">Kelas</th>
                             <th class="px-4 py-3 font-medium">Periode</th>
                             <th class="px-4 py-3 font-medium">Status</th>
+                            @if ($canManageStudents)
+                                <th class="px-4 py-3 text-right font-medium">Aksi</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @foreach ($placements as $placement)
+                            @php
+                                $hasViolationRecords = $placement->catatan_pelanggaran_count > 0;
+                                $hasReplacementPlacement = $student->status_siswa !== 'aktif'
+                                    || collect($activePlacementIds)->contains(fn ($activePlacementId) => $activePlacementId !== $placement->id);
+                                $canDeletePlacement = $canManageStudents
+                                    && !$hasViolationRecords
+                                    && $hasReplacementPlacement;
+                                $placementModalId = 'delete-placement-' . $placement->id;
+                            @endphp
                             <tr>
                                 <td class="px-4 py-3 text-sm text-gray-800">
                                     {{ $placement->tahunAjaran?->nama_tahun_ajaran ?? '—' }}</td>
@@ -134,11 +154,69 @@
                                 <td class="px-4 py-3"><x-ui.badge
                                         :variant="$placement->status_aktif ? 'dark' : 'outline'">{{ $placement->status_aktif ? 'Aktif' : 'Selesai' }}</x-ui.badge>
                                 </td>
+                                @if ($canManageStudents)
+                                    <td class="px-4 py-3 text-right">
+                                        <details class="mb-2 text-left">
+                                            <summary class="cursor-pointer text-sm font-medium text-gray-700 underline decoration-gray-300 underline-offset-2">Koreksi tanggal</summary>
+                                            <form method="POST" action="{{ route('admin.students.placements.update', [$student, $placement->id]) }}" class="mt-3 grid gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 sm:grid-cols-2">
+                                                @csrf
+                                                @method('PATCH')
+                                                <label class="space-y-1.5">
+                                                    <span class="block text-xs font-medium text-gray-700">Tanggal mulai</span>
+                                                    <input type="date" name="tanggal_mulai" required value="{{ old('tanggal_mulai', $placement->tanggal_mulai?->toDateString()) }}" class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-200">
+                                                    <x-ui.form-error name="tanggal_mulai" />
+                                                </label>
+                                                <label class="space-y-1.5">
+                                                    <span class="block text-xs font-medium text-gray-700">Tanggal selesai (opsional)</span>
+                                                    <input type="date" name="tanggal_selesai" value="{{ old('tanggal_selesai', $placement->tanggal_selesai?->toDateString()) }}" class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-200">
+                                                    <x-ui.form-error name="tanggal_selesai" />
+                                                </label>
+                                                <div class="flex justify-end sm:col-span-2">
+                                                    <x-ui.button size="sm" type="submit">Simpan koreksi</x-ui.button>
+                                                </div>
+                                            </form>
+                                        </details>
+                                        @if ($canDeletePlacement)
+                                            <x-ui.button variant="secondary" size="sm" type="button"
+                                                :data-modal-open="$placementModalId">Hapus riwayat</x-ui.button>
+                                        @elseif ($hasViolationRecords)
+                                            <span class="text-xs text-gray-500">Terkait {{ $placement->catatan_pelanggaran_count }} catatan pelanggaran</span>
+                                        @else
+                                            <span class="text-xs text-gray-500">Siswa aktif perlu penempatan pengganti</span>
+                                        @endif
+                                    </td>
+                                @endif
                             </tr>
                         @endforeach
                     </tbody>
             </x-ui.table></div>@else<x-ui.empty-state class="mt-5" title="Belum ada riwayat kelas"
                 description="Admin dapat menambahkan penempatan kelas untuk tahun ajaran siswa." />
+        @endif
+        @if ($canManageStudents)
+            @foreach ($placements as $placement)
+                @php
+                    $hasViolationRecords = $placement->catatan_pelanggaran_count > 0;
+                    $hasReplacementPlacement = $student->status_siswa !== 'aktif'
+                        || collect($activePlacementIds)->contains(fn ($activePlacementId) => $activePlacementId !== $placement->id);
+                @endphp
+                @if (!$hasViolationRecords && $hasReplacementPlacement)
+                    <x-ui.modal :id="'delete-placement-' . $placement->id" title="Hapus riwayat penempatan?"
+                        :description="'Siswa ' . $student->nama . ', kelas ' . ($placement->kelas?->nama_kelas ?? '—')
+                            . ', tahun ajaran ' . ($placement->tahunAjaran?->nama_tahun_ajaran ?? '—')
+                            . ', periode ' . ($placement->tanggal_mulai?->format('d/m/Y') ?? '—')
+                            . ' sampai ' . ($placement->tanggal_selesai?->format('d/m/Y') ?? 'sekarang') . '.'">
+                        <p class="mb-4 text-sm text-gray-600">Data penempatan ini akan dihapus permanen. Data siswa, penempatan lain, wali kelas, dan riwayat pelanggaran tidak ikut dihapus.</p>
+                        <form method="POST" action="{{ route('admin.students.placements.destroy', [$student, $placement->id]) }}">
+                            @csrf
+                            @method('DELETE')
+                            <div class="flex justify-end gap-2">
+                                <x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button>
+                                <x-ui.button type="submit">Hapus riwayat</x-ui.button>
+                            </div>
+                        </form>
+                    </x-ui.modal>
+                @endif
+            @endforeach
         @endif
     </x-ui.card>
 
@@ -258,6 +336,21 @@
                 <div class="flex justify-end gap-2">
                     <x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button>
                     <x-ui.button type="submit">Aktifkan siswa</x-ui.button>
+                </div>
+            </form>
+        </x-ui.modal>
+    @endif
+
+    @if ($canManageStudents && $canGraduate)
+        <x-ui.modal id="graduate-student" title="Tandai siswa lulus?"
+            description="Siswa akan masuk arsip alumni dan tidak tersedia untuk pencatatan pelanggaran baru. Riwayat kelas, wali kelas, dan pelanggaran tetap disimpan.">
+            <form method="POST" action="{{ route('admin.students.status', $student) }}">
+                @csrf
+                @method('PATCH')
+                <input type="hidden" name="status_siswa" value="lulus">
+                <div class="flex justify-end gap-2">
+                    <x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button>
+                    <x-ui.button type="submit">Tandai lulus</x-ui.button>
                 </div>
             </form>
         </x-ui.modal>

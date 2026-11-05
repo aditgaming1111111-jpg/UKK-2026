@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Guru;
 use App\Models\Kelas;
+use App\Models\KelasSiswa;
 use App\Models\PelanggaranSiswa;
 use App\Models\Siswa;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -73,15 +74,19 @@ class SiswaReadService
     }
 
     /**
-     * @return array{placements: Collection, violations: LengthAwarePaginator, pointRecap: Collection}
+     * @return array{placements: Collection, activePlacementIds: list<int>, violations: LengthAwarePaginator, pointRecap: Collection}
      */
     public function detail(Siswa $siswa, ?Guru $guru = null): array
     {
         $placements = $siswa->penempatanKelas()
             ->with(['kelas:id,nama_kelas,tingkat,jurusan', 'tahunAjaran:id,nama_tahun_ajaran,tanggal_mulai,tanggal_selesai'])
+            ->withCount('catatanPelanggaran')
             ->orderByDesc('tanggal_mulai')
             ->orderByDesc('id')
             ->get();
+        $activePlacementIds = $placements
+            ->filter(static fn (KelasSiswa $placement): bool => $placement->status_aktif && $placement->tanggal_selesai === null)
+            ->modelKeys();
 
         $visibleViolations = $this->visibleViolations($siswa, $guru);
 
@@ -131,7 +136,7 @@ class SiswaReadService
             ])
             ->values();
 
-        return compact('placements', 'violations', 'pointRecap');
+        return compact('placements', 'activePlacementIds', 'violations', 'pointRecap');
     }
 
     /**

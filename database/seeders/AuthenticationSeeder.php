@@ -50,7 +50,8 @@ class AuthenticationSeeder extends Seeder
         Guru::updateOrCreate(
             ['user_id' => $guru->id],
             [
-                'nip' => '1980010120260001',
+                'nip' => '198001012026000001',
+                'status_kepegawaian' => 'PNS',
                 'nama' => $guru->nama,
                 'email' => $guru->email,
                 'status_aktif' => true,

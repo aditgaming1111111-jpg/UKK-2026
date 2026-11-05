@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SiswaIndexRequest;
 use App\Http\Requests\Admin\StorePenempatanKelasRequest;
 use App\Http\Requests\Admin\StoreSiswaRequest;
+use App\Http\Requests\Admin\UpdatePenempatanKelasRequest;
 use App\Http\Requests\Admin\UpdateSiswaRequest;
 use App\Http\Requests\Admin\UpdateSiswaStatusRequest;
 use App\Models\Kelas;
@@ -14,6 +15,7 @@ use App\Models\TahunAjaran;
 use App\Services\ActivityLogger;
 use App\Services\SiswaPenempatanService;
 use App\Services\SiswaReadService;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -65,7 +67,10 @@ class SiswaController extends Controller
         return view('siswa.show', array_merge([
             'student' => $siswa,
             'canManageStudents' => true,
-            'canPermanentlyDelete' => ! $siswa->penempatanKelas()->exists() && ! $siswa->catatanPelanggaran()->exists(),
+            'canPermanentlyDelete' => $siswa->status_siswa !== 'lulus'
+                && ! $siswa->penempatanKelas()->exists()
+                && ! $siswa->catatanPelanggaran()->exists(),
+            'canGraduate' => $siswa->status_siswa !== 'lulus' && $siswa->hasCompletedGradeTwelvePlacement(),
             'classes' => Kelas::query()->orderBy('tingkat')->orderBy('nama_kelas')->get(),
             'academicYears' => TahunAjaran::query()->orderByDesc('tanggal_mulai')->get(),
         ], $siswaReadService->detail($siswa)));
@@ -102,9 +107,11 @@ class SiswaController extends Controller
         DB::transaction(static function () use ($siswa): void {
             $lockedStudent = Siswa::query()->whereKey($siswa->id)->lockForUpdate()->firstOrFail();
 
-            if ($lockedStudent->penempatanKelas()->exists() || $lockedStudent->catatanPelanggaran()->exists()) {
+            if ($lockedStudent->status_siswa === 'lulus'
+                || $lockedStudent->penempatanKelas()->exists()
+                || $lockedStudent->catatanPelanggaran()->exists()) {
                 throw ValidationException::withMessages([
-                    'siswa' => 'Siswa memiliki riwayat kelas atau pelanggaran sehingga tidak dapat dihapus permanen. Nonaktifkan siswa untuk mempertahankan riwayat.',
+                    'siswa' => 'Siswa berstatus lulus atau memiliki riwayat kelas/pelanggaran sehingga tidak dapat dihapus permanen. Arsipkan dengan mempertahankan data siswa.',
                 ]);
             }
 
@@ -120,15 +127,25 @@ class SiswaController extends Controller
         $status = $request->validated('status_siswa');
 
         DB::transaction(static function () use ($siswa, $status): void {
-            Siswa::query()->whereKey($siswa->id)->lockForUpdate()->firstOrFail()->update([
-                'status_siswa' => $status,
-            ]);
+            $lockedStudent = Siswa::query()->whereKey($siswa->id)->lockForUpdate()->firstOrFail();
+
+            if ($status === 'lulus' && ! $lockedStudent->hasCompletedGradeTwelvePlacement()) {
+                throw ValidationException::withMessages([
+                    'status_siswa' => 'Siswa hanya dapat ditandai lulus setelah penempatan kelas XII selesai dan tahun ajaran berakhir.',
+                ]);
+            }
+
+            $lockedStudent->update(['status_siswa' => $status]);
         });
         $activityLogger->record($request->user(), $request, 'Status siswa diubah', 'Status siswa ID #'.$siswa->id.' diubah menjadi '.$status.'.');
 
-        $message = $status === 'aktif'
-            ? 'Siswa berhasil diaktifkan. Riwayat siswa tetap tersimpan.'
-            : 'Siswa dinonaktifkan. Riwayat siswa tetap tersimpan.';
+        $message = match ($status) {
+            'aktif' => 'Siswa berhasil diaktifkan. Riwayat siswa tetap tersimpan.',
+            'nonaktif' => 'Siswa dinonaktifkan. Riwayat siswa tetap tersimpan.',
+            'pindah' => 'Status siswa diperbarui menjadi pindah. Riwayat siswa tetap tersimpan.',
+            'keluar' => 'Status siswa diperbarui menjadi keluar. Riwayat siswa tetap tersimpan.',
+            'lulus' => 'Siswa ditandai lulus dan tersimpan sebagai arsip alumni. Riwayat tetap tersimpan.',
+        };
 
         return to_route('admin.students.show', $siswa)->with('success', $message);
     }
@@ -143,5 +160,109 @@ class SiswaController extends Controller
         $activityLogger->record($request->user(), $request, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #'.$siswa->id.' dicatat dengan ID #'.$placement->id.'.');
 
         return to_route('admin.students.show', $siswa)->with('success', 'Penempatan kelas berhasil disimpan.');
+    }
+
+    public function updatePlacement(
+        UpdatePenempatanKelasRequest $request,
+        Siswa $siswa,
+        int $placementId,
+        SiswaPenempatanService $siswaPenempatanService,
+        ActivityLogger $activityLogger,
+    ): RedirectResponse {
+        DB::transaction(function () use ($request, $siswa, $placementId, $siswaPenempatanService, $activityLogger): void {
+            $lockedStudent = Siswa::query()->whereKey($siswa->id)->lockForUpdate()->firstOrFail();
+            $placement = $lockedStudent->penempatanKelas()
+                ->with(['tahunAjaran:id,tanggal_mulai,tanggal_selesai', 'siswa:id'])
+                ->whereKey($placementId)
+                ->lockForUpdate()
+                ->firstOrFail();
+            $startDate = CarbonImmutable::parse($request->validated('tanggal_mulai'))->startOfDay();
+            $endDateValue = $request->validated('tanggal_selesai');
+            $endDate = $endDateValue !== null ? CarbonImmutable::parse($endDateValue)->startOfDay() : null;
+
+            $siswaPenempatanService->assertCorrectionIsValid($placement, $startDate, $endDate);
+
+            $beforeStartDate = $placement->tanggal_mulai?->format('Y-m-d') ?? 'kosong';
+            $beforeEndDate = $placement->tanggal_selesai?->format('Y-m-d') ?? 'kosong';
+
+            $placement->update([
+                'tanggal_mulai' => $startDate->toDateString(),
+                'tanggal_selesai' => $endDate?->toDateString(),
+            ]);
+
+            $activityLogger->record(
+                $request->user(),
+                $request,
+                'Tanggal penempatan siswa dikoreksi',
+                sprintf(
+                    'Admin ID #%d mengoreksi tanggal penempatan #%d siswa %s (NISN %s). Sebelum: mulai %s, selesai %s. Sesudah: mulai %s, selesai %s.',
+                    $request->user()->id,
+                    $placement->id,
+                    $lockedStudent->nama,
+                    $lockedStudent->nisn,
+                    $beforeStartDate,
+                    $beforeEndDate,
+                    $startDate->toDateString(),
+                    $endDate?->toDateString() ?? 'kosong',
+                ),
+            );
+        });
+
+        return to_route('admin.students.show', $siswa)->with('success', 'Tanggal penempatan berhasil dikoreksi dan dicatat di log aktivitas.');
+    }
+
+    public function destroyPlacement(
+        Request $request,
+        Siswa $siswa,
+        int $placementId,
+        ActivityLogger $activityLogger,
+    ): RedirectResponse {
+        Gate::authorize('managePlacements', $siswa);
+
+        DB::transaction(function () use ($request, $siswa, $placementId, $activityLogger): void {
+            $lockedStudent = Siswa::query()->whereKey($siswa->id)->lockForUpdate()->firstOrFail();
+            $placement = $lockedStudent->penempatanKelas()
+                ->with(['kelas:id,nama_kelas', 'tahunAjaran:id,nama_tahun_ajaran'])
+                ->whereKey($placementId)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($placement->catatanPelanggaran()->exists()) {
+                throw ValidationException::withMessages([
+                    'placement' => 'Riwayat penempatan ini masih terkait dengan catatan pelanggaran dan tidak dapat dihapus.',
+                ]);
+            }
+
+            $hasReplacementPlacement = $lockedStudent->penempatanKelas()
+                ->whereKeyNot($placement->id)
+                ->where('status_aktif', true)
+                ->whereNull('tanggal_selesai')
+                ->exists();
+
+            if ($lockedStudent->status_siswa === 'aktif' && ! $hasReplacementPlacement) {
+                throw ValidationException::withMessages([
+                    'placement' => 'Siswa aktif harus memiliki penempatan pengganti sebelum riwayat ini dihapus. Tambahkan penempatan pengganti atau nonaktifkan siswa melalui tindakan yang tersedia.',
+                ]);
+            }
+
+            $startDate = $placement->tanggal_mulai?->format('d/m/Y') ?? 'tidak tersedia';
+            $endDate = $placement->tanggal_selesai?->format('d/m/Y') ?? 'sekarang';
+            $description = sprintf(
+                'Admin ID #%d menghapus penempatan #%d milik siswa %s (NISN %s), kelas %s, tahun ajaran %s, periode %s sampai %s.',
+                $request->user()->id,
+                $placement->id,
+                $lockedStudent->nama,
+                $lockedStudent->nisn,
+                $placement->kelas?->nama_kelas ?? 'kelas tidak tersedia',
+                $placement->tahunAjaran?->nama_tahun_ajaran ?? 'tahun ajaran tidak tersedia',
+                $startDate,
+                $endDate,
+            );
+
+            $placement->delete();
+            $activityLogger->record($request->user(), $request, 'Riwayat penempatan siswa dihapus', $description);
+        });
+
+        return to_route('admin.students.show', $siswa)->with('success', 'Riwayat penempatan berhasil dihapus. Riwayat lain tetap tersimpan.');
     }
 }

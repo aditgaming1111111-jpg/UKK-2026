@@ -28,7 +28,7 @@ class SiswaIndexRequest extends FormRequest
             'kelas_id' => ['nullable', 'integer', 'exists:t_kelas,id'],
             'tingkat' => ['nullable', 'string', 'max:20', 'exists:t_kelas,tingkat'],
             'jurusan' => ['nullable', 'string', 'max:255', 'exists:t_kelas,jurusan'],
-            'status' => ['nullable', Rule::in(['aktif', 'nonaktif'])],
+            'status' => ['nullable', Rule::in(['aktif', 'nonaktif', 'pindah', 'keluar', 'lulus'])],
         ];
     }
 

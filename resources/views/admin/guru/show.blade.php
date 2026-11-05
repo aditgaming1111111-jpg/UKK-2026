@@ -47,7 +47,11 @@
             <dl class="mt-5 grid gap-4 sm:grid-cols-2">
                 <div>
                     <dt class="text-xs font-medium uppercase tracking-wide text-gray-500">NIP</dt>
-                    <dd class="mt-1 text-sm font-semibold text-gray-900">{{ $teacher->nip }}</dd>
+                    <dd class="mt-1 text-sm font-semibold text-gray-900">{{ $teacher->nip ?: '—' }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs font-medium uppercase tracking-wide text-gray-500">Status kepegawaian</dt>
+                    <dd class="mt-1 text-sm text-gray-800">{{ $teacher->status_kepegawaian ?: 'Belum diatur' }}</dd>
                 </div>
                 <div>
                     <dt class="text-xs font-medium uppercase tracking-wide text-gray-500">Nama</dt>

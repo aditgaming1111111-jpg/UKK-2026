@@ -7,6 +7,7 @@ use App\Models\KelasSiswa;
 use App\Models\LogPelanggaran;
 use App\Models\Pelanggaran;
 use App\Models\PelanggaranSiswa;
+use App\Models\Siswa;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -39,6 +40,14 @@ class PencatatanPelanggaranService
             if ($placement === null || $placement->tahunAjaran === null) {
                 throw ValidationException::withMessages([
                     'kelas_siswa_id' => 'Penempatan kelas siswa tidak ditemukan.',
+                ]);
+            }
+
+            $student = Siswa::query()->whereKey($placement->siswa_id)->lockForUpdate()->first();
+
+            if ($student === null || $student->status_siswa !== 'aktif') {
+                throw ValidationException::withMessages([
+                    'kelas_siswa_id' => 'Siswa tidak aktif dan tidak dapat menerima catatan pelanggaran baru.',
                 ]);
             }
 

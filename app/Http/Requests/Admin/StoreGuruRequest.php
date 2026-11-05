@@ -24,7 +24,8 @@ class StoreGuruRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nip' => ['required', 'string', 'max:255', 'unique:t_guru,nip'],
+            'status_kepegawaian' => ['required', 'string', Rule::in(Guru::STATUS_KEPEGAWAIAN)],
+            'nip' => ['required_if:status_kepegawaian,PNS', 'nullable', 'string', 'digits:18', 'unique:t_guru,nip'],
             'nama' => ['required', 'string', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:t_guru,email', Rule::unique('t_users', 'email')],
             'password_login' => ['required', 'string', 'min:8', 'confirmed'],
@@ -33,8 +34,10 @@ class StoreGuruRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        $nip = trim((string) $this->input('nip', ''));
+
         $this->merge([
-            'nip' => trim((string) $this->input('nip', '')),
+            'nip' => $nip === '' ? null : $nip,
             'nama' => trim((string) $this->input('nama', '')),
             'email' => strtolower(trim((string) $this->input('email', ''))),
         ]);
@@ -43,7 +46,10 @@ class StoreGuruRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'nip.required' => 'NIP wajib diisi.',
+            'status_kepegawaian.required' => 'Status kepegawaian wajib dipilih.',
+            'status_kepegawaian.in' => 'Status kepegawaian harus PNS, PPPK, atau Non-PNS.',
+            'nip.required_if' => 'NIP wajib diisi untuk Guru berstatus PNS.',
+            'nip.digits' => 'NIP harus tepat 18 digit angka.',
             'nip.unique' => 'NIP sudah terdaftar.',
             'nama.required' => 'Nama Guru wajib diisi.',
             'nama.max' => 'Nama Guru maksimal 100 karakter.',

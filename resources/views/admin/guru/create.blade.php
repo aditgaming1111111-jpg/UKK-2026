@@ -12,8 +12,16 @@
         <form method="POST" action="{{ route('admin.teachers.store') }}">
             @csrf
             <h2 class="text-base font-semibold text-gray-950">Identitas dan akun Guru</h2>
-            <div class="mt-4 grid gap-5 sm:grid-cols-2"><x-ui.input label="NIP" name="nip" required /><x-ui.input
-                    label="Nama lengkap" name="nama" required />
+            <div class="mt-4 grid gap-5 sm:grid-cols-2">
+                <x-ui.select label="Status kepegawaian" name="status_kepegawaian" required>
+                    <option value="">Pilih status kepegawaian</option>
+                    @foreach (\App\Models\Guru::STATUS_KEPEGAWAIAN as $employmentStatus)
+                        <option value="{{ $employmentStatus }}" @selected(old('status_kepegawaian') === $employmentStatus)>{{ $employmentStatus }}</option>
+                    @endforeach
+                </x-ui.select>
+                <x-ui.input label="NIP" name="nip" inputmode="numeric" maxlength="18"
+                    hint="Wajib untuk PNS. Untuk PPPK dan Non-PNS opsional; jika diisi harus tepat 18 digit angka." />
+                <x-ui.input label="Nama lengkap" name="nama" required />
                 <div class="sm:col-span-2"><x-ui.input label="Email" name="email" type="email"
                         hint="Email ini digunakan untuk identitas Guru sekaligus login." required /></div>
             </div>

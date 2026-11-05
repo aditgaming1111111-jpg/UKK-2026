@@ -106,6 +106,31 @@ class GuruPencatatanPelanggaranTest extends TestCase
         $this->assertDatabaseCount('t_pelanggaran_siswa', 0);
     }
 
+    public function test_graduated_student_is_excluded_from_search_and_cannot_receive_a_new_violation(): void
+    {
+        [$teacherUser, , $student, $placement, $violation] = $this->recordingContext();
+        $student->update(['status_siswa' => 'lulus']);
+
+        $this->actingAs($teacherUser)->getJson(route('guru.violations.student-search', [
+            'q' => 'Siswa Uji',
+            'tanggal_pelanggaran' => today()->toDateString(),
+        ]))->assertOk()->assertExactJson([]);
+
+        $this->from(route('guru.violations.create'))
+            ->post(route('guru.violations.store'), [
+                'kelas_siswa_id' => $placement->id,
+                'pelanggaran_id' => $violation->id,
+                'tanggal_pelanggaran' => today()->toDateString(),
+            ])
+            ->assertRedirect(route('guru.violations.create'))
+            ->assertSessionHasErrors([
+                'kelas_siswa_id' => 'Siswa tidak aktif dan tidak dapat menerima catatan pelanggaran baru.',
+            ]);
+
+        $this->assertDatabaseCount('t_pelanggaran_siswa', 0);
+        $this->assertDatabaseCount('t_log_pelanggaran', 0);
+    }
+
     public function test_active_categories_and_their_active_violation_types_are_available_for_recording(): void
     {
         [$teacherUser, , $student, $placement, $firstViolation] = $this->recordingContext();

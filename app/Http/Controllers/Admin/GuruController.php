@@ -61,6 +61,7 @@ class GuruController extends Controller
 
             return $user->guru()->create([
                 'nip' => $data['nip'],
+                'status_kepegawaian' => $data['status_kepegawaian'],
                 'nama' => $data['nama'],
                 'email' => Str::lower(trim($data['email'])),
                 'status_aktif' => true,
@@ -106,6 +107,7 @@ class GuruController extends Controller
             $lockedGuru = Guru::query()->whereKey($guru->id)->lockForUpdate()->firstOrFail();
             $lockedGuru->update([
                 'nip' => $data['nip'],
+                'status_kepegawaian' => $data['status_kepegawaian'],
                 'nama' => $data['nama'],
                 'email' => Str::lower(trim($data['email'])),
             ]);

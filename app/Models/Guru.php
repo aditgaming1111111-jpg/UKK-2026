@@ -9,9 +9,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['nip', 'nama', 'email', 'status_aktif', 'user_id'])]
+#[Fillable(['nip', 'status_kepegawaian', 'nama', 'email', 'status_aktif', 'user_id'])]
 class Guru extends Model
 {
+    public const STATUS_KEPEGAWAIAN = ['PNS', 'PPPK', 'Non-PNS'];
+
     /** @use HasFactory<GuruFactory> */
     use HasFactory;
 

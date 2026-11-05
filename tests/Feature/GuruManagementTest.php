@@ -33,7 +33,8 @@ class GuruManagementTest extends TestCase
         $administrator = User::factory()->create(['role' => 'admin']);
 
         $response = $this->actingAs($administrator)->post(route('admin.teachers.store'), [
-            'nip' => '198700123',
+            'status_kepegawaian' => 'PNS',
+            'nip' => '198700123000000001',
             'nama' => 'Rina Puspita',
             'email' => 'RINA.LOGIN@example.test',
             'password_login' => 'rahasia-guru-2026',
@@ -41,10 +42,11 @@ class GuruManagementTest extends TestCase
             'role' => 'admin',
         ]);
 
-        $teacher = Guru::query()->where('nip', '198700123')->firstOrFail();
+        $teacher = Guru::query()->where('nip', '198700123000000001')->firstOrFail();
         $user = User::query()->where('email', 'rina.login@example.test')->firstOrFail();
         $response->assertRedirect(route('admin.teachers.show', $teacher));
         $this->assertDatabaseHas('t_guru', ['id' => $teacher->id, 'user_id' => $user->id, 'status_aktif' => true]);
+        $this->assertSame('PNS', $teacher->status_kepegawaian);
         $this->assertDatabaseHas('t_users', ['id' => $user->id, 'role' => 'guru', 'nama' => 'Rina Puspita']);
         $this->assertTrue(Hash::check('rahasia-guru-2026', $user->password));
         $this->assertTrue($teacher->user->is($user));
@@ -56,6 +58,97 @@ class GuruManagementTest extends TestCase
         ]);
     }
 
+    public function test_admin_can_create_pppk_and_non_pns_without_nip(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $this->actingAs($administrator);
+
+        foreach (['PPPK', 'Non-PNS'] as $index => $employmentStatus) {
+            $this->post(route('admin.teachers.store'), [
+                'status_kepegawaian' => $employmentStatus,
+                'nip' => '',
+                'nama' => 'Guru '.$employmentStatus,
+                'email' => 'guru.'.$index.'@example.test',
+                'password_login' => 'rahasia-guru-2026',
+                'password_login_confirmation' => 'rahasia-guru-2026',
+            ])->assertRedirect();
+        }
+
+        $this->assertDatabaseHas('t_guru', ['status_kepegawaian' => 'PPPK', 'nip' => null]);
+        $this->assertDatabaseHas('t_guru', ['status_kepegawaian' => 'Non-PNS', 'nip' => null]);
+    }
+
+    public function test_pns_requires_an_eighteen_digit_unique_nip(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $this->actingAs($administrator);
+
+        foreach ([null, '', '12345678901234567', '1234567890123456789', '12345678901234567A'] as $index => $nip) {
+            $this->from(route('admin.teachers.create'))->post(route('admin.teachers.store'), [
+                'status_kepegawaian' => 'PNS',
+                'nip' => $nip,
+                'nama' => 'Guru PNS '.$index,
+                'email' => 'guru.pns.'.$index.'@example.test',
+                'password_login' => 'rahasia-guru-2026',
+                'password_login_confirmation' => 'rahasia-guru-2026',
+            ])->assertSessionHasErrors('nip');
+        }
+
+        Guru::factory()->create(['nip' => '123456789012345678']);
+        $this->from(route('admin.teachers.create'))->post(route('admin.teachers.store'), [
+            'status_kepegawaian' => 'PNS',
+            'nip' => '123456789012345678',
+            'nama' => 'Guru NIP Duplikat',
+            'email' => 'guru.nip.duplicate@example.test',
+            'password_login' => 'rahasia-guru-2026',
+            'password_login_confirmation' => 'rahasia-guru-2026',
+        ])->assertSessionHasErrors('nip');
+
+        $this->post(route('admin.teachers.store'), [
+            'status_kepegawaian' => 'PNS',
+            'nip' => '123456789012345679',
+            'nama' => 'Guru PNS Valid',
+            'email' => 'guru.pns.valid@example.test',
+            'password_login' => 'rahasia-guru-2026',
+            'password_login_confirmation' => 'rahasia-guru-2026',
+        ])->assertRedirect();
+        $this->assertDatabaseHas('t_guru', ['nip' => '123456789012345679', 'status_kepegawaian' => 'PNS']);
+    }
+
+    public function test_non_pns_may_provide_a_unique_eighteen_digit_nip_and_edit_status(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $teacher = Guru::factory()->create(['status_kepegawaian' => 'PPPK', 'nip' => null]);
+
+        $this->actingAs($administrator)->put(route('admin.teachers.update', $teacher), [
+            'status_kepegawaian' => 'Non-PNS',
+            'nip' => '123456789012345678',
+            'nama' => $teacher->nama,
+            'email' => $teacher->email,
+        ])->assertRedirect(route('admin.teachers.show', $teacher));
+
+        $this->assertDatabaseHas('t_guru', [
+            'id' => $teacher->id,
+            'status_kepegawaian' => 'Non-PNS',
+            'nip' => '123456789012345678',
+        ]);
+
+        Guru::factory()->create(['nip' => '123456789012345679']);
+        $this->from(route('admin.teachers.edit', $teacher))->put(route('admin.teachers.update', $teacher), [
+            'status_kepegawaian' => 'PPPK',
+            'nip' => '123456789012345679',
+            'nama' => $teacher->nama,
+            'email' => $teacher->email,
+        ])->assertSessionHasErrors('nip');
+
+        $this->from(route('admin.teachers.edit', $teacher))->put(route('admin.teachers.update', $teacher), [
+            'status_kepegawaian' => 'PNS',
+            'nip' => null,
+            'nama' => $teacher->nama,
+            'email' => $teacher->email,
+        ])->assertSessionHasErrors('nip');
+    }
+
     public function test_teacher_name_is_limited_to_one_hundred_characters_on_create_and_update(): void
     {
         $administrator = User::factory()->create(['role' => 'admin']);
@@ -63,18 +156,20 @@ class GuruManagementTest extends TestCase
         $name = str_repeat('G', 100);
 
         $this->post(route('admin.teachers.store'), [
-            'nip' => '198700123',
+            'status_kepegawaian' => 'PNS',
+            'nip' => '198700123000000001',
             'nama' => $name,
             'email' => 'guru.name@example.test',
             'password_login' => 'rahasia-guru-2026',
             'password_login_confirmation' => 'rahasia-guru-2026',
         ])->assertRedirect();
 
-        $teacher = Guru::query()->where('nip', '198700123')->firstOrFail();
+        $teacher = Guru::query()->where('nip', '198700123000000001')->firstOrFail();
         $this->assertSame($name, $teacher->nama);
 
         $this->from(route('admin.teachers.create'))->post(route('admin.teachers.store'), [
-            'nip' => '198700124',
+            'status_kepegawaian' => 'PNS',
+            'nip' => '198700124000000001',
             'nama' => str_repeat('G', 101),
             'email' => 'guru.name.invalid@example.test',
             'password_login' => 'rahasia-guru-2026',
@@ -82,12 +177,14 @@ class GuruManagementTest extends TestCase
         ])->assertSessionHasErrors(['nama' => 'Nama Guru maksimal 100 karakter.']);
 
         $this->from(route('admin.teachers.edit', $teacher))->put(route('admin.teachers.update', $teacher), [
+            'status_kepegawaian' => 'PNS',
             'nip' => $teacher->nip,
             'nama' => str_repeat('G', 101),
             'email' => $teacher->email,
         ])->assertSessionHasErrors(['nama' => 'Nama Guru maksimal 100 karakter.']);
 
         $this->put(route('admin.teachers.update', $teacher), [
+            'status_kepegawaian' => 'PNS',
             'nip' => $teacher->nip,
             'nama' => $name,
             'email' => $teacher->email,
@@ -99,7 +196,8 @@ class GuruManagementTest extends TestCase
         $administrator = User::factory()->create(['role' => 'admin']);
 
         $this->actingAs($administrator)->from(route('admin.teachers.create'))->post(route('admin.teachers.store'), [
-            'nip' => '198700124',
+            'status_kepegawaian' => 'PNS',
+            'nip' => '198700124000000001',
             'nama' => 'Guru Tanpa Login',
             'email' => 'contact@example.test',
         ])->assertSessionHasErrors(['password_login']);
@@ -107,7 +205,7 @@ class GuruManagementTest extends TestCase
         $this->assertModelExists($administrator);
         $this->assertNull($administrator->guru);
         $this->assertTrue($administrator->isActiveAccount());
-        $this->assertDatabaseMissing('t_guru', ['nip' => '198700124']);
+        $this->assertDatabaseMissing('t_guru', ['nip' => '198700124000000001']);
     }
 
     public function test_duplicate_email_is_rejected_without_creating_a_teacher(): void
@@ -117,7 +215,8 @@ class GuruManagementTest extends TestCase
 
         $this->actingAs($administrator)->from(route('admin.teachers.create'))
             ->post(route('admin.teachers.store'), [
-                'nip' => '198700125',
+                'status_kepegawaian' => 'PNS',
+                'nip' => '198700125000000001',
                 'nama' => 'Guru Email Duplikat',
                 'email' => 'SAME.LOGIN@example.test',
                 'password_login' => 'rahasia-guru-2026',
@@ -125,7 +224,7 @@ class GuruManagementTest extends TestCase
             ])
             ->assertSessionHasErrors(['email' => 'Email sudah digunakan pada data Guru atau akun pengguna.']);
 
-        $this->assertDatabaseMissing('t_guru', ['nip' => '198700125']);
+        $this->assertDatabaseMissing('t_guru', ['nip' => '198700125000000001']);
     }
 
     public function test_account_without_a_valid_teacher_relation_cannot_log_in(): void
@@ -151,6 +250,7 @@ class GuruManagementTest extends TestCase
         $user = $teacher->user;
 
         $this->actingAs($administrator)->put(route('admin.teachers.update', $teacher), [
+            'status_kepegawaian' => $teacher->status_kepegawaian,
             'nip' => $teacher->nip,
             'nama' => 'Nama Sesudah',
             'email' => 'UPDATED.LOGIN@example.test',
@@ -192,6 +292,7 @@ class GuruManagementTest extends TestCase
 
         $this->actingAs($administrator)->from(route('admin.teachers.show', $teacher))
             ->put(route('admin.teachers.update', $teacher), [
+                'status_kepegawaian' => $teacher->status_kepegawaian,
                 'nip' => $teacher->nip,
                 'nama' => $teacher->nama,
                 'email' => 'already.used@example.test',
@@ -284,7 +385,7 @@ class GuruManagementTest extends TestCase
     public function test_admin_can_list_search_filter_and_paginate_teachers(): void
     {
         $administrator = User::factory()->create(['role' => 'admin']);
-        Guru::factory()->create(['nama' => 'Guru Dicari', 'nip' => 'nip-unik-1']);
+        Guru::factory()->create(['nama' => 'Guru Dicari', 'nip' => '198001012026000001']);
         Guru::factory()->create(['status_aktif' => false, 'nama' => 'Guru Nonaktif']);
         Guru::factory()->count(15)->create();
 

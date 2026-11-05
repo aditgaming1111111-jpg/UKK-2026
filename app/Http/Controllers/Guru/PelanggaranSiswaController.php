@@ -55,8 +55,11 @@ class PelanggaranSiswaController extends Controller
                     ->whereDate('tanggal_selesai', '>=', $date);
             })
             ->whereHas('siswa', function ($query) use ($term): void {
-                $query->where('nisn', 'like', '%'.$term.'%')
-                    ->orWhere('nama', 'like', '%'.$term.'%');
+                $query->where('status_siswa', 'aktif')
+                    ->where(static function ($searchQuery) use ($term): void {
+                        $searchQuery->where('nisn', 'like', '%'.$term.'%')
+                            ->orWhere('nama', 'like', '%'.$term.'%');
+                    });
             })
             ->orderByDesc('tanggal_mulai')
             ->limit(20)
