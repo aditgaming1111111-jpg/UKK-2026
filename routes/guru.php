@@ -4,6 +4,7 @@ use App\Http\Controllers\Guru\CatatanSayaController;
 use App\Http\Controllers\Guru\GuruDashboardController;
 use App\Http\Controllers\Guru\PelanggaranSiswaController;
 use App\Http\Controllers\Guru\RekapKelasController;
+use App\Http\Controllers\Guru\RekapPoinController;
 use App\Http\Controllers\Guru\SiswaController;
 use App\Http\Controllers\RiwayatPelanggaranController;
 use Illuminate\Support\Facades\Route;
@@ -13,6 +14,7 @@ Route::prefix('guru')
     ->middleware('role:guru')
     ->group(function (): void {
         Route::get('/', GuruDashboardController::class)->name('dashboard');
+        Route::get('rekap-poin', [RekapPoinController::class, 'index'])->name('point-recap.index');
         Route::get('rekap-kelas', [RekapKelasController::class, 'index'])->name('class-recap.index');
         Route::get('rekap-kelas/{tahunAjaran}/{kelas}/pdf', [RekapKelasController::class, 'pdf'])->whereNumber('tahunAjaran')->whereNumber('kelas')->name('class-recap.pdf');
         Route::get('rekap-kelas/{tahunAjaran}/{kelas}/excel', [RekapKelasController::class, 'excel'])->whereNumber('tahunAjaran')->whereNumber('kelas')->name('class-recap.excel');
@@ -27,6 +29,5 @@ Route::prefix('guru')
         Route::patch('pelanggaran/riwayat/{pelanggaranSiswa}/batal', [RiwayatPelanggaranController::class, 'cancel'])->name('violations.cancel');
         Route::get('catatan-saya', [CatatanSayaController::class, 'index'])->name('my-notes.index');
         Route::get('catatan-saya/{pelanggaranSiswa}', [CatatanSayaController::class, 'show'])->name('my-notes.show');
-        Route::get('siswa', [SiswaController::class, 'index'])->name('students.index');
         Route::get('siswa/{siswa}', [SiswaController::class, 'show'])->name('students.show');
     });

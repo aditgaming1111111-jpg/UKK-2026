@@ -7,6 +7,7 @@
 @section('page-heading')
     <x-ui.page-heading :title="$academicYear->nama_tahun_ajaran" description="Periode akademik dan riwayat yang terkait.">
         <div class="flex flex-wrap gap-2">
+            <x-ui.button variant="secondary" :href="route('admin.academic-years.student-transitions', $academicYear)">Kenaikan kelas & kelulusan</x-ui.button>
             <x-ui.button variant="secondary" :href="route('admin.academic-years.edit', $academicYear)">Edit periode</x-ui.button>
             @if ($academicYear->penempatan_siswa_count === 0 && $academicYear->penugasan_wali_kelas_count === 0)
                 <x-ui.button variant="secondary" type="button" data-modal-open="delete-academic-year">Hapus tahun ajaran</x-ui.button>

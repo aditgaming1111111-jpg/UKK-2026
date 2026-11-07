@@ -30,12 +30,21 @@ class SiswaController extends Controller
      */
     public function index(SiswaIndexRequest $request, SiswaReadService $siswaReadService): View
     {
+        $filters = $request->validated();
+        $academicYears = $siswaReadService->academicYears();
+        $selectedAcademicYear = isset($filters['tahun_ajaran_id'])
+            ? $academicYears->firstWhere('id', (int) $filters['tahun_ajaran_id'])
+            : ($academicYears->firstWhere('status_aktif', true) ?? $academicYears->first());
+        $filters['tahun_ajaran_id'] = $selectedAcademicYear?->id;
+
         return view('siswa.index', [
-            'students' => $siswaReadService->directory($request->validated()),
+            'students' => $siswaReadService->directory($filters, $request->user()),
             'classes' => $siswaReadService->classes(),
             'levels' => $siswaReadService->levels(),
             'majors' => $siswaReadService->majors(),
-            'filters' => $request->validated(),
+            'filters' => $filters,
+            'academicYears' => $academicYears,
+            'selectedAcademicYear' => $selectedAcademicYear,
             'canManageStudents' => true,
         ]);
     }

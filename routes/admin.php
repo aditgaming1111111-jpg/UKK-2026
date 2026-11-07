@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\LogAktivitasController;
 use App\Http\Controllers\Admin\PelanggaranController;
 use App\Http\Controllers\Admin\PelanggaranKategoriController;
 use App\Http\Controllers\Admin\SiswaController;
+use App\Http\Controllers\Admin\StudentTransitionController;
 use App\Http\Controllers\Admin\TahunAjaranController;
 use App\Http\Controllers\Admin\WaliKelasController;
 use App\Http\Controllers\RiwayatPelanggaranController;
@@ -42,6 +43,10 @@ Route::prefix('admin')
         Route::resource('tahun-ajaran', TahunAjaranController::class)
             ->parameters(['tahun-ajaran' => 'tahunAjaran'])
             ->names('academic-years');
+        Route::get('tahun-ajaran/{tahunAjaran}/proses-siswa', [StudentTransitionController::class, 'show'])
+            ->name('academic-years.student-transitions');
+        Route::post('tahun-ajaran/{tahunAjaran}/proses-siswa', [StudentTransitionController::class, 'store'])
+            ->name('academic-years.student-transitions.store');
         Route::resource('kategori-pelanggaran', PelanggaranKategoriController::class)
             ->parameters(['kategori-pelanggaran' => 'pelanggaranKategori'])
             ->names('violation-categories');

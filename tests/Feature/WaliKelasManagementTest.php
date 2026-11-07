@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\Guru;
 use App\Models\Kelas;
+use App\Models\KelasSiswa;
+use App\Models\Siswa;
 use App\Models\TahunAjaran;
 use App\Models\User;
 use App\Models\WaliKelas;
@@ -184,5 +186,56 @@ class WaliKelasManagementTest extends TestCase
                 && $assignments->total() === 13
                 && $assignments->getCollection()->contains(fn (WaliKelas $assignment): bool => $assignment->is($completedByDate))
                 && $assignments->getCollection()->contains(fn (WaliKelas $assignment): bool => $assignment->is($completedByStatus)));
+    }
+
+    public function test_only_assigned_homeroom_teacher_can_open_its_class_recap(): void
+    {
+        $ordinaryTeacher = Guru::factory()->create();
+        $this->actingAs($ordinaryTeacher->user)
+            ->get(route('guru.class-recap.index'))
+            ->assertForbidden();
+
+        $homeroomTeacher = Guru::factory()->create();
+        $assignedClass = Kelas::factory()->create(['nama_kelas' => 'XI RPL Wali']);
+        $otherClass = Kelas::factory()->create(['nama_kelas' => 'XI RPL Lain']);
+        $assignedStudent = Siswa::factory()->create(['nama' => 'Siswa Dalam Kelas Wali']);
+        $otherStudent = Siswa::factory()->create(['nama' => 'Siswa Kelas Lain']);
+        $year = TahunAjaran::factory()->create([
+            'nama_tahun_ajaran' => 'Tahun Berjalan',
+            'tanggal_mulai' => today()->subMonth()->toDateString(),
+            'tanggal_selesai' => today()->addMonth()->toDateString(),
+            'status_aktif' => true,
+        ]);
+        WaliKelas::factory()->for($homeroomTeacher, 'guru')->for($assignedClass, 'kelas')->for($year, 'tahunAjaran')->create([
+            'tanggal_mulai' => today()->subMonth()->toDateString(),
+            'tanggal_selesai' => null,
+            'status_aktif' => true,
+        ]);
+        KelasSiswa::factory()->for($assignedStudent, 'siswa')->for($assignedClass, 'kelas')->for($year, 'tahunAjaran')->create([
+            'tanggal_mulai' => today()->subMonth()->toDateString(),
+            'tanggal_selesai' => null,
+            'status_aktif' => true,
+        ]);
+        KelasSiswa::factory()->for($otherStudent, 'siswa')->for($otherClass, 'kelas')->for($year, 'tahunAjaran')->create([
+            'tanggal_mulai' => today()->subMonth()->toDateString(),
+            'tanggal_selesai' => null,
+            'status_aktif' => true,
+        ]);
+
+        $this->actingAs($homeroomTeacher->user)
+            ->get(route('guru.class-recap.index', ['tahun_ajaran_id' => $year->id, 'kelas_id' => $assignedClass->id]))
+            ->assertOk()
+            ->assertViewHas('selectedClass', fn (Kelas $kelas): bool => $kelas->is($assignedClass))
+            ->assertDontSee('Data Siswa')
+            ->assertSee('Rekap Poin');
+
+        $this->get(route('guru.class-recap.index', ['tahun_ajaran_id' => $year->id, 'kelas_id' => $otherClass->id]))
+            ->assertForbidden();
+
+        $this->get(route('guru.class-recap.show', [$year->id, $assignedClass->id, $assignedStudent->id]))
+            ->assertOk()
+            ->assertSee('Siswa Dalam Kelas Wali');
+        $this->get(route('guru.class-recap.show', [$year->id, $assignedClass->id, $otherStudent->id]))
+            ->assertNotFound();
     }
 }

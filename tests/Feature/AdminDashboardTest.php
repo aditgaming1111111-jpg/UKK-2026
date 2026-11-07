@@ -112,7 +112,22 @@ class AdminDashboardTest extends TestCase
             ->assertSee('Siswa Aktif')
             ->assertSee('Terlambat masuk')
             ->assertSee('Dibatalkan')
+            ->assertSeeText('Laporan')
             ->assertSee('Koreksi data');
+
+        $this->get(route('admin.reports.index'))->assertOk();
+    }
+
+    public function test_admin_sidebar_hides_violation_history_menu_and_keeps_reports_accessible(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+
+        $this->actingAs($administrator)->get(route('admin.academic-years.index'))
+            ->assertOk()
+            ->assertDontSeeText('Data Pelanggaran')
+            ->assertSeeText('Laporan');
+
+        $this->get(route('admin.reports.index'))->assertOk();
     }
 
     public function test_selected_academic_year_filters_violation_statistics_and_history(): void

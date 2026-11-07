@@ -4,7 +4,7 @@
 
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[
-        ['label' => 'Data Siswa', 'url' => route(auth()->user()->role . '.students.index')],
+        ['label' => auth()->user()->role === 'admin' ? 'Data Siswa' : 'Rekap Kelas Saya', 'url' => route(auth()->user()->role === 'admin' ? 'admin.students.index' : 'guru.class-recap.index')],
         ['label' => $student->nama],
     ]" />
 @endsection

@@ -134,7 +134,7 @@
             <x-ui.card>
                 <div>
                     <h2 class="text-base font-semibold text-gray-950">Akses lainnya</h2>
-                    <p class="mt-1 text-sm text-gray-500">Temukan siswa dan tinjau catatan Anda.</p>
+                    <p class="mt-1 text-sm text-gray-500">Lihat rekap poin siswa dan riwayat pelanggaran.</p>
                 </div>
                 <div class="mt-4 space-y-2">
                     @foreach ($quickLinks as $quickLink)

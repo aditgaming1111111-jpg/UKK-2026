@@ -26,6 +26,7 @@ class SiswaIndexRequest extends FormRequest
         return [
             'q' => ['nullable', 'string', 'max:100'],
             'kelas_id' => ['nullable', 'integer', 'exists:t_kelas,id'],
+            'tahun_ajaran_id' => ['nullable', 'integer', 'exists:t_tahun_ajaran,id'],
             'tingkat' => ['nullable', 'string', 'max:20', 'exists:t_kelas,tingkat'],
             'jurusan' => ['nullable', 'string', 'max:255', 'exists:t_kelas,jurusan'],
             'status' => ['nullable', Rule::in(['aktif', 'nonaktif', 'pindah', 'keluar', 'lulus'])],
@@ -37,6 +38,7 @@ class SiswaIndexRequest extends FormRequest
         return [
             'q.max' => 'Pencarian maksimal 100 karakter.',
             'kelas_id.exists' => 'Kelas yang dipilih tidak ditemukan.',
+            'tahun_ajaran_id.exists' => 'Tahun ajaran yang dipilih tidak ditemukan.',
             'tingkat.exists' => 'Tingkat yang dipilih tidak ditemukan.',
             'jurusan.exists' => 'Jurusan yang dipilih tidak ditemukan.',
             'status.in' => 'Status siswa tidak valid.',

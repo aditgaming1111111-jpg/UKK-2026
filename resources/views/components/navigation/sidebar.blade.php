@@ -10,7 +10,6 @@
         ['label' => 'Wali Kelas', 'route' => 'admin.homeroom-teachers.index', 'icon' => 'user-check'],
         ['label' => 'Kategori Pelanggaran', 'route' => 'admin.violation-categories.index', 'icon' => 'tag'],
         ['label' => 'Jenis Pelanggaran', 'route' => 'admin.violations.index', 'icon' => 'warning'],
-        ['label' => 'Data Pelanggaran', 'route' => 'admin.student-violations.index', 'icon' => 'document'],
         ['label' => 'Laporan', 'route' => 'admin.reports.index', 'icon' => 'chart'],
         ['label' => 'Log Aktivitas', 'route' => 'admin.audit-logs.index', 'icon' => 'clock'],
         ['label' => 'Profil', 'route' => 'profile.edit', 'icon' => 'user'],
@@ -18,9 +17,9 @@
 
     $guruMenu = [
         ['label' => 'Dashboard', 'route' => 'guru.dashboard', 'icon' => 'grid'],
-        ['label' => 'Data Siswa', 'route' => 'guru.students.index', 'icon' => 'users'],
         ['label' => 'Input Pelanggaran', 'route' => 'guru.violations.create', 'icon' => 'plus'],
         ['label' => 'Riwayat Pelanggaran', 'route' => 'guru.violations.index', 'icon' => 'clock'],
+        ['label' => 'Rekap Poin', 'route' => 'guru.point-recap.index', 'icon' => 'chart'],
         ['label' => 'Catatan Saya', 'route' => 'guru.my-notes.index', 'active' => 'guru.my-notes.*', 'icon' => 'document'],
         ['label' => 'Profil', 'route' => 'profile.edit', 'icon' => 'user'],
     ];

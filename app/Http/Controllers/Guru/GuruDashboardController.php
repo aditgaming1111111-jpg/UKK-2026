@@ -90,7 +90,7 @@ class GuruDashboardController extends Controller
             'homeroomAssignment' => $homeroomAssignment,
             'hasActiveWaliKelas' => $homeroomAssignment !== null,
             'quickLinks' => [
-                ['label' => 'Cari Siswa', 'route' => 'guru.students.index'],
+                ['label' => 'Rekap Poin', 'route' => 'guru.point-recap.index'],
                 ['label' => 'Riwayat Pelanggaran', 'route' => 'guru.violations.index'],
             ],
         ]);

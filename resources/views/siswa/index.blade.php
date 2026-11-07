@@ -7,7 +7,7 @@
 @endsection
 
 @section('page-heading')
-    <x-ui.page-heading title="Data Siswa" description="Cari dan lihat identitas serta kelas siswa.">
+    <x-ui.page-heading title="Data Siswa" description="Cari siswa, lihat kelas, serta rekap poin aktif per tahun ajaran.">
         @if ($canManageStudents)
             <x-ui.button :href="route('admin.students.create')">Tambah siswa</x-ui.button>
         @endif
@@ -22,7 +22,7 @@
 
     <x-ui.card>
         <form method="GET" action="{{ route(auth()->user()->role . '.students.index') }}"
-            class="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+            class="grid gap-4 sm:grid-cols-2 xl:grid-cols-8">
             <div class="sm:col-span-2"><x-ui.search placeholder="Cari NIS, NISN, atau nama siswa" :value="$filters['q'] ?? null" /></div>
             <label class="space-y-1.5"><span class="block text-sm font-medium text-gray-700">Kelas</span><select
                     name="kelas_id"
@@ -61,6 +61,18 @@
                     <option value="keluar" @selected(($filters['status'] ?? '') === 'keluar')>Keluar</option>
                     <option value="lulus" @selected(($filters['status'] ?? '') === 'lulus')>Lulus</option>
                 </select></label>
+            <label class="space-y-1.5"><span class="block text-sm font-medium text-gray-700">Tahun ajaran poin</span><select
+                    name="tahun_ajaran_id"
+                    class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-gray-500 focus:ring-2 focus:ring-gray-200">
+                    @forelse ($academicYears as $academicYear)
+                        <option value="{{ $academicYear->id }}" @selected(($filters['tahun_ajaran_id'] ?? '') == $academicYear->id)>
+                            {{ $academicYear->nama_tahun_ajaran }}{{ $academicYear->status_aktif ? ' · Aktif' : '' }}
+                        </option>
+                    @empty
+                        <option value="">Belum ada tahun ajaran</option>
+                    @endforelse
+                </select>
+            </label>
             <div class="flex items-end gap-2"><x-ui.button type="submit">Terapkan</x-ui.button><x-ui.button
                     variant="secondary" :href="route(auth()->user()->role . '.students.index')">Reset</x-ui.button></div>
         </form>
@@ -75,6 +87,7 @@
                         <th class="px-5 py-3 font-medium">NIS</th>
                         <th class="px-5 py-3 font-medium">NISN</th>
                         <th class="px-5 py-3 font-medium">Kelas saat ini</th>
+                        <th class="px-5 py-3 font-medium">Poin aktif{{ $selectedAcademicYear ? ' · '.$selectedAcademicYear->nama_tahun_ajaran : '' }}</th>
                         <th class="px-5 py-3 font-medium">Status</th>
                         <th class="px-5 py-3 text-right font-medium">Aksi</th>
                     </tr>
@@ -83,8 +96,12 @@
                     @foreach ($students as $student)
                         @php($currentPlacement = $student->penempatanKelas->first())
                         <tr class="hover:bg-gray-50">
-                            <td class="px-5 py-4"><a class="font-semibold text-gray-900 underline-offset-4 hover:underline"
-                                    href="{{ route(auth()->user()->role . '.students.show', $student) }}">{{ $student->nama }}</a>
+                            <td class="px-5 py-4">@if ($student->can_view_details)
+                                    <a class="font-semibold text-gray-900 underline-offset-4 hover:underline"
+                                        href="{{ route(auth()->user()->role . '.students.show', $student) }}">{{ $student->nama }}</a>
+                                @else
+                                    <span class="font-semibold text-gray-900">{{ $student->nama }}</span>
+                                @endif
                                 <p class="mt-1 text-xs text-gray-500">
                                     {{ $student->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan' }}</p>
                             </td>
@@ -97,11 +114,15 @@
                                     </p>
                                 @endif
                             </td>
+                            <td class="whitespace-nowrap px-5 py-4 text-sm font-medium text-gray-800">{{ number_format($student->active_points, 0, ',', '.') }} poin</td>
                             <td class="px-5 py-4"><x-ui.badge
                                     :variant="$student->status_siswa === 'aktif' ? 'dark' : 'outline'">{{ ucfirst($student->status_siswa) }}</x-ui.badge></td>
-                            <td class="whitespace-nowrap px-5 py-4 text-right"><a
-                                    class="text-sm font-medium text-gray-700 underline-offset-4 hover:underline"
-                                    href="{{ route(auth()->user()->role . '.students.show', $student) }}">Lihat detail</a>
+                            <td class="whitespace-nowrap px-5 py-4 text-right">@if ($student->can_view_details)
+                                    <a class="text-sm font-medium text-gray-700 underline-offset-4 hover:underline"
+                                        href="{{ route(auth()->user()->role . '.students.show', $student) }}">Lihat detail</a>
+                                @else
+                                    <span class="text-xs text-gray-400">Detail terbatas</span>
+                                @endif
                                 @if ($canManageStudents)
                                     <span class="px-2 text-gray-300">·</span><a
                                         class="text-sm font-medium text-gray-700 underline-offset-4 hover:underline"

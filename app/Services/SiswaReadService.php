@@ -2,11 +2,12 @@
 
 namespace App\Services;
 
-use App\Models\Guru;
 use App\Models\Kelas;
 use App\Models\KelasSiswa;
 use App\Models\PelanggaranSiswa;
 use App\Models\Siswa;
+use App\Models\TahunAjaran;
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -16,17 +17,26 @@ use Illuminate\Support\Collection;
 class SiswaReadService
 {
     /**
-     * @param  array{q?: string|null, kelas_id?: int|string|null, tingkat?: string|null, jurusan?: string|null, status?: string|null}  $filters
+     * @param  array{q?: string|null, kelas_id?: int|string|null, tingkat?: string|null, jurusan?: string|null, status?: string|null, tahun_ajaran_id?: int|string|null}  $filters
      * @return LengthAwarePaginator<int, Siswa>
      */
-    public function directory(array $filters): LengthAwarePaginator
+    public function directory(array $filters, User $user): LengthAwarePaginator
     {
         $classId = $filters['kelas_id'] ?? null;
         $level = $filters['tingkat'] ?? null;
         $major = $filters['jurusan'] ?? null;
+        $academicYearId = $filters['tahun_ajaran_id'] ?? null;
+        $activePoints = PelanggaranSiswa::query()
+            ->join('t_kelas_siswa', 't_kelas_siswa.id', '=', 't_pelanggaran_siswa.kelas_siswa_id')
+            ->where('t_pelanggaran_siswa.status', 'aktif')
+            ->when($academicYearId !== null, static fn (Builder $query): Builder => $query->where('t_kelas_siswa.tahun_ajaran_id', $academicYearId), static fn (Builder $query): Builder => $query->whereRaw('1 = 0'))
+            ->selectRaw('t_kelas_siswa.siswa_id, COALESCE(SUM(t_pelanggaran_siswa.poin_saat_dicatat), 0) AS active_points')
+            ->groupBy('t_kelas_siswa.siswa_id');
 
-        return Siswa::query()
+        $students = Siswa::query()
             ->select(['id', 'nis', 'nisn', 'nama', 'jenis_kelamin', 'status_siswa'])
+            ->leftJoinSub($activePoints->toBase(), 'student_active_points', 'student_active_points.siswa_id', '=', 't_siswa.id')
+            ->addSelect('student_active_points.active_points')
             ->with(['penempatanKelas' => static fn (Relation $query): Relation => $query
                 ->select(['id', 'siswa_id', 'kelas_id', 'status_aktif', 'tanggal_selesai'])
                 ->where('status_aktif', true)
@@ -53,6 +63,63 @@ class SiswaReadService
             ->orderBy('id')
             ->paginate(10)
             ->withQueryString();
+
+        $viewableStudentIds = $this->viewableStudentIds($user, $students->getCollection()->modelKeys());
+
+        foreach ($students as $student) {
+            $student->setAttribute('can_view_details', in_array($student->id, $viewableStudentIds, true));
+            $student->setAttribute('active_points', (int) ($student->active_points ?? 0));
+        }
+
+        return $students;
+    }
+
+    /**
+     * @param  array{q?: string|null, tahun_ajaran_id?: int|string|null}  $filters
+     * @return LengthAwarePaginator<int, Siswa>
+     */
+    public function pointRecap(array $filters): LengthAwarePaginator
+    {
+        $academicYearId = $filters['tahun_ajaran_id'] ?? null;
+        $activePoints = PelanggaranSiswa::query()
+            ->join('t_kelas_siswa', 't_kelas_siswa.id', '=', 't_pelanggaran_siswa.kelas_siswa_id')
+            ->where('t_pelanggaran_siswa.status', 'aktif')
+            ->when(
+                $academicYearId !== null,
+                static fn (Builder $query): Builder => $query->where('t_kelas_siswa.tahun_ajaran_id', $academicYearId),
+                static fn (Builder $query): Builder => $query->whereRaw('1 = 0'),
+            )
+            ->selectRaw('t_kelas_siswa.siswa_id, COALESCE(SUM(t_pelanggaran_siswa.poin_saat_dicatat), 0) AS active_points')
+            ->groupBy('t_kelas_siswa.siswa_id');
+
+        return Siswa::query()
+            ->select(['t_siswa.id', 't_siswa.nisn', 't_siswa.nama', 't_siswa.status_siswa'])
+            ->leftJoinSub($activePoints->toBase(), 'student_active_points', 'student_active_points.siswa_id', '=', 't_siswa.id')
+            ->addSelect('student_active_points.active_points')
+            ->when($filters['q'] ?? null, static function (Builder $query, string $search): void {
+                $query->where(static function (Builder $searchQuery) use ($search): void {
+                    $searchQuery->where('t_siswa.nisn', 'like', '%'.$search.'%')
+                        ->orWhere('t_siswa.nama', 'like', '%'.$search.'%');
+                });
+            })
+            ->orderBy('t_siswa.nama')
+            ->orderBy('t_siswa.id')
+            ->paginate(10)
+            ->withQueryString()
+            ->through(static function (Siswa $student): Siswa {
+                $student->setAttribute('active_points', (int) ($student->active_points ?? 0));
+
+                return $student;
+            });
+    }
+
+    /** @return Collection<int, TahunAjaran> */
+    public function academicYears(): Collection
+    {
+        return TahunAjaran::query()
+            ->orderByDesc('status_aktif')
+            ->orderByDesc('tanggal_mulai')
+            ->get(['id', 'nama_tahun_ajaran', 'status_aktif']);
     }
 
     /** @return Collection<int, Kelas> */
@@ -76,7 +143,7 @@ class SiswaReadService
     /**
      * @return array{placements: Collection, activePlacementIds: list<int>, violations: LengthAwarePaginator, pointRecap: Collection}
      */
-    public function detail(Siswa $siswa, ?Guru $guru = null): array
+    public function detail(Siswa $siswa): array
     {
         $placements = $siswa->penempatanKelas()
             ->with(['kelas:id,nama_kelas,tingkat,jurusan', 'tahunAjaran:id,nama_tahun_ajaran,tanggal_mulai,tanggal_selesai'])
@@ -88,7 +155,7 @@ class SiswaReadService
             ->filter(static fn (KelasSiswa $placement): bool => $placement->status_aktif && $placement->tanggal_selesai === null)
             ->modelKeys();
 
-        $visibleViolations = $this->visibleViolations($siswa, $guru);
+        $visibleViolations = $this->visibleViolations($siswa);
 
         $violations = (clone $visibleViolations)
             ->with([
@@ -142,26 +209,63 @@ class SiswaReadService
     /**
      * @return Builder<PelanggaranSiswa>
      */
-    private function visibleViolations(Siswa $siswa, ?Guru $guru): Builder
+    private function visibleViolations(Siswa $siswa): Builder
     {
         return PelanggaranSiswa::query()
-            ->whereHas('penempatanKelas', static fn (Builder $query): Builder => $query->where('siswa_id', $siswa->id))
-            ->when($guru !== null, static fn (Builder $query): Builder => $query->where(static function (Builder $visibilityQuery) use ($guru, $siswa): void {
-                $visibilityQuery->where('guru_id', $guru->id)
-                    ->orWhereHas('penempatanKelas', static fn (Builder $placementQuery): Builder => $placementQuery
-                        ->where('siswa_id', $siswa->id)
-                        ->whereExists(static fn (QueryBuilder $assignmentQuery): QueryBuilder => $assignmentQuery
-                            ->selectRaw('1')
+            ->whereHas('penempatanKelas', static fn (Builder $query): Builder => $query->where('siswa_id', $siswa->id));
+    }
+
+    /** @param list<int> $studentIds
+     * @return list<int>
+     */
+    private function viewableStudentIds(User $user, array $studentIds): array
+    {
+        if ($user->role === 'admin') {
+            return $studentIds;
+        }
+
+        if ($user->role !== 'guru' || $studentIds === []) {
+            return [];
+        }
+
+        $teacherId = $user->guru()->where('status_aktif', true)->value('id');
+
+        if ($teacherId === null) {
+            return [];
+        }
+
+        $today = today()->toDateString();
+
+        return Siswa::query()
+            ->whereKey($studentIds)
+            ->where('status_siswa', 'aktif')
+            ->whereHas('penempatanKelas', static function (Builder $placementQuery) use ($teacherId, $today): void {
+                $placementQuery
+                    ->where('status_aktif', true)
+                    ->whereDate('tanggal_mulai', '<=', $today)
+                    ->where(static function (Builder $query) use ($today): void {
+                        $query->whereNull('tanggal_selesai')
+                            ->orWhereDate('tanggal_selesai', '>=', $today);
+                    })
+                    ->whereHas('tahunAjaran', static fn (Builder $yearQuery): Builder => $yearQuery
+                        ->whereDate('tanggal_mulai', '<=', $today)
+                        ->whereDate('tanggal_selesai', '>=', $today))
+                    ->whereExists(static function (QueryBuilder $assignmentQuery) use ($teacherId, $today): void {
+                        $assignmentQuery->selectRaw('1')
                             ->from('t_wali_kelas')
                             ->whereColumn('t_wali_kelas.kelas_id', 't_kelas_siswa.kelas_id')
                             ->whereColumn('t_wali_kelas.tahun_ajaran_id', 't_kelas_siswa.tahun_ajaran_id')
-                            ->where('t_wali_kelas.guru_id', $guru->id)
+                            ->where('t_wali_kelas.guru_id', $teacherId)
                             ->where('t_wali_kelas.status_aktif', true)
-                            ->whereColumn('t_wali_kelas.tanggal_mulai', '<=', 't_pelanggaran_siswa.tanggal_pelanggaran')
-                            ->where(static function (QueryBuilder $dateQuery): void {
-                                $dateQuery->whereNull('t_wali_kelas.tanggal_selesai')
-                                    ->orWhereColumn('t_wali_kelas.tanggal_selesai', '>=', 't_pelanggaran_siswa.tanggal_pelanggaran');
-                            })));
-            }));
+                            ->whereDate('t_wali_kelas.tanggal_mulai', '<=', $today)
+                            ->where(static function (QueryBuilder $query) use ($today): void {
+                                $query->whereNull('t_wali_kelas.tanggal_selesai')
+                                    ->orWhereDate('t_wali_kelas.tanggal_selesai', '>=', $today);
+                            });
+                    });
+            })
+            ->pluck('id')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
     }
 }

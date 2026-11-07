@@ -11,7 +11,7 @@
 
 @section('page-heading')
     <x-ui.page-heading title="Catat Pelanggaran" description="Poin, guru pencatat, kelas, dan tahun ajaran dikunci berdasarkan data server.">
-        <x-ui.button variant="secondary" :href="route('guru.students.index')">Cari siswa</x-ui.button>
+        <x-ui.button variant="secondary" href="#pencarian_siswa">Cari siswa</x-ui.button>
     </x-ui.page-heading>
 @endsection
 

@@ -29,7 +29,7 @@ class GuruPencatatanPelanggaranTest extends TestCase
 
     public function test_teacher_can_record_violation_using_server_owned_teacher_points_and_status(): void
     {
-        [$teacherUser, $teacher, $student, $placement, $violation] = $this->recordingContext();
+        [$teacherUser, $teacher, , $placement, $violation] = $this->recordingContext();
         $otherTeacher = Guru::factory()->create();
 
         $response = $this->actingAs($teacherUser)->post(route('guru.violations.store'), [
@@ -45,10 +45,11 @@ class GuruPencatatanPelanggaranTest extends TestCase
             'tahun_ajaran_id' => 999,
         ]);
 
-        $response->assertRedirect(route('guru.students.show', $student))
+        $record = PelanggaranSiswa::query()->sole();
+
+        $response->assertRedirect(route('guru.violations.show', $record))
             ->assertSessionHas('success', 'Catatan pelanggaran berhasil disimpan.');
 
-        $record = PelanggaranSiswa::query()->sole();
         $this->assertSame($teacher->id, $record->guru_id);
         $this->assertSame($placement->id, $record->kelas_siswa_id);
         $this->assertSame($violation->poin, $record->poin_saat_dicatat);
@@ -133,7 +134,7 @@ class GuruPencatatanPelanggaranTest extends TestCase
 
     public function test_active_categories_and_their_active_violation_types_are_available_for_recording(): void
     {
-        [$teacherUser, , $student, $placement, $firstViolation] = $this->recordingContext();
+        [$teacherUser, , , $placement, $firstViolation] = $this->recordingContext();
         $firstCategory = $firstViolation->kategori;
         $secondCategory = PelanggaranKategori::factory()->create([
             'nama_kategori' => 'Keterlambatan Uji',
@@ -170,7 +171,7 @@ class GuruPencatatanPelanggaranTest extends TestCase
                 'kelas_siswa_id' => $placement->id,
                 'pelanggaran_id' => $violation->id,
                 'tanggal_pelanggaran' => today()->toDateString(),
-            ])->assertRedirect(route('guru.students.show', $student));
+            ])->assertRedirect(route('guru.violations.show', PelanggaranSiswa::query()->latest('id')->firstOrFail()));
         }
 
         $this->assertDatabaseCount('t_pelanggaran_siswa', 2);

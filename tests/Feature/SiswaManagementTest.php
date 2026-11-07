@@ -826,14 +826,18 @@ class SiswaManagementTest extends TestCase
             ->assertSee('Dibatalkan');
     }
 
-    public function test_guru_can_read_students_but_cannot_manage_student_or_placement_data(): void
+    public function test_guru_cannot_open_student_directory_or_unassigned_student_details_or_manage_data(): void
     {
         $teacherUser = User::factory()->create(['role' => 'guru']);
         Guru::factory()->for($teacherUser, 'user')->create();
         $student = Siswa::factory()->create(['nama' => 'Siswa Terlihat']);
 
-        $this->actingAs($teacherUser)->get(route('guru.students.index'))->assertOk()->assertSee('Siswa Terlihat');
-        $this->actingAs($teacherUser)->get(route('guru.students.show', $student))->assertSee('Identitas siswa');
+        $this->actingAs($teacherUser)->get('/guru/siswa')->assertNotFound();
+        $this->get(route('guru.dashboard'))
+            ->assertOk()
+            ->assertDontSee('Data Siswa')
+            ->assertSee('Rekap Poin');
+        $this->actingAs($teacherUser)->get(route('guru.students.show', $student))->assertForbidden();
         $this->actingAs($teacherUser)->get(route('admin.students.index'))->assertForbidden();
         $this->actingAs($teacherUser)->post(route('admin.students.store'), [])->assertForbidden();
         $this->actingAs($teacherUser)->put(route('admin.students.update', $student), [])->assertForbidden();
@@ -868,13 +872,16 @@ class SiswaManagementTest extends TestCase
 
     public function test_teacher_cannot_access_admin_student_routes_and_guest_is_redirected(): void
     {
-        $this->get(route('guru.students.index'))->assertRedirect(route('login'));
+        $this->get('/guru/siswa')->assertNotFound();
 
         $administrator = User::factory()->create(['role' => 'admin']);
-        $this->actingAs($administrator)->get(route('guru.students.index'))->assertForbidden();
+        $this->actingAs($administrator)->get('/guru/siswa')->assertNotFound();
+        $this->get(route('admin.students.index'))
+            ->assertOk()
+            ->assertSee('Data Siswa');
     }
 
-    public function test_teacher_sees_own_violation_history_and_assigned_homeroom_history_only(): void
+    public function test_only_assigned_homeroom_teacher_can_open_student_details_and_sees_full_history(): void
     {
         $teacherUser = User::factory()->create(['role' => 'guru']);
         $teacher = Guru::factory()->for($teacherUser, 'user')->create();
@@ -886,7 +893,11 @@ class SiswaManagementTest extends TestCase
             'tanggal_mulai' => '2026-07-01',
             'tanggal_selesai' => '2027-06-30',
         ]);
-        $placement = KelasSiswa::factory()->for($student, 'siswa')->for($class, 'kelas')->for($year, 'tahunAjaran')->create();
+        $placement = KelasSiswa::factory()->for($student, 'siswa')->for($class, 'kelas')->for($year, 'tahunAjaran')->create([
+            'tanggal_mulai' => $year->tanggal_mulai->toDateString(),
+            'tanggal_selesai' => null,
+            'status_aktif' => true,
+        ]);
         $category = PelanggaranKategori::factory()->create();
         $violation = Pelanggaran::factory()->for($category, 'kategori')->create();
         PelanggaranSiswa::factory()->for($placement, 'penempatanKelas')->for($violation, 'pelanggaran')->for($teacher, 'guru')
@@ -894,16 +905,93 @@ class SiswaManagementTest extends TestCase
         PelanggaranSiswa::factory()->for($placement, 'penempatanKelas')->for($violation, 'pelanggaran')->for($otherTeacher, 'guru')
             ->create(['poin_saat_dicatat' => 9]);
 
-        $this->actingAs($teacherUser)->get(route('guru.students.show', $student))
-            ->assertViewHas('violations', fn ($records): bool => $records->count() === 1)
-            ->assertViewHas('pointRecap', fn ($recap): bool => $recap->first()['total_points'] === 4);
+        $this->actingAs($teacherUser)->get(route('guru.students.show', $student))->assertForbidden();
 
         WaliKelas::factory()->for($teacher, 'guru')->for($class, 'kelas')->for($year, 'tahunAjaran')
-            ->create(['tanggal_mulai' => '2026-07-01', 'tanggal_selesai' => null, 'status_aktif' => true]);
+            ->create([
+                'tanggal_mulai' => $year->tanggal_mulai->toDateString(),
+                'tanggal_selesai' => null,
+                'status_aktif' => true,
+            ]);
 
         $this->actingAs($teacherUser)->get(route('guru.students.show', $student))
             ->assertViewHas('violations', fn ($records): bool => $records->count() === 2)
             ->assertViewHas('pointRecap', fn ($recap): bool => $recap->first()['total_points'] === 13);
+    }
+
+    public function test_homeroom_teacher_cannot_open_student_detail_from_another_class(): void
+    {
+        $teacherUser = User::factory()->create(['role' => 'guru']);
+        $teacher = Guru::factory()->for($teacherUser, 'user')->create();
+        $assignedClass = Kelas::factory()->create();
+        $otherClass = Kelas::factory()->create();
+        $year = TahunAjaran::factory()->create([
+            'tanggal_mulai' => today()->subMonth()->toDateString(),
+            'tanggal_selesai' => today()->addMonth()->toDateString(),
+            'status_aktif' => true,
+        ]);
+        $assignedStudent = Siswa::factory()->create(['nama' => 'Siswa Kelas Wali']);
+        $otherStudent = Siswa::factory()->create(['nama' => 'Siswa Kelas Lain']);
+        KelasSiswa::factory()->for($assignedStudent, 'siswa')->for($assignedClass, 'kelas')->for($year, 'tahunAjaran')->create([
+            'tanggal_mulai' => today()->subMonth()->toDateString(),
+            'tanggal_selesai' => null,
+            'status_aktif' => true,
+        ]);
+        KelasSiswa::factory()->for($otherStudent, 'siswa')->for($otherClass, 'kelas')->for($year, 'tahunAjaran')->create([
+            'tanggal_mulai' => today()->subMonth()->toDateString(),
+            'tanggal_selesai' => null,
+            'status_aktif' => true,
+        ]);
+        WaliKelas::factory()->for($teacher, 'guru')->for($assignedClass, 'kelas')->for($year, 'tahunAjaran')->create([
+            'tanggal_mulai' => today()->subMonth()->toDateString(),
+            'tanggal_selesai' => null,
+            'status_aktif' => true,
+        ]);
+
+        $this->actingAs($teacherUser)->get(route('guru.students.show', $assignedStudent))
+            ->assertOk()
+            ->assertSee('Siswa Kelas Wali');
+        $this->get(route('guru.students.show', $otherStudent))->assertForbidden();
+    }
+
+    public function test_guru_can_see_active_point_recap_for_all_students_without_student_detail_access(): void
+    {
+        $teacherUser = User::factory()->create(['role' => 'guru']);
+        Guru::factory()->for($teacherUser, 'user')->create();
+        $recordingTeacher = Guru::factory()->create();
+        $category = PelanggaranKategori::factory()->create();
+        $violation = Pelanggaran::factory()->for($category, 'kategori')->create();
+        $year = TahunAjaran::factory()->create([
+            'nama_tahun_ajaran' => '2026/2027',
+            'tanggal_mulai' => today()->subMonth()->toDateString(),
+            'tanggal_selesai' => today()->addMonth()->toDateString(),
+            'status_aktif' => true,
+        ]);
+        $firstStudent = Siswa::factory()->create(['nama' => 'Siswa Rekap A']);
+        $secondStudent = Siswa::factory()->create(['nama' => 'Siswa Rekap B']);
+        $firstPlacement = KelasSiswa::factory()->for($firstStudent, 'siswa')->for($year, 'tahunAjaran')->create([
+            'tanggal_mulai' => today()->subMonth()->toDateString(),
+        ]);
+        $secondPlacement = KelasSiswa::factory()->for($secondStudent, 'siswa')->for($year, 'tahunAjaran')->create([
+            'tanggal_mulai' => today()->subMonth()->toDateString(),
+        ]);
+        PelanggaranSiswa::factory()->for($firstPlacement, 'penempatanKelas')->for($violation, 'pelanggaran')->for($recordingTeacher, 'guru')
+            ->create(['poin_saat_dicatat' => 6]);
+        PelanggaranSiswa::factory()->for($firstPlacement, 'penempatanKelas')->for($violation, 'pelanggaran')->for($recordingTeacher, 'guru')
+            ->create(['poin_saat_dicatat' => 11, 'status' => 'dibatalkan']);
+        PelanggaranSiswa::factory()->for($secondPlacement, 'penempatanKelas')->for($violation, 'pelanggaran')->for($recordingTeacher, 'guru')
+            ->create(['poin_saat_dicatat' => 4]);
+
+        $this->actingAs($teacherUser)->get(route('guru.point-recap.index', ['tahun_ajaran_id' => $year->id]))
+            ->assertOk()
+            ->assertSee('Rekap Poin')
+            ->assertSee('Siswa Rekap A')
+            ->assertSee('Siswa Rekap B')
+            ->assertSee('6 poin')
+            ->assertSee('4 poin')
+            ->assertDontSee('Detail Siswa');
+        $this->get('/guru/siswa')->assertNotFound();
+        $this->get(route('guru.students.show', $firstStudent))->assertForbidden();
     }
 
     public function test_student_directory_paginates_ten_results_and_preserves_search_and_status_filters(): void

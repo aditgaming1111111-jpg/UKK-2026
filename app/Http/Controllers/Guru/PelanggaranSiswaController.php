@@ -84,10 +84,9 @@ class PelanggaranSiswaController extends Controller
     {
         $record = $service->record($request->user(), $request->validated());
         $activityLogger->record($request->user(), $request, 'Pelanggaran dicatat', 'Catatan pelanggaran siswa ID #'.$record->id.' berhasil dibuat.');
-        $student = $record->penempatanKelas->siswa;
 
         return redirect()
-            ->route('guru.students.show', $student)
+            ->route('guru.violations.show', $record)
             ->with('success', 'Catatan pelanggaran berhasil disimpan.');
     }
 }
