@@ -6,6 +6,19 @@
 @if(session('success'))<x-ui.toast>{{ session('success') }}</x-ui.toast>@endif
 @if($errors->any())<x-ui.error-state title="Penugasan belum dapat diubah" :description="$errors->first()"/>@endif
 <x-ui.card><dl class="grid gap-5 sm:grid-cols-2"><div><dt class="text-sm text-gray-500">Guru</dt><dd class="mt-1 font-medium">{{ $assignment->guru->nama }} <span class="text-sm text-gray-500">({{ $assignment->guru->nip }})</span></dd></div><div><dt class="text-sm text-gray-500">Kelas</dt><dd class="mt-1 font-medium">{{ $assignment->kelas->nama_kelas }} · {{ $assignment->kelas->tingkat }}</dd></div><div><dt class="text-sm text-gray-500">Tahun ajaran</dt><dd class="mt-1 font-medium">{{ $assignment->tahunAjaran->nama_tahun_ajaran }}</dd></div><div><dt class="text-sm text-gray-500">Status</dt><dd class="mt-1"><x-ui.badge>{{ $assignment->status_aktif && !$assignment->tanggal_selesai ? 'Aktif' : 'Selesai' }}</x-ui.badge></dd></div><div><dt class="text-sm text-gray-500">Tanggal mulai</dt><dd class="mt-1">{{ $assignment->tanggal_mulai->format('d F Y') }}</dd></div><div><dt class="text-sm text-gray-500">Tanggal selesai</dt><dd class="mt-1">{{ $assignment->tanggal_selesai?->format('d F Y') ?? 'Belum diakhiri' }}</dd></div></dl>
+<form method="POST" action="{{ route('admin.homeroom-teachers.update', $assignment) }}" class="mt-8 space-y-5 border-t border-gray-200 pt-6">
+    @csrf
+    @method('PATCH')
+    <h2 class="text-base font-semibold text-gray-900">Koreksi tanggal penugasan</h2>
+    <p class="text-sm text-gray-500">Tanggal harus berada dalam periode tahun ajaran. Kosongkan tanggal selesai jika penugasan masih aktif.</p>
+    <div class="grid gap-5 sm:grid-cols-2">
+        <x-ui.input label="Tanggal mulai" name="tanggal_mulai" type="date" :value="old('tanggal_mulai', $assignment->tanggal_mulai->toDateString())" required />
+        <x-ui.input label="Tanggal selesai" name="tanggal_selesai" type="date" :value="old('tanggal_selesai', $assignment->tanggal_selesai?->toDateString())" />
+    </div>
+    <div class="flex justify-end">
+        <x-ui.button type="submit">Simpan koreksi</x-ui.button>
+    </div>
+</form>
 @if ($assignment->status_aktif && !$assignment->tanggal_selesai)
     <form id="close-homeroom-assignment" method="POST" data-modal-confirm-form
         action="{{ route('admin.homeroom-teachers.close', $assignment) }}"

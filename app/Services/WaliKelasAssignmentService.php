@@ -128,4 +128,86 @@ class WaliKelasAssignmentService
             return $assignment->refresh();
         });
     }
+
+    /**
+     * @param  array{tanggal_mulai: string, tanggal_selesai?: string|null}  $attributes
+     * @return array{before: array{tanggal_mulai: string, tanggal_selesai: string|null, status_aktif: bool}, assignment: WaliKelas}
+     */
+    public function updateDates(WaliKelas $waliKelas, array $attributes): array
+    {
+        return DB::transaction(function () use ($waliKelas, $attributes): array {
+            Kelas::query()->whereKey($waliKelas->kelas_id)->lockForUpdate()->firstOrFail();
+            Guru::query()->whereKey($waliKelas->guru_id)->lockForUpdate()->firstOrFail();
+
+            $assignment = WaliKelas::query()->whereKey($waliKelas->id)->lockForUpdate()->firstOrFail();
+            $academicYear = TahunAjaran::query()->findOrFail($assignment->tahun_ajaran_id);
+            $startDate = CarbonImmutable::parse($attributes['tanggal_mulai'])->startOfDay();
+            $endDate = isset($attributes['tanggal_selesai']) && $attributes['tanggal_selesai'] !== ''
+                ? CarbonImmutable::parse($attributes['tanggal_selesai'])->startOfDay()
+                : null;
+            $yearStart = CarbonImmutable::parse($academicYear->tanggal_mulai)->startOfDay();
+            $yearEnd = CarbonImmutable::parse($academicYear->tanggal_selesai)->startOfDay();
+
+            if ($startDate->lt($yearStart) || $startDate->gt($yearEnd)) {
+                throw ValidationException::withMessages([
+                    'tanggal_mulai' => 'Tanggal mulai harus berada dalam periode tahun ajaran yang dipilih.',
+                ]);
+            }
+
+            if ($endDate !== null && ($endDate->lt($startDate) || $endDate->lt($yearStart) || $endDate->gt($yearEnd))) {
+                throw ValidationException::withMessages([
+                    'tanggal_selesai' => 'Tanggal selesai harus setelah tanggal mulai dan berada dalam periode tahun ajaran yang dipilih.',
+                ]);
+            }
+
+            $candidateEnd = $endDate ?? $yearEnd;
+            $otherAssignments = WaliKelas::query()
+                ->with('tahunAjaran:id,tanggal_mulai,tanggal_selesai')
+                ->where('id', '!=', $assignment->id)
+                ->where(static function ($query) use ($assignment): void {
+                    $query->where('kelas_id', $assignment->kelas_id)
+                        ->orWhere('guru_id', $assignment->guru_id);
+                })
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get();
+
+            foreach ($otherAssignments as $otherAssignment) {
+                if ($otherAssignment->tahunAjaran === null) {
+                    continue;
+                }
+
+                $otherStart = CarbonImmutable::parse($otherAssignment->tanggal_mulai)->startOfDay();
+                $otherEnd = $otherAssignment->tanggal_selesai !== null
+                    ? CarbonImmutable::parse($otherAssignment->tanggal_selesai)->startOfDay()
+                    : CarbonImmutable::parse($otherAssignment->tahunAjaran->tanggal_selesai)->startOfDay();
+
+                if ($otherStart->lte($candidateEnd) && $otherEnd->gte($startDate)) {
+                    $conflictField = $otherAssignment->kelas_id === $assignment->kelas_id ? 'tanggal_mulai' : 'tanggal_selesai';
+                    $conflictMessage = $otherAssignment->kelas_id === $assignment->kelas_id
+                        ? 'Periode penugasan bertabrakan dengan penugasan wali kelas lain pada kelas ini.'
+                        : 'Guru memiliki penugasan wali kelas lain yang bertabrakan pada periode tersebut.';
+
+                    throw ValidationException::withMessages([$conflictField => $conflictMessage]);
+                }
+            }
+
+            $before = [
+                'tanggal_mulai' => $assignment->tanggal_mulai->toDateString(),
+                'tanggal_selesai' => $assignment->tanggal_selesai?->toDateString(),
+                'status_aktif' => (bool) $assignment->status_aktif,
+            ];
+
+            $assignment->update([
+                'tanggal_mulai' => $startDate->toDateString(),
+                'tanggal_selesai' => $endDate?->toDateString(),
+                'status_aktif' => $endDate === null,
+            ]);
+
+            return [
+                'before' => $before,
+                'assignment' => $assignment->refresh(),
+            ];
+        });
+    }
 }

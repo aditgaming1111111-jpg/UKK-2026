@@ -26,4 +26,9 @@ class WaliKelasPolicy
     {
         return $user->role === 'admin';
     }
+
+    public function updateDates(User $user, WaliKelas $waliKelas): bool
+    {
+        return $user->role === 'admin';
+    }
 }

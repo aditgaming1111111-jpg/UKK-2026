@@ -61,5 +61,6 @@ Route::prefix('admin')
         Route::get('wali-kelas/create', [WaliKelasController::class, 'create'])->name('homeroom-teachers.create');
         Route::post('wali-kelas', [WaliKelasController::class, 'store'])->name('homeroom-teachers.store');
         Route::get('wali-kelas/{waliKelas}', [WaliKelasController::class, 'show'])->name('homeroom-teachers.show');
+        Route::patch('wali-kelas/{waliKelas}', [WaliKelasController::class, 'updateDates'])->name('homeroom-teachers.update');
         Route::patch('wali-kelas/{waliKelas}/akhiri', [WaliKelasController::class, 'close'])->name('homeroom-teachers.close');
     });

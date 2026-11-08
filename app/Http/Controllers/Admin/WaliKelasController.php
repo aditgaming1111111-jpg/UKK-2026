@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\CloseWaliKelasRequest;
 use App\Http\Requests\Admin\StoreWaliKelasRequest;
+use App\Http\Requests\Admin\UpdateWaliKelasRequest;
 use App\Http\Requests\Admin\WaliKelasIndexRequest;
 use App\Models\Guru;
 use App\Models\Kelas;
@@ -13,6 +14,7 @@ use App\Models\WaliKelas;
 use App\Services\ActivityLogger;
 use App\Services\WaliKelasAssignmentService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
@@ -87,5 +89,33 @@ class WaliKelasController extends Controller
         $activityLogger->record($request->user(), $request, 'Penugasan wali kelas diakhiri', 'Penugasan wali kelas ID #'.$waliKelas->id.' berhasil diakhiri.');
 
         return to_route('admin.homeroom-teachers.show', $waliKelas)->with('success', 'Penugasan wali kelas diakhiri; riwayat tetap tersimpan.');
+    }
+
+    public function updateDates(
+        UpdateWaliKelasRequest $request,
+        WaliKelas $waliKelas,
+        WaliKelasAssignmentService $service,
+        ActivityLogger $activityLogger,
+    ): RedirectResponse {
+        DB::transaction(function () use ($request, $waliKelas, $service, $activityLogger): void {
+            ['before' => $before, 'assignment' => $updatedAssignment] = $service->updateDates($waliKelas, $request->validated());
+            $activityLogger->record(
+                $request->user(),
+                $request,
+                'Tanggal penugasan wali kelas dikoreksi',
+                'Penugasan ID #'.$updatedAssignment->id
+                    .' (guru #'.$updatedAssignment->guru_id
+                    .', kelas #'.$updatedAssignment->kelas_id
+                    .', tahun ajaran #'.$updatedAssignment->tahun_ajaran_id
+                    .') dikoreksi. Sebelum: '.json_encode($before, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE)
+                    .'. Sesudah: '.json_encode([
+                        'tanggal_mulai' => $updatedAssignment->tanggal_mulai->toDateString(),
+                        'tanggal_selesai' => $updatedAssignment->tanggal_selesai?->toDateString(),
+                        'status_aktif' => (bool) $updatedAssignment->status_aktif,
+                    ], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE).'.',
+            );
+        });
+
+        return to_route('admin.homeroom-teachers.show', $waliKelas)->with('success', 'Tanggal penugasan wali kelas berhasil dikoreksi.');
     }
 }
