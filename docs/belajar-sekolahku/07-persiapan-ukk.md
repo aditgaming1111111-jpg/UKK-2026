@@ -2,6 +2,8 @@
 
 Jawaban di bawah mengikuti kode SekolahKu saat ini. Saat presentasi, buka file yang dirujuk dan tunjukkan alurnya; hindari mengklaim aturan yang tidak ada pada request, service, migration, atau test.
 
+Untuk panduan penggunaan Admin/Guru dan bank pertanyaan lanjutan, lanjutkan ke [Panduan penggunaan dan tanya jawab](08-panduan-penggunaan-dan-tanya-jawab.md).
+
 ## Ringkasan proyek dalam satu menit
 
 > SekolahKu adalah aplikasi Laravel 13 untuk administrasi data sekolah dan pencatatan pelanggaran siswa. Role login hanya Admin dan Guru. Identitas siswa memakai NISN unik, sementara kelas siswa dan wali kelas dicatat sebagai histori per tahun ajaran. Ketika Guru mencatat pelanggaran, backend memeriksa penempatan yang berlaku pada tanggal kejadian, mengambil poin dari master aktif, lalu menyimpan snapshot poin. Catatan koreksi atau pembatalan dicatat ke log dalam transaksi. Admin mengelola sistem dan laporan seluruh sekolah; Guru dapat mencatat dari kelas mana pun dan melihat riwayat yang diizinkan. Guru dengan penugasan wali kelas yang sesuai memperoleh rekap kelas khusus.
@@ -78,7 +80,7 @@ Migration mendefinisikan skema secara terurut. Seeder mengisi akun contoh untuk 
 
 ### 16. Bagaimana tahu fitur tidak regresi?
 
-Feature test mengirim request melalui route dan memeriksa status/redirect, isi response, perubahan database, otorisasi, serta hitungan. Run terbaru dalam dokumentasi ini: 112 test dan 751 assertion lulus dengan php artisan test --compact. Angka itu berlaku untuk kondisi repository saat dijalankan dan bukan pengganti uji MySQL/browser pada mesin deployment.
+Feature test mengirim request melalui route dan memeriksa status/redirect, isi response, perubahan database, otorisasi, serta hitungan. Hasil terakhir yang tercatat pada 8 November 2026: 171 test dan 1.184 assertion lulus dengan `php artisan test --compact`. Angka itu berlaku untuk kondisi repository saat dijalankan dan bukan pengganti uji MySQL/browser pada mesin deployment.
 
 ## Penjelasan fitur di depan penguji: contoh pencatatan
 
@@ -102,8 +104,8 @@ Catatan tetap menunjuk ke record t_kelas_siswa lama. Laporan membaca relasi pene
 **“Bisakah Guru mencatat pelanggaran di kelas lain?”**
 Ya. Pencatatan tidak mensyaratkan penugasan wali kelas. Backend mensyaratkan Guru aktif dan penempatan siswa yang valid pada tanggal kejadian. Penugasan wali kelas hanya membuka rekap kelas sesuai cakupannya.
 
-**“Kenapa NIP bukan 18 digit?”**
-Implementasi menyimpan NIP sebagai string unik dan validasi tidak menetapkan format 18 digit. Proyek belum mengunci apakah nilai ini NIP ASN atau nomor internal sekolah; jangan mengklaim format tertentu.
+**“Bagaimana aturan NIP berdasarkan status kepegawaian?”**
+Status kepegawaian menentukan aturan: PNS wajib mengisi tepat 18 digit; PPPK dan Non-PNS boleh kosong, tetapi jika NIP diisi tetap harus 18 digit dan unik. Nilai disimpan sebagai string agar nol di depan tidak hilang.
 
 **“Apakah database aktual sudah cocok dengan ERD?”**
 Yang dapat dipastikan dari repository adalah skema migration. Untuk memastikan database pada PC/server, periksa migrate:status dan struktur tabel langsung pada koneksi yang benar. Jangan menyimpulkan dari ERD atau dump saja.

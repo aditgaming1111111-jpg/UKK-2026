@@ -14,6 +14,11 @@ Jalankan perintah terhadap database yang dikonfigurasi aplikasi. Periksa `APP_EN
 2. `2026_10_01_121847_migrate_users_to_t_users_and_create_t_guru_table.php` mengganti nama tabel akun menjadi `t_users`, mengubah kolom `name` ke `nama`, menambah `role`, dan membuat `t_guru`. Migration berhenti jika tabel `users` berisi data agar pemindahan akun tidak ditentukan secara sembarangan.
 3. `2026_10_01_132222_create_sekolahku_core_tables.php` membuat tabel siswa, kelas, tahun ajaran, penempatan, wali kelas, kategori, jenis pelanggaran, catatan, serta audit sesuai urutan FK. Foreign key memakai perlindungan `restrictOnDelete()` pada relasi historis.
 4. `2026_10_01_155432_add_unique_index_to_t_pelanggaran_kode.php` memeriksa duplikasi kode sebelum menambahkan unique index.
+5. `2026_11_04_113055_add_nis_and_tanggal_lahir_to_t_siswa_table.php` menambah NIS dan tanggal lahir yang nullable/unik sesuai skema.
+6. `2026_11_04_115330_create_t_log_aktivitas_table.php` menambah tabel audit aktivitas umum yang dipakai untuk tindakan Admin dan perubahan administratif.
+7. `2026_11_05_103812_add_status_kepegawaian_to_t_guru_table.php` menambah status kepegawaian, mengubah NIP menjadi nullable dengan panjang maksimal 18, dan membatalkan migration bila menemukan NIP lama lebih dari 18 karakter.
+
+Fitur kenaikan kelas, tinggal kelas, kelulusan massal, dan koreksi tanggal penugasan wali kelas menggunakan tabel/kolom yang sudah tersedia. Fitur tersebut tidak menambah tabel khusus. Sebelas tabel inti ditambah tabel `t_log_aktivitas` membuat jumlah tabel aplikasi berawalan `t_` menjadi 12.
 
 Nama file diawali timestamp agar Laravel mengetahui urutan eksekusi. Skema rinci ada di [Database MySQL](02-database-mysql.md).
 

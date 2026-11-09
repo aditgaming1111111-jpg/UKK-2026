@@ -6,7 +6,7 @@
 |---|---|---|
 | NISN | Wajib tepat 10 digit dan unik; unique index juga ada di skema. | StoreSiswaRequest, UpdateSiswaRequest, migration t_siswa. |
 | Nama siswa/Guru/jenis/kategori/profil | Wajib sesuai form dan maksimal 100 karakter pada request tambah/edit yang relevan. | Store/UpdateSiswaRequest, Store/UpdateGuruRequest, Store/UpdatePelanggaranRequest, pasangan request kategori, UpdateProfileRequest. |
-| NIP Guru | Wajib, string maksimal 255, unik. Tidak ada aturan 18 digit; migration hanya membuat kolom string dan unique. | StoreGuruRequest, UpdateGuruRequest, migration t_guru. |
+| NIP Guru | Status kepegawaian wajib dipilih: PNS, PPPK, atau Non-PNS. PNS wajib mengisi tepat 18 digit; status PPPK/Non-PNS boleh kosong, tetapi NIP yang diisi harus tepat 18 digit dan unik. Kolom disimpan sebagai string 18 karakter agar nol di depan tidak hilang. | StoreGuruRequest, UpdateGuruRequest, Guru, migration 2026_11_05_103812. |
 | Email | Format email dan unik di akun t_users. Form identitas Guru juga memvalidasi agar email tidak bentrok dengan akun lain serta identitas Guru lain. | Store/UpdateGuruRequest, UpdateProfileRequest; t_users punya unique email, t_guru.email tidak punya unique index di migration. |
 | Password login Guru | Minimal 8 karakter dan perlu konfirmasi. | StoreGuruRequest dan update akun terkait. |
 | Ganti password profil | Meminta password saat ini, password baru minimal 8 karakter, dan konfirmasi. Model User memakai cast hashed; seeder juga memakai Hash::make. | UpdatePasswordRequest, User, AuthenticationSeeder. |
@@ -16,7 +16,8 @@
 | Tahun ajaran | Nama unik sesuai Form Request; tanggal selesai tidak boleh sebelum tanggal mulai; manager memeriksa benturan periode. | Store/UpdateTahunAjaranRequest, TahunAjaranManager. |
 | Tanggal kejadian | Wajib tanggal valid dan tidak boleh melewati hari ini. Harus tercakup oleh tanggal penempatan dan tanggal tahun ajaran yang dipilih. | StorePelanggaranSiswaRequest, SearchSiswaPenempatanRequest, PencatatanPelanggaranService. |
 | Koreksi/pembatalan | Alasan diwajibkan; tanggal koreksi divalidasi lagi terhadap konteks penempatan/tahun catatan. | UpdatePelanggaranSiswaRequest, CancelPelanggaranSiswaRequest, RiwayatPelanggaranService. |
-| Penempatan dan wali kelas | ID FK harus ada; tanggal diverifikasi service terhadap periode, dan konflik rentang ditolak. | StorePenempatanKelasRequest, StoreWaliKelasRequest, SiswaPenempatanService, WaliKelasAssignmentService. |
+| Penempatan dan wali kelas | ID FK harus ada; tanggal diverifikasi service terhadap periode, konflik rentang ditolak; koreksi wali kelas mengecualikan record yang sedang diedit dan tetap memeriksa bentrok guru/kelas. | Store/UpdatePenempatanKelasRequest, StoreWaliKelasRequest, UpdateWaliKelasRequest, SiswaPenempatanService, WaliKelasAssignmentService. |
+| Transisi siswa | Transisi massal hanya setelah tahun asal selesai; status siswa dan penempatan asal diperiksa ulang saat proses; kelas target harus sesuai tingkat; duplikasi dan bentrok target ditolak. | ProcessStudentTransitionRequest, StudentTransitionService, StudentTransitionTest. |
 
 Batas validasi aplikasi berbeda dari batas fisik kolom. Contohnya, migration mendefinisikan nama sebagai string standar (umumnya sampai 255 karakter di MySQL), sedangkan Form Request membatasi nama pengguna/jenis/kategori/profil sampai 100. Poin master dan snapshot memakai unsigned small integer di migration, sementara batas bisnis poin master 1–100 ditegakkan request.
 
@@ -44,7 +45,8 @@ Test PHPUnit berbasis feature berada di tests/Feature/. Cakupan penting:
 | AuthenticationTest.php | Login Admin/Guru, kredensial gagal, logout, route internal, lintas role, akun Guru nonaktif. |
 | SiswaManagementTest.php | CRUD/status siswa, NISN duplikat, batas nama, penempatan/riwayat, benturan kelas, detail dan pagination. |
 | GuruManagementTest.php | Identitas-akun Guru, email duplikat, relasi akun, akun tidak aktif, batas nama, pagination dan hak Admin. |
-| KelasManagementTest.php, TahunAjaranManagementTest.php, WaliKelasManagementTest.php | CRUD yang diizinkan, konflik periode, riwayat dan perlindungan akses. |
+| KelasManagementTest.php, TahunAjaranManagementTest.php, WaliKelasManagementTest.php | CRUD yang diizinkan, konflik periode, riwayat dan perlindungan akses; koreksi tanggal wali kelas, audit, penolakan bentrok, dan kelanjutan rekap. |
+| StudentTransitionTest.php | Pratinjau/kenaikan, pemetaan, pengecualian, tinggal kelas, kelulusan, transaksi, deduplikasi, log, dan akses Admin. |
 | PelanggaranMasterManagementTest.php | Kode duplikat, batas poin 1/100, nama 100 karakter, kategori nonaktif, historis setelah master dinonaktifkan. |
 | GuruPencatatanPelanggaranTest.php | Input manipulatif, Guru/poin/status dari server, tanggal dan penempatan, master nonaktif, snapshot poin. |
 | RiwayatPelanggaranTest.php, CatatanSayaTest.php | Cakupan seluruh riwayat Guru vs catatan pribadi, filter, pagination, koreksi/batal, audit dan poin. |
@@ -54,14 +56,14 @@ Test PHPUnit berbasis feature berada di tests/Feature/. Cakupan penting:
 
 ## Hasil run terbaru
 
-Pada 24 Oktober 2026, perintah php artisan test --compact dijalankan setelah audit dokumentasi dan sebelum perubahan dokumentasi:
+Pada 8 November 2026, setelah implementasi koreksi tanggal penugasan wali kelas, perintah `php artisan test --compact` dijalankan:
 
-- **Berhasil:** 112 test.
+- **Berhasil:** 171 test.
 - **Gagal:** 0.
-- **Assertions:** 751.
-- **Durasi yang dilaporkan PHPUnit:** sekitar 11,957 detik.
+- **Assertions:** 1.184.
+- **Durasi yang dilaporkan PHPUnit:** sekitar 12,858 detik.
 
-Perubahan pada pekerjaan ini hanya file Markdown; tidak mengubah perilaku aplikasi. Hasil di atas adalah hasil test yang benar-benar dijalankan, bukan jaminan MySQL produksi atau browser nyata.
+Dokumentasi ini diperbarui pada 9 November 2026 dan tidak mengubah perilaku aplikasi; angka di atas adalah hasil run terakhir yang tercatat, bukan run ulang khusus untuk perubahan Markdown. Hasil test bukan jaminan untuk MySQL produksi atau browser nyata.
 
 ## Yang belum diverifikasi
 

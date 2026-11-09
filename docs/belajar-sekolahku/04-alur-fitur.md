@@ -21,19 +21,22 @@ Dokumen ini menelusuri proses pengguna sampai database dan tampilan. Rute lengka
 
 ## 3. Siswa dan riwayat penempatan
 
-Admin memakai route `admin.students.*` untuk tambah, lihat, ubah, menonaktifkan/mengaktifkan identitas, dan membuat penempatan. Guru memakai `guru.students.*` hanya untuk membaca.
+Admin memakai route `admin.students.*` untuk tambah, lihat, ubah status, membuat/mengoreksi penempatan, dan tindakan histori lain yang diizinkan. Guru tidak memiliki daftar Data Siswa. Guru yang menjadi wali kelas dapat membuka detail siswa hanya dari Rekap Kelas yang ditugaskan; `SiswaPolicy::view` memeriksa penugasan dan penempatan aktif, sehingga URL langsung ke siswa kelas lain ditolak.
 
 - `StoreSiswaRequest` / `UpdateSiswaRequest` menjaga NISN tepat 10 digit dan unik serta memvalidasi nama, jenis kelamin, tahun masuk, dan field terkait.
 - `SiswaReadService::directory` membentuk query pencarian/filter, eager-load penempatan yang dianggap saat ini, lalu pagination 10 data per halaman.
 - `SiswaReadService::detail` mengambil riwayat penempatan, riwayat catatan (dengan cakupan sesuai pengguna), dan ringkasan poin aktif per tahun ajaran.
 - `SiswaPenempatanService` membuat penempatan dalam transaksi dan menolak rentang yang bertentangan. Penempatan lama tidak diganti dengan identitas siswa baru.
 - Foreign key restrict dan aksi status menjaga riwayat tetap terhubung. Catatan historis menyimpan referensi penempatan yang dipilih saat kejadian.
+- Status siswa mencakup aktif, nonaktif, pindah, keluar, dan lulus. Alumni tetap tersimpan dan dapat dicari Admin; kelulusan hanya sah setelah penempatan kelas XII dan tahun ajaran selesai. Siswa lulus tidak menjadi calon pencatatan pelanggaran baru.
+- Penghapusan riwayat penempatan hanya tersedia untuk Admin dan diblokir bila penempatan masih punya catatan pelanggaran atau penghapusan akan membuat siswa aktif kehilangan penempatan pengganti. Penghapusan yang lolos dicatat ke `t_log_aktivitas` dalam transaksi.
+- Di detail tahun ajaran, `StudentTransitionController` dan `StudentTransitionService` menyediakan pratinjau kenaikan kelas, tinggal kelas, pengecualian siswa, dan kelulusan massal. Proses hanya dapat dijalankan setelah tahun asal selesai; kelas tujuan divalidasi, penempatan lama ditutup tetapi disimpan, dan setiap siswa yang diproses dicatat di log.
 
 **Berkas utama:** `app/Http/Controllers/Admin/SiswaController.php`, `app/Http/Controllers/Guru/SiswaController.php`, `app/Services/SiswaReadService.php`, `app/Services/SiswaPenempatanService.php`, `app/Policies/SiswaPolicy.php`, `app/Http/Requests/Admin/*Siswa*.php`, `resources/views/siswa/`.
 
 ## 4. Guru dan akun pengguna
 
-Admin memakai `admin.teachers.*`. Identitas Guru di `t_guru` dan akun di `t_users` dibuat/diubah bersama dalam transaksi. `StoreGuruRequest` memeriksa NIP unik tanpa menetapkan pola 18 digit, nama maksimal 100, email valid dan tidak dipakai akun/data Guru lain, serta password login minimal 8 karakter dan terkonfirmasi. Password di-hash. Admin tidak membutuhkan identitas Guru; akun role Guru harus terkait identitas Guru aktif agar bisa login. Menonaktifkan Guru mempertahankan record, penugasan, dan catatan lamanya.
+Admin memakai `admin.teachers.*`. Identitas Guru di `t_guru` dan akun di `t_users` dibuat/diubah bersama dalam transaksi. Status kepegawaian adalah PNS, PPPK, atau Non-PNS. PNS wajib mempunyai NIP tepat 18 digit; PPPK/Non-PNS boleh mengosongkan NIP, tetapi NIP yang diisi harus 18 digit dan unik. Nama maksimal 100, email valid dan unik untuk akun. Password login minimal 8 karakter dan di-hash. Admin tidak membutuhkan identitas Guru; akun role Guru harus terkait identitas Guru aktif agar bisa login. Menonaktifkan Guru mempertahankan record, penugasan, dan catatan lamanya.
 
 **Berkas:** `app/Http/Controllers/Admin/GuruController.php`, `app/Services/GuruDirectory.php`, `app/Models/Guru.php`, `app/Models/User.php`, `app/Policies/GuruPolicy.php`, `app/Http/Requests/Admin/*Guru*.php`, `resources/views/admin/guru/`.
 
@@ -44,6 +47,8 @@ Ketiga modul ini hanya dapat dikelola Admin.
 - Kelas: `admin.classes.*`; kelas dengan riwayat terkait tidak dihapus permanen.
 - Tahun ajaran: `admin.academic-years.*`; `TahunAjaranManager` menjalankan perubahan yang saling terkait dalam transaksi, memeriksa validitas tanggal dan benturan periode, serta mempertahankan tahun lama.
 - Penugasan wali kelas: route `admin.homeroom-teachers.*`; `WaliKelasAssignmentService::assign` mengunci data kelas/Guru yang terkait, memeriksa Guru aktif dan tumpang tindih, lalu menutup penugasan lama dan membuat penugasan baru dalam transaksi. `close` mengakhiri penugasan dengan tanggal, bukan menghapus sejarah.
+- Detail penugasan juga menyediakan koreksi tanggal mulai/selesai melalui `UpdateWaliKelasRequest` dan `WaliKelasAssignmentService::updateDates`. Koreksi mengecualikan record itu sendiri saat memeriksa bentrok, menguji konflik kelas dan Guru lain, mempertahankan periode tahun ajaran, dan mencatat nilai sebelum/sesudah secara atomik. Tanggal selesai kosong berarti penugasan aktif.
+- Proses siswa massal dibuka dari detail tahun ajaran melalui `admin.academic-years.student-transitions`. Pratinjau memisahkan calon yang memenuhi syarat dari yang ditolak, Admin memetakan kelas, lalu mengecualikan siswa yang tidak diproses. Tinggal kelas memetakan ke tingkat yang sama; kenaikan menuju satu tingkat di atas; kelas XII harus memakai proses tinggal kelas atau kelulusan.
 
 Saat menggunakan rekap, penugasan dicocokkan dengan guru login, kelas, tahun ajaran, dan tanggal periode. Mengubah ID kelas/tahun di URL tidak seharusnya memberi akses ke kelas di luar penugasan karena service menghitung ulang cakupan.
 

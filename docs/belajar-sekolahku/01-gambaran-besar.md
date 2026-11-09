@@ -51,9 +51,10 @@ Contoh login: `LoginRequest` memeriksa format email dan password. `Authenticated
 | Autentikasi dan profil | `/login`, `/profil` | `routes/web.php` → controller auth/profil → Form Request → `t_users` dan `t_guru`. |
 | Dashboard Admin | `/admin` | `AdminDashboardController` membaca siswa/Guru aktif, statistik periode, kategori, catatan, dan aktivitas terbaru. |
 | Dashboard Guru | `/guru` | `GuruDashboardController` membatasi statistik dan catatan terbaru kepada Guru login; kartu rekap hanya jika ditemukan penugasan relevan. |
-| Data siswa | `/admin/siswa`, `/guru/siswa` | Admin mengelola identitas dan penempatan; Guru hanya membaca. `SiswaReadService` menangani daftar, detail, riwayat, dan rekap poin. |
+| Data siswa | `/admin/siswa`, `/guru/rekap-kelas/{tahun}/{kelas}/{siswa}` | Admin mengelola identitas dan penempatan. Guru tidak memiliki menu daftar Data Siswa; wali kelas hanya membuka detail siswa di kelas penugasannya lewat Rekap Kelas. Mendukung arsip alumni, riwayat kelas, koreksi tanggal penempatan, dan penghapusan riwayat yang lolos pemeriksaan keamanan. |
 | Data Guru | `/admin/guru` | Identitas `t_guru` dan akun `t_users` dikelola Admin dalam relasi satu-ke-satu. |
-| Data akademik | `/admin/kelas`, `/admin/tahun-ajaran`, `/admin/wali-kelas` | Pengelolaan Admin mempertahankan periode dan riwayat penempatan/penugasan. |
+| Data akademik | `/admin/kelas`, `/admin/tahun-ajaran`, `/admin/wali-kelas` | Pengelolaan Admin mempertahankan periode dan riwayat penempatan/penugasan; tanggal wali kelas dapat dikoreksi dengan validasi bentrok dan audit. |
+| Transisi siswa | `/admin/tahun-ajaran/{tahunAjaran}/proses-siswa` | Pratinjau, pemetaan kelas, pengecualian siswa, kenaikan kelas, tinggal kelas, dan kelulusan massal setelah tahun asal selesai. |
 | Master pelanggaran | `/admin/kategori-pelanggaran`, `/admin/jenis-pelanggaran` | Admin mengelola master; jenis yang tersedia untuk pencatatan harus aktif bersama kategorinya. |
 | Catat pelanggaran | `/guru/pelanggaran/create` | AJAX mencari penempatan yang cocok dengan tanggal kejadian; backend mengulang validasi dan menentukan Guru, poin, status, dan audit. |
 | Riwayat dan Catatan Saya | `/guru/pelanggaran/riwayat`, `/guru/catatan-saya` | Riwayat adalah seluruh catatan yang boleh dilihat Guru; Catatan Saya tetap disaring ke pencatat yang sedang login. |
@@ -62,6 +63,17 @@ Contoh login: `LoginRequest` memeriksa format email dan password. `Authenticated
 | Log aktivitas | `/admin/log-pelanggaran` | Log catatan ditampilkan read-only melalui halaman Admin. |
 
 Route, controller, validasi, dan file pendukung dijabarkan di [alur fitur](04-alur-fitur.md) dan [panduan membaca kode](05-panduan-membaca-kode.md).
+
+## Perubahan penting yang sudah masuk
+
+- Autentikasi dua role, proteksi route, layout Admin/Guru, dashboard berbasis query, dan komponen Blade/Tailwind reusable.
+- Modul identitas siswa/Guru, akun, kelas, tahun ajaran, penempatan siswa, dan penugasan wali kelas dengan perlindungan histori.
+- Master kategori/jenis pelanggaran dengan batas poin 1-100; pencatatan menyimpan snapshot poin, tanggal kejadian, konteks penempatan, dan identitas Guru dari akun login.
+- Riwayat bersama yang diizinkan, Catatan Saya yang personal, koreksi/pembatalan dengan audit, rekap wali kelas, laporan Admin, PDF/Excel, filter, dan pagination.
+- Status alumni, penghapusan riwayat penempatan yang terkendali, transisi siswa massal, status kepegawaian PNS/PPPK/Non-PNS, dan koreksi tanggal penugasan wali kelas.
+- Penyempurnaan antarmuka monochrome, responsif, modal konsisten, pencarian dan filter, serta navigasi role.
+
+Untuk panduan langkah pengguna, daftar tools, alasan desain, dan tanya jawab teknis penguji, lihat [Panduan penggunaan dan tanya jawab](08-panduan-penggunaan-dan-tanya-jawab.md).
 
 ## Batas verifikasi
 

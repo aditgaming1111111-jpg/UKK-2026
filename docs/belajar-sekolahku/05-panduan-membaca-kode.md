@@ -59,6 +59,12 @@ RiwayatPelanggaranService::update (sekitar baris 17–50) memulai transaksi, men
 
 Route rekap berada di routes/guru.php (baris 16–19), seluruhnya tetap dalam grup role:guru. RekapKelasController memanggil RekapWaliKelasReport; service memvalidasi assignment dan parameter kelas/tahun yang diminta terhadap penugasan Guru login sebelum membentuk query penempatan/catatan. Ringkasan aktif dibangun dengan agregat pada poin_saat_dicatat dan kondisi status; tabel rincian mengambil record secara terpisah. Cara ini menghindari mencampur kolom detail dengan agregat tanpa pengelompokan. PDF menggunakan Pdf::loadView; Excel memakai Excel::download dan dua sheet export khusus.
 
+## Contoh nyata: transisi siswa dan audit aktivitas
+
+Detail tahun ajaran memanggil `StudentTransitionController::show` untuk membangun pratinjau dan `store` untuk menerima konfirmasi. `ProcessStudentTransitionRequest` memvalidasi mode, tahun tujuan, pemetaan kelas, daftar pengecualian, dan hak Admin. `StudentTransitionService::process` mengulang validasi data mutable, menggunakan transaksi, menutup penempatan lama, membuat penempatan baru untuk kenaikan/tinggal kelas atau menandai lulus, lalu mencatat satu aktivitas per siswa. File utamanya: `routes/admin.php`, `app/Http/Controllers/Admin/StudentTransitionController.php`, `app/Services/StudentTransitionService.php`, dan `tests/Feature/StudentTransitionTest.php`.
+
+Koreksi tanggal wali kelas berjalan dari route Admin ke `UpdateWaliKelasRequest`, Policy, lalu `WaliKelasAssignmentService::updateDates`. Service tidak membuat penugasan baru; ia mengunci dan memperbarui record lama, memeriksa periode/bentrok, dan controller menulis deskripsi sebelum/sesudah dalam transaksi yang sama. `WaliKelasManagementTest` memeriksa koreksi tanggal, audit, bentrok, hak akses, dan jumlah poin pada rekap.
+
 ## Cara menelusuri fitur lain
 
 Contoh daftar siswa:
