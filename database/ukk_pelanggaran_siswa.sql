@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Nov 04, 2026 at 11:10 PM
+-- Generation Time: Nov 09, 2026 at 08:57 AM
 -- Server version: 8.4.3
--- PHP Version: 8.3.30
+-- PHP Version: 8.3.33
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -28,8 +28,8 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `cache` (
-  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `value` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `expiration` bigint NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -40,8 +40,8 @@ CREATE TABLE `cache` (
 --
 
 CREATE TABLE `cache_locks` (
-  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `owner` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `owner` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `expiration` bigint NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -53,11 +53,11 @@ CREATE TABLE `cache_locks` (
 
 CREATE TABLE `failed_jobs` (
   `id` bigint UNSIGNED NOT NULL,
-  `uuid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `connection` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `queue` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `exception` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `uuid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `connection` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `exception` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -69,8 +69,8 @@ CREATE TABLE `failed_jobs` (
 
 CREATE TABLE `jobs` (
   `id` bigint UNSIGNED NOT NULL,
-  `queue` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `attempts` smallint UNSIGNED NOT NULL,
   `reserved_at` int UNSIGNED DEFAULT NULL,
   `available_at` int UNSIGNED NOT NULL,
@@ -84,13 +84,13 @@ CREATE TABLE `jobs` (
 --
 
 CREATE TABLE `job_batches` (
-  `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `total_jobs` int NOT NULL,
   `pending_jobs` int NOT NULL,
   `failed_jobs` int NOT NULL,
-  `failed_job_ids` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `options` mediumtext COLLATE utf8mb4_unicode_ci,
+  `failed_job_ids` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `options` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `cancelled_at` int DEFAULT NULL,
   `created_at` int NOT NULL,
   `finished_at` int DEFAULT NULL
@@ -104,7 +104,7 @@ CREATE TABLE `job_batches` (
 
 CREATE TABLE `migrations` (
   `id` int UNSIGNED NOT NULL,
-  `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `migration` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -130,8 +130,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 --
 
 CREATE TABLE `password_reset_tokens` (
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -142,21 +142,17 @@ CREATE TABLE `password_reset_tokens` (
 --
 
 CREATE TABLE `sessions` (
-  `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` bigint UNSIGNED DEFAULT NULL,
-  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_agent` text COLLATE utf8mb4_unicode_ci,
-  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `last_activity` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `sessions`
 --
-
-INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('eLOy3uJNuZ6BjUMm0wp35bZMYqUaezYUQXDweO98', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJIT3ZEMXZLQjVsemdWSzFwTDl5WklQVFEwc05GVzdDVWxSMGZDakF1IiwiX3ByZXZpb3VzIjp7InVybCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDAwXC9sb2dpbiIsInJvdXRlIjoibG9naW4ifSwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119fQ==', 1793833786),
-('Yv2v2OpCWo6Ip7kJK6fNRDrHz9KDXIPi2XqYa6ZD', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJpN3JKdmd4NXNLN3U2NG5sVVpRc0xCaHFicFJEeExINDBMd3lCbVU0IiwiX2ZsYXNoIjp7Im5ldyI6W10sIm9sZCI6W119LCJfcHJldmlvdXMiOnsidXJsIjoiaHR0cDpcL1wvMTI3LjAuMC4xOjgwMDBcL2xvZ2luIiwicm91dGUiOiJsb2dpbiJ9fQ==', 1793833783);
 
 -- --------------------------------------------------------
 
@@ -166,10 +162,10 @@ INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, 
 
 CREATE TABLE `t_guru` (
   `id` bigint UNSIGNED NOT NULL,
-  `nip` varchar(18) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `status_kepegawaian` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `nama` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nip` varchar(18) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status_kepegawaian` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nama` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `status_aktif` tinyint(1) NOT NULL DEFAULT '1',
   `user_id` bigint UNSIGNED NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -208,11 +204,11 @@ INSERT INTO `t_guru` (`id`, `nip`, `status_kepegawaian`, `nama`, `email`, `statu
 (26, '202600000000000025', NULL, 'Asep Taufiq Hidayat, S.Kom', 'aseptaufiqhidayat@sekolahku.com', 1, 27, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
 (27, '202600000000000026', NULL, 'Rendy Ichsan Kusumah, S.T', 'rendyichsankusumah@sekolahku.com', 1, 28, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
 (28, '202600000000000027', NULL, 'Feri Rahmawan, S.Pd', 'ferirahmawan@sekolahku.com', 1, 29, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(29, '202600000000000028', NULL, 'Ari Sandriana, S.Kom', 'arisandriana@sekolahku.com', 1, 30, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(29, '202600000000000028', 'PNS', 'Ari Sandriana, S.Kom', 'arisandriana@sekolahku.com', 1, 30, '2026-11-04 15:01:22', '2026-11-09 00:53:30'),
 (30, '202600000000000029', NULL, 'Yaneu Nurdian, S.Pd., M.Pd', 'yaneunurdian@sekolahku.com', 1, 31, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
 (31, '202600000000000030', NULL, 'Ucu Muhammad Khoer N, S.Pd', 'ucumuhammadkhoern@sekolahku.com', 1, 32, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
 (32, '202600000000000031', NULL, 'Mira Dwi Rahmawati, S.Ag', 'miradwirahmawati@sekolahku.com', 1, 33, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(33, '202600000000000032', NULL, 'Aldi Maulana, S.Pd', 'aldimaulana@sekolahku.com', 1, 34, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(33, '202600000000000032', 'PNS', 'Aldi Maulana, S.Pd', 'aldimaulana@sekolahku.com', 1, 34, '2026-11-04 15:01:22', '2026-11-09 00:53:21'),
 (34, '202600000000000033', NULL, 'Eli Rosliah, S.Pd', 'elirosliah@sekolahku.com', 1, 35, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
 (35, '202600000000000034', NULL, 'Isni Nur Fitriani, S.Pd', 'isninurfitriani@sekolahku.com', 1, 36, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
 (36, '202600000000000035', NULL, 'Aanisah Putri Nur Aini, S.Pd', 'aanisahputrinuraini@sekolahku.com', 1, 37, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
@@ -245,9 +241,9 @@ INSERT INTO `t_guru` (`id`, `nip`, `status_kepegawaian`, `nama`, `email`, `statu
 
 CREATE TABLE `t_kelas` (
   `id` bigint UNSIGNED NOT NULL,
-  `nama_kelas` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `tingkat` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `jurusan` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nama_kelas` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tingkat` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `jurusan` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -258,7 +254,10 @@ CREATE TABLE `t_kelas` (
 
 INSERT INTO `t_kelas` (`id`, `nama_kelas`, `tingkat`, `jurusan`, `created_at`, `updated_at`) VALUES
 (1, 'XII RPL 1', '12', 'Rekayasa Perangkat Lunak', '2026-11-04 08:03:36', '2026-11-04 08:03:36'),
-(2, 'XII RPL 2', '12', 'Rekayasa Perangkat Lunak', '2026-11-04 08:03:52', '2026-11-04 08:03:52');
+(2, 'XII RPL 2', '12', 'Rekayasa Perangkat Lunak', '2026-11-04 08:03:52', '2026-11-04 08:03:52'),
+(3, 'XII TKR 3', '12', 'Teknik Kendaraan Ringan', '2026-11-09 07:22:48', '2026-11-09 01:53:26'),
+(4, 'XII TKJ 4', '12', 'Teknik Komputer dan Jaringan', '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(5, 'XII TSM 3', '12', 'Teknik Sepeda Motor', '2026-11-09 07:49:39', '2026-11-09 07:49:39');
 
 -- --------------------------------------------------------
 
@@ -285,54 +284,151 @@ CREATE TABLE `t_kelas_siswa` (
 INSERT INTO `t_kelas_siswa` (`id`, `siswa_id`, `kelas_id`, `tahun_ajaran_id`, `tanggal_mulai`, `tanggal_selesai`, `status_aktif`, `created_at`, `updated_at`) VALUES
 (1, 1, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 08:10:57', '2026-11-04 08:10:57'),
 (2, 2, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 08:11:16', '2026-11-04 08:11:16'),
-(3, 27, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 08:11:35', '2026-11-04 08:11:35'),
-(4, 75, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 08:22:23', '2026-11-04 08:22:23'),
-(5, 76, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:44:19', '2026-11-04 15:44:19'),
-(6, 77, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:44:41', '2026-11-04 15:44:41'),
-(7, 51, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:44:59', '2026-11-04 15:44:59'),
-(8, 52, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:45:17', '2026-11-04 15:45:17'),
-(9, 53, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:46:00', '2026-11-04 15:46:00'),
-(10, 78, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:46:21', '2026-11-04 15:46:21'),
-(11, 79, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:46:42', '2026-11-04 15:46:42'),
-(12, 80, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:47:09', '2026-11-04 15:47:09'),
-(13, 54, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:47:35', '2026-11-04 15:47:35'),
-(14, 81, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:47:54', '2026-11-04 15:47:54'),
-(15, 82, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:48:19', '2026-11-04 15:48:19'),
-(16, 83, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:48:45', '2026-11-04 15:48:45'),
-(17, 55, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:49:04', '2026-11-04 15:49:04'),
-(18, 84, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:49:25', '2026-11-04 15:49:25'),
-(19, 56, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:49:42', '2026-11-04 15:49:42'),
-(20, 85, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:50:02', '2026-11-04 15:50:02'),
-(21, 86, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:50:23', '2026-11-04 15:50:23'),
-(22, 57, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:50:48', '2026-11-04 15:50:48'),
-(23, 87, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:51:07', '2026-11-04 15:51:07'),
-(24, 58, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:51:35', '2026-11-04 15:51:35'),
-(25, 59, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:51:56', '2026-11-04 15:51:56'),
-(26, 88, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:52:18', '2026-11-04 15:52:18'),
-(27, 89, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:52:39', '2026-11-04 15:52:39'),
-(28, 60, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:52:57', '2026-11-04 15:52:57'),
-(29, 90, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:53:14', '2026-11-04 15:53:14'),
-(30, 61, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:53:31', '2026-11-04 15:53:31'),
-(31, 91, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:53:50', '2026-11-04 15:53:50'),
-(32, 92, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:54:08', '2026-11-04 15:54:08'),
-(33, 62, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:54:29', '2026-11-04 15:54:29'),
-(34, 93, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:54:47', '2026-11-04 15:54:47'),
-(35, 63, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:55:03', '2026-11-04 15:55:03'),
-(36, 94, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:55:20', '2026-11-04 15:55:20'),
-(37, 64, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:55:38', '2026-11-04 15:55:38'),
-(38, 65, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:55:57', '2026-11-04 15:55:57'),
-(39, 66, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:56:13', '2026-11-04 15:56:13'),
-(40, 95, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:56:33', '2026-11-04 15:56:33'),
-(41, 67, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:56:55', '2026-11-04 15:56:55'),
-(42, 68, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:57:10', '2026-11-04 15:57:10'),
-(43, 96, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:57:28', '2026-11-04 15:57:28'),
-(44, 69, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:57:43', '2026-11-04 15:57:43'),
-(45, 70, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:57:58', '2026-11-04 15:57:58'),
-(46, 71, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:58:13', '2026-11-04 15:58:13'),
-(47, 72, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:58:30', '2026-11-04 15:58:30'),
-(48, 73, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:58:45', '2026-11-04 15:58:45'),
-(49, 97, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:59:04', '2026-11-04 15:59:04'),
-(50, 74, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:59:22', '2026-11-04 15:59:22');
+(3, 3, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 08:11:35', '2026-11-04 08:11:35'),
+(4, 28, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 08:22:23', '2026-11-04 08:22:23'),
+(5, 29, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:44:19', '2026-11-04 15:44:19'),
+(6, 30, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:44:41', '2026-11-04 15:44:41'),
+(7, 4, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:44:59', '2026-11-04 15:44:59'),
+(8, 5, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:45:17', '2026-11-04 15:45:17'),
+(9, 6, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:46:00', '2026-11-04 15:46:00'),
+(10, 31, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:46:21', '2026-11-04 15:46:21'),
+(11, 32, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:46:42', '2026-11-04 15:46:42'),
+(12, 33, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:47:09', '2026-11-04 15:47:09'),
+(13, 7, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:47:35', '2026-11-04 15:47:35'),
+(14, 34, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:47:54', '2026-11-04 15:47:54'),
+(15, 35, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:48:19', '2026-11-04 15:48:19'),
+(16, 36, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:48:45', '2026-11-04 15:48:45'),
+(17, 8, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:49:04', '2026-11-04 15:49:04'),
+(18, 37, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:49:25', '2026-11-04 15:49:25'),
+(19, 9, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:49:42', '2026-11-04 15:49:42'),
+(20, 38, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:50:02', '2026-11-04 15:50:02'),
+(21, 39, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:50:23', '2026-11-04 15:50:23'),
+(22, 10, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:50:48', '2026-11-04 15:50:48'),
+(23, 40, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:51:07', '2026-11-04 15:51:07'),
+(24, 11, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:51:35', '2026-11-04 15:51:35'),
+(25, 12, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:51:56', '2026-11-04 15:51:56'),
+(26, 41, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:52:18', '2026-11-04 15:52:18'),
+(27, 42, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:52:39', '2026-11-04 15:52:39'),
+(28, 13, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:52:57', '2026-11-04 15:52:57'),
+(29, 43, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:53:14', '2026-11-04 15:53:14'),
+(30, 14, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:53:31', '2026-11-04 15:53:31'),
+(31, 44, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:53:50', '2026-11-04 15:53:50'),
+(32, 45, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:54:08', '2026-11-04 15:54:08'),
+(33, 15, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:54:29', '2026-11-04 15:54:29'),
+(34, 46, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:54:47', '2026-11-04 15:54:47'),
+(35, 16, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:55:03', '2026-11-04 15:55:03'),
+(36, 47, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:55:20', '2026-11-04 15:55:20'),
+(37, 17, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:55:38', '2026-11-04 15:55:38'),
+(38, 18, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:55:57', '2026-11-04 15:55:57'),
+(39, 19, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:56:13', '2026-11-04 15:56:13'),
+(40, 48, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:56:33', '2026-11-04 15:56:33'),
+(41, 20, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:56:55', '2026-11-04 15:56:55'),
+(42, 21, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:57:10', '2026-11-04 15:57:10'),
+(43, 49, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:57:28', '2026-11-04 15:57:28'),
+(44, 22, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:57:43', '2026-11-04 15:57:43'),
+(45, 23, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:57:58', '2026-11-04 15:57:58'),
+(46, 24, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:58:13', '2026-11-04 15:58:13'),
+(47, 25, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:58:30', '2026-11-04 15:58:30'),
+(48, 26, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:58:45', '2026-11-04 15:58:45'),
+(49, 50, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 15:59:04', '2026-11-04 15:59:04'),
+(50, 27, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 15:59:22', '2026-11-04 15:59:22'),
+(51, 51, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(52, 52, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(53, 53, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(54, 54, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(55, 55, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(56, 56, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(57, 57, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(58, 58, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(59, 59, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(60, 60, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(61, 61, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(62, 62, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(63, 63, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(64, 64, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(65, 65, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(66, 66, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(67, 67, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(68, 68, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(69, 69, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(70, 70, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(71, 71, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(72, 72, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(73, 73, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(74, 74, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(75, 75, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(76, 76, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(77, 77, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(78, 78, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(79, 79, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(80, 80, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(81, 81, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(82, 82, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(83, 83, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(114, 84, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(115, 85, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(116, 86, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(117, 87, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(118, 88, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(119, 89, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(120, 90, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(121, 91, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(122, 92, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(123, 93, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(124, 94, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(125, 95, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(126, 96, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(127, 97, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(128, 98, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(129, 99, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(130, 100, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(131, 101, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(132, 102, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(133, 103, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(134, 104, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(135, 105, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(136, 106, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(137, 107, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(138, 108, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(139, 109, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(140, 110, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(141, 111, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(142, 112, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(143, 113, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(144, 114, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(145, 115, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(146, 116, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(177, 117, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(178, 118, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(179, 119, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(180, 120, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(181, 121, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(182, 122, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(183, 123, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(184, 124, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(185, 125, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(186, 126, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(187, 127, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(188, 128, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(189, 129, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(190, 130, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(191, 131, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(192, 132, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(193, 133, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(194, 134, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(195, 135, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(196, 136, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(197, 137, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(198, 138, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(199, 139, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(200, 140, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(201, 141, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(202, 142, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(203, 143, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(204, 144, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(205, 145, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(206, 146, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39'),
+(207, 147, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39');
 
 -- --------------------------------------------------------
 
@@ -343,10 +439,10 @@ INSERT INTO `t_kelas_siswa` (`id`, `siswa_id`, `kelas_id`, `tahun_ajaran_id`, `t
 CREATE TABLE `t_log_aktivitas` (
   `id` bigint UNSIGNED NOT NULL,
   `user_id` bigint UNSIGNED NOT NULL,
-  `aktivitas` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `deskripsi` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_agent` text COLLATE utf8mb4_unicode_ci,
+  `aktivitas` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `deskripsi` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -422,7 +518,61 @@ INSERT INTO `t_log_aktivitas` (`id`, `user_id`, `aktivitas`, `deskripsi`, `ip_ad
 (65, 1, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #74 dicatat dengan ID #50.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 15:59:22'),
 (66, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 16:07:10'),
 (67, 30, 'Login', 'Pengguna berhasil masuk sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 16:07:27'),
-(68, 30, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 16:09:43');
+(68, 30, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-04 16:09:43'),
+(69, 1, 'Login', 'Pengguna berhasil masuk sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-08 23:19:31'),
+(70, 1, 'Tanggal penugasan wali kelas dikoreksi', 'Penugasan ID #2 (guru #33, kelas #2, tahun ajaran #1) dikoreksi. Sebelum: {\"tanggal_mulai\":\"2027-06-18\",\"tanggal_selesai\":null,\"status_aktif\":true}. Sesudah: {\"tanggal_mulai\":\"2026-07-13\",\"tanggal_selesai\":null,\"status_aktif\":true}.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-08 23:19:56'),
+(71, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-08 23:31:19'),
+(72, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-08 23:32:26'),
+(73, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-08 23:39:18'),
+(74, 1, 'Login', 'Pengguna berhasil masuk sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-08 23:39:25'),
+(75, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-08 23:50:44'),
+(76, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-08 23:50:54'),
+(77, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-08 23:51:07'),
+(78, 1, 'Login', 'Pengguna berhasil masuk sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-08 23:51:29'),
+(79, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-08 23:59:52'),
+(80, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:00:00'),
+(81, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:01:19'),
+(82, 3, 'Login', 'Pengguna berhasil masuk sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:01:33'),
+(83, 3, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:02:52'),
+(84, 1, 'Login', 'Pengguna berhasil masuk sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:02:58'),
+(85, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:08:13'),
+(86, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:08:20'),
+(87, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:08:21'),
+(88, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:08:57'),
+(89, 1, 'Login', 'Pengguna berhasil masuk sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:09:03'),
+(90, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:29:05'),
+(91, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:29:18'),
+(92, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:41:01'),
+(93, 1, 'Login', 'Pengguna berhasil masuk sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:41:20'),
+(94, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:50:40'),
+(95, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:50:47'),
+(96, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:51:45'),
+(97, 1, 'Login', 'Pengguna berhasil masuk sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:51:51'),
+(98, 1, 'Data Guru diperbarui', 'Identitas Guru ID #33 berhasil diperbarui.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:53:21'),
+(99, 1, 'Data Guru diperbarui', 'Identitas Guru ID #29 berhasil diperbarui.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:53:30'),
+(100, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:53:36'),
+(101, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:53:46'),
+(102, 34, 'Pelanggaran dicatat', 'Catatan pelanggaran siswa ID #1 berhasil dibuat.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:54:42'),
+(103, 34, 'Pelanggaran dicatat', 'Catatan pelanggaran siswa ID #2 berhasil dibuat.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:55:22'),
+(104, 34, 'Pelanggaran dicatat', 'Catatan pelanggaran siswa ID #3 berhasil dibuat.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:56:07'),
+(105, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:56:09'),
+(106, 3, 'Login', 'Pengguna berhasil masuk sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:56:15'),
+(107, 3, 'Pelanggaran dicatat', 'Catatan pelanggaran siswa ID #4 berhasil dibuat.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:56:40'),
+(108, 3, 'Pelanggaran dicatat', 'Catatan pelanggaran siswa ID #5 berhasil dibuat.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:57:17'),
+(109, 3, 'Pelanggaran dicatat', 'Catatan pelanggaran siswa ID #6 berhasil dibuat.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:57:31'),
+(110, 3, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:58:05'),
+(111, 30, 'Login', 'Pengguna berhasil masuk sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:58:23'),
+(112, 30, 'Pelanggaran dicatat', 'Catatan pelanggaran siswa ID #7 berhasil dibuat.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:58:37'),
+(113, 30, 'Pelanggaran dicatat', 'Catatan pelanggaran siswa ID #8 berhasil dibuat.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:58:55'),
+(114, 30, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:58:57'),
+(115, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:59:02'),
+(116, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 01:00:27'),
+(117, 1, 'Login', 'Pengguna berhasil masuk sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 01:00:32'),
+(118, 1, 'Kelas diperbarui', 'Data kelas ID #3 berhasil diperbarui.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 01:53:26'),
+(119, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 01:54:53'),
+(120, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 01:55:01'),
+(121, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 01:55:03'),
+(122, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 01:56:45');
 
 -- --------------------------------------------------------
 
@@ -434,12 +584,26 @@ CREATE TABLE `t_log_pelanggaran` (
   `id` bigint UNSIGNED NOT NULL,
   `pelanggaran_siswa_id` bigint UNSIGNED NOT NULL,
   `user_id` bigint UNSIGNED NOT NULL,
-  `aksi` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `data_sebelum` text COLLATE utf8mb4_unicode_ci,
-  `data_sesudah` text COLLATE utf8mb4_unicode_ci,
-  `alasan` text COLLATE utf8mb4_unicode_ci,
+  `aksi` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `data_sebelum` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `data_sesudah` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `alasan` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `t_log_pelanggaran`
+--
+
+INSERT INTO `t_log_pelanggaran` (`id`, `pelanggaran_siswa_id`, `user_id`, `aksi`, `data_sebelum`, `data_sesudah`, `alasan`, `created_at`) VALUES
+(1, 1, 34, 'tambah', NULL, '{\"kelas_siswa_id\":19,\"pelanggaran_id\":4,\"guru_id\":33,\"tanggal_pelanggaran\":\"2026-11-09 00:00:00\",\"tanggal_dicatat\":\"2026-11-09 07:54:42\",\"poin_saat_dicatat\":10,\"keterangan\":\"Bolos pelajaran matematika\",\"tindakan\":\"Cuman test ajaa\",\"status\":\"aktif\",\"updated_at\":\"2026-11-09 07:54:42\",\"created_at\":\"2026-11-09 07:54:42\",\"id\":1}', 'Pencatatan awal', '2026-11-09 00:54:42'),
+(2, 2, 34, 'tambah', NULL, '{\"kelas_siswa_id\":34,\"pelanggaran_id\":19,\"guru_id\":33,\"tanggal_pelanggaran\":\"2026-11-09 00:00:00\",\"tanggal_dicatat\":\"2026-11-09 07:55:22\",\"poin_saat_dicatat\":15,\"keterangan\":\"cuman test ajaa\",\"tindakan\":\"cuman test ajaa\",\"status\":\"aktif\",\"updated_at\":\"2026-11-09 07:55:22\",\"created_at\":\"2026-11-09 07:55:22\",\"id\":2}', 'Pencatatan awal', '2026-11-09 00:55:22'),
+(3, 3, 34, 'tambah', NULL, '{\"kelas_siswa_id\":125,\"pelanggaran_id\":7,\"guru_id\":33,\"tanggal_pelanggaran\":\"2026-11-09 00:00:00\",\"tanggal_dicatat\":\"2026-11-09 07:56:07\",\"poin_saat_dicatat\":5,\"keterangan\":\"cuman test ajaa\",\"tindakan\":\"cuman test ajaa\",\"status\":\"aktif\",\"updated_at\":\"2026-11-09 07:56:07\",\"created_at\":\"2026-11-09 07:56:07\",\"id\":3}', 'Pencatatan awal', '2026-11-09 00:56:07'),
+(4, 4, 3, 'tambah', NULL, '{\"kelas_siswa_id\":25,\"pelanggaran_id\":7,\"guru_id\":2,\"tanggal_pelanggaran\":\"2026-11-09 00:00:00\",\"tanggal_dicatat\":\"2026-11-09 07:56:40\",\"poin_saat_dicatat\":5,\"keterangan\":\"cuman test ajaa\",\"tindakan\":\"cuman test ajaa\",\"status\":\"aktif\",\"updated_at\":\"2026-11-09 07:56:40\",\"created_at\":\"2026-11-09 07:56:40\",\"id\":4}', 'Pencatatan awal', '2026-11-09 00:56:40'),
+(5, 5, 3, 'tambah', NULL, '{\"kelas_siswa_id\":45,\"pelanggaran_id\":18,\"guru_id\":2,\"tanggal_pelanggaran\":\"2026-11-09 00:00:00\",\"tanggal_dicatat\":\"2026-11-09 07:57:16\",\"poin_saat_dicatat\":10,\"keterangan\":\"cuman test ajaa\",\"tindakan\":\"cuman test ajaa\",\"status\":\"aktif\",\"updated_at\":\"2026-11-09 07:57:16\",\"created_at\":\"2026-11-09 07:57:16\",\"id\":5}', 'Pencatatan awal', '2026-11-09 00:57:16'),
+(6, 6, 3, 'tambah', NULL, '{\"kelas_siswa_id\":19,\"pelanggaran_id\":7,\"guru_id\":2,\"tanggal_pelanggaran\":\"2026-11-09 00:00:00\",\"tanggal_dicatat\":\"2026-11-09 07:57:30\",\"poin_saat_dicatat\":5,\"keterangan\":\"cuman test ajaa\",\"tindakan\":\"cuman test ajaa\",\"status\":\"aktif\",\"updated_at\":\"2026-11-09 07:57:30\",\"created_at\":\"2026-11-09 07:57:30\",\"id\":6}', 'Pencatatan awal', '2026-11-09 00:57:31'),
+(7, 7, 30, 'tambah', NULL, '{\"kelas_siswa_id\":19,\"pelanggaran_id\":7,\"guru_id\":29,\"tanggal_pelanggaran\":\"2026-11-09 00:00:00\",\"tanggal_dicatat\":\"2026-11-09 07:58:37\",\"poin_saat_dicatat\":5,\"keterangan\":\"cuman test ajaa\",\"tindakan\":\"cuman test ajaa\",\"status\":\"aktif\",\"updated_at\":\"2026-11-09 07:58:37\",\"created_at\":\"2026-11-09 07:58:37\",\"id\":7}', 'Pencatatan awal', '2026-11-09 00:58:37'),
+(8, 8, 30, 'tambah', NULL, '{\"kelas_siswa_id\":13,\"pelanggaran_id\":1,\"guru_id\":29,\"tanggal_pelanggaran\":\"2026-11-09 00:00:00\",\"tanggal_dicatat\":\"2026-11-09 07:58:55\",\"poin_saat_dicatat\":5,\"keterangan\":\"cuman test ajaa\",\"tindakan\":\"cuman test ajaa\",\"status\":\"aktif\",\"updated_at\":\"2026-11-09 07:58:55\",\"created_at\":\"2026-11-09 07:58:55\",\"id\":8}', 'Pencatatan awal', '2026-11-09 00:58:55');
 
 -- --------------------------------------------------------
 
@@ -450,9 +614,9 @@ CREATE TABLE `t_log_pelanggaran` (
 CREATE TABLE `t_pelanggaran` (
   `id` bigint UNSIGNED NOT NULL,
   `kategori_id` bigint UNSIGNED NOT NULL,
-  `kode` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `nama_pelanggaran` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `deskripsi` text COLLATE utf8mb4_unicode_ci,
+  `kode` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nama_pelanggaran` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `deskripsi` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `poin` smallint UNSIGNED NOT NULL,
   `status_aktif` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -498,8 +662,8 @@ INSERT INTO `t_pelanggaran` (`id`, `kategori_id`, `kode`, `nama_pelanggaran`, `d
 
 CREATE TABLE `t_pelanggaran_kategori` (
   `id` bigint UNSIGNED NOT NULL,
-  `nama_kategori` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `deskripsi` text COLLATE utf8mb4_unicode_ci,
+  `nama_kategori` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `deskripsi` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `status_aktif` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -530,12 +694,26 @@ CREATE TABLE `t_pelanggaran_siswa` (
   `tanggal_pelanggaran` date NOT NULL,
   `tanggal_dicatat` datetime NOT NULL,
   `poin_saat_dicatat` smallint UNSIGNED NOT NULL,
-  `keterangan` text COLLATE utf8mb4_unicode_ci,
-  `tindakan` text COLLATE utf8mb4_unicode_ci,
-  `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'aktif',
+  `keterangan` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `tindakan` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'aktif',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `t_pelanggaran_siswa`
+--
+
+INSERT INTO `t_pelanggaran_siswa` (`id`, `kelas_siswa_id`, `pelanggaran_id`, `guru_id`, `tanggal_pelanggaran`, `tanggal_dicatat`, `poin_saat_dicatat`, `keterangan`, `tindakan`, `status`, `created_at`, `updated_at`) VALUES
+(1, 19, 4, 33, '2026-11-09', '2026-11-09 07:54:42', 10, 'Bolos pelajaran matematika', 'Cuman test ajaa', 'aktif', '2026-11-09 00:54:42', '2026-11-09 00:54:42'),
+(2, 34, 19, 33, '2026-11-09', '2026-11-09 07:55:22', 15, 'cuman test ajaa', 'cuman test ajaa', 'aktif', '2026-11-09 00:55:22', '2026-11-09 00:55:22'),
+(3, 125, 7, 33, '2026-11-09', '2026-11-09 07:56:07', 5, 'cuman test ajaa', 'cuman test ajaa', 'aktif', '2026-11-09 00:56:07', '2026-11-09 00:56:07'),
+(4, 25, 7, 2, '2026-11-09', '2026-11-09 07:56:40', 5, 'cuman test ajaa', 'cuman test ajaa', 'aktif', '2026-11-09 00:56:40', '2026-11-09 00:56:40'),
+(5, 45, 18, 2, '2026-11-09', '2026-11-09 07:57:16', 10, 'cuman test ajaa', 'cuman test ajaa', 'aktif', '2026-11-09 00:57:16', '2026-11-09 00:57:16'),
+(6, 19, 7, 2, '2026-11-09', '2026-11-09 07:57:30', 5, 'cuman test ajaa', 'cuman test ajaa', 'aktif', '2026-11-09 00:57:30', '2026-11-09 00:57:30'),
+(7, 19, 7, 29, '2026-11-09', '2026-11-09 07:58:37', 5, 'cuman test ajaa', 'cuman test ajaa', 'aktif', '2026-11-09 00:58:37', '2026-11-09 00:58:37'),
+(8, 13, 1, 29, '2026-11-09', '2026-11-09 07:58:55', 5, 'cuman test ajaa', 'cuman test ajaa', 'aktif', '2026-11-09 00:58:55', '2026-11-09 00:58:55');
 
 -- --------------------------------------------------------
 
@@ -545,15 +723,15 @@ CREATE TABLE `t_pelanggaran_siswa` (
 
 CREATE TABLE `t_siswa` (
   `id` bigint UNSIGNED NOT NULL,
-  `nisn` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `nama` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `jenis_kelamin` char(1) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `alamat` text COLLATE utf8mb4_unicode_ci,
+  `nisn` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nama` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `jenis_kelamin` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `alamat` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `tahun_masuk` smallint UNSIGNED NOT NULL,
-  `status_siswa` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'aktif',
+  `status_siswa` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'aktif',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `nis` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nis` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `tanggal_lahir` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -564,54 +742,151 @@ CREATE TABLE `t_siswa` (
 INSERT INTO `t_siswa` (`id`, `nisn`, `nama`, `jenis_kelamin`, `alamat`, `tahun_masuk`, `status_siswa`, `created_at`, `updated_at`, `nis`, `tanggal_lahir`) VALUES
 (1, '0000000001', 'ADITTIA NUR LANTIP', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-04 15:10:12', '2026-11-04 08:21:17', '2024000001', '2008-01-15'),
 (2, '0000000002', 'AGNIA ROSYA NOERILLAH', 'P', 'Tasikmalaya', 2026, 'aktif', '2026-11-04 15:10:12', '2026-11-04 08:21:33', '2024000002', '2008-03-22'),
-(27, '0000000027', 'ALFIN RAHADIAN', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-04 15:10:12', '2026-11-04 08:21:49', '2024000027', '2009-01-12'),
-(51, '0000000003', 'ANISA AMIRULLA', 'P', 'Jl. Tentara Pelajar, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000003', '2008-05-10'),
-(52, '0000000004', 'ARADEA KANDI', 'L', 'Jl. RE Martadinata, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:45:25', '2024000004', '2008-07-19'),
-(53, '0000000005', 'ARFA DIESA OKMALELIZA', 'P', 'Jl. Sutisna Senjaya, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000005', '2008-09-12'),
-(54, '0000000006', 'FITRI NUR SYAMI', 'P', 'Jl. Paseh, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000006', '2008-11-25'),
-(55, '0000000007', 'JUNITA PUTRI NUR RAHMAN', 'P', 'Jl. Mitra Batik, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000007', '2008-02-08'),
-(56, '0000000008', 'MOHAMMAD ATALARIK ALI SYAHBANA', 'L', 'Jl. Perintis Kemerdekaan, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000008', '2008-04-17'),
-(57, '0000000009', 'MUHAMAD FAHRIL FAHRUROZI', 'L', 'Jl. Gunung Sabeulah, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000009', '2008-06-29'),
-(58, '0000000010', 'MUHAMMAD ADNAN SYAEFUL ISLAMI', 'L', 'Jl. Letnan Harun, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000010', '2008-08-13'),
-(59, '0000000011', 'MUHAMMAD ZAHRU AQILA FIKRI', 'L', 'Jl. BKR, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000011', '2008-10-21'),
-(60, '0000000012', 'NADIA ZULFA SORAYA', 'P', 'Jl. Cieunteung, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000012', '2008-12-05'),
-(61, '0000000013', 'NAZRIL ILHAM', 'L', 'Jl. Siliwangi, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000013', '2008-01-28'),
-(62, '0000000014', 'PUSPITA DEWI', 'P', 'Jl. Gobras, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000014', '2008-03-14'),
-(63, '0000000015', 'RAKHA MUHAMMAD HAYKAL', 'L', 'Jl. Indihiang, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000015', '2008-05-26'),
-(64, '0000000016', 'RANI MEILANI', 'P', 'Jl. Mangkubumi, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000016', '2008-07-07'),
-(65, '0000000017', 'REIHAN MUZAKI', 'L', 'Jl. Tamansari, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000017', '2008-09-30'),
-(66, '0000000018', 'RESA JULIANSAH', 'L', 'Jl. Kawalu, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000018', '2008-11-11'),
-(67, '0000000019', 'RIZKI PERMATA SUGIANTO', 'L', 'Jl. Cibeureum, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000019', '2008-02-19'),
-(68, '0000000020', 'SAHIRA FIRAJ', 'P', 'Jl. Cipedes, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000020', '2008-04-03'),
-(69, '0000000021', 'SENDI MARDIAN', 'L', 'Jl. Awipari, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000021', '2008-06-16'),
-(70, '0000000022', 'SHAHAIDAN NIZZAR', 'L', 'Jl. Sukarindik, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000022', '2008-08-27'),
-(71, '0000000023', 'SHERLY SATRIANI', 'P', 'Jl. Sukamulya, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000023', '2008-10-09'),
-(72, '0000000024', 'SOFI NURJANAH', 'P', 'Jl. Mulyasari, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000024', '2008-12-18'),
-(73, '0000000025', 'SURAIYA SALSABILA AZZAHRA', 'P', 'Jl. Cikalang, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000025', '2009-02-12'),
-(74, '0000000026', 'TONI ANTONIO', 'L', 'Jl. Sukaraja, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000026', '2009-04-24'),
-(75, '0000000028', 'ALISA RAMADHANI', 'P', 'Jl. Sambongpari, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000028', '2009-02-18'),
-(76, '0000000029', 'AMA AURA LIVIA', 'P', 'Jl. Sukamaju, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000029', '2009-03-21'),
-(77, '0000000030', 'ANIS KHOERUNNISA NUR RAMADANI', 'P', 'Jl. Cibunigeulis, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000030', '2009-04-15'),
-(78, '0000000031', 'AZMIL AMIRA', 'P', 'Jl. Parakannyasag, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000031', '2009-05-09'),
-(79, '0000000032', 'AZRIL AKBAR FAWJI ABDILLAH', 'L', 'Jl. Cibeureum, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000032', '2009-06-24'),
-(80, '0000000033', 'ERLANGGA SAPUTRA HIDAYAT', 'L', 'Jl. Bantarsari, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000033', '2009-07-11'),
-(81, '0000000034', 'HILMA HUMMA TUNNAJAH', 'P', 'Jl. Sukaraja, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000034', '2009-08-19'),
-(82, '0000000035', 'ILMA NAJYA', 'P', 'Jl. Setiajaya, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000035', '2009-09-13'),
-(83, '0000000036', 'JULIANA DHARMA PANGESTU', 'P', 'Jl. Sukahurip, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000036', '2009-10-22'),
-(84, '0000000037', 'KAYLA NUR FADILAH', 'P', 'Jl. Cikadongdong, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000037', '2009-11-16'),
-(85, '0000000038', 'MOZA DINA NABILLAH', 'P', 'Jl. Cintaraja, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000038', '2009-12-05'),
-(86, '0000000039', 'MUHAMAD ALFARIZI', 'L', 'Jl. Mangkubumi, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000039', '2009-01-27'),
-(87, '0000000040', 'MUHAMAD FAHRIN ADAM', 'L', 'Jl. Urug, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000040', '2009-02-14'),
-(88, '0000000041', 'MUHAMMAD ZIDANE MAULANA', 'L', 'Jl. Kawalu, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000041', '2009-03-08'),
-(89, '0000000042', 'MUHAMMAD ZULFAN NURALFANSYAH', 'L', 'Jl. Cibeuti, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000042', '2009-04-26'),
-(90, '0000000043', 'NATIYA NUR AZKIYA', 'P', 'Jl. Sukagalih, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000043', '2009-05-17'),
-(91, '0000000044', 'NOVITA PUSPITASARI', 'P', 'Jl. Leuwidahu, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000044', '2009-06-12'),
-(92, '0000000045', 'NUCKY ANDREAS FEBRIAN', 'L', 'Jl. Sukamaju, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000045', '2009-07-23'),
-(93, '0000000046', 'RADITYA JETI PRASETYA', 'L', 'Jl. Awipari, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000046', '2009-08-07'),
-(94, '0000000047', 'RANGGA RAMADIYANTO NURHAKIM', 'L', 'Jl. Cibunigeulis, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000047', '2009-09-25'),
-(95, '0000000048', 'RISQI MUHAMAD IHWANI', 'L', 'Jl. Setiamulya, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000048', '2009-10-14'),
-(96, '0000000049', 'SALWA SABILATUL ZARKAH', 'P', 'Jl. Sukarindik, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000049', '2009-11-29'),
-(97, '0000000050', 'TAZKIA ZAHRA', 'P', 'Jl. Indihiang, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000050', '2009-12-19');
+(3, '0000000027', 'ALFIN RAHADIAN', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-04 15:10:12', '2026-11-04 08:21:49', '2024000027', '2009-01-12'),
+(4, '0000000003', 'ANISA AMIRULLA', 'P', 'Jl. Tentara Pelajar, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000003', '2008-05-10'),
+(5, '0000000004', 'ARADEA KANDI', 'L', 'Jl. RE Martadinata, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:45:25', '2024000004', '2008-07-19'),
+(6, '0000000005', 'ARFA DIESA OKMALELIZA', 'P', 'Jl. Sutisna Senjaya, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000005', '2008-09-12'),
+(7, '0000000006', 'FITRI NUR SYAMI', 'P', 'Jl. Paseh, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000006', '2008-11-25'),
+(8, '0000000007', 'JUNITA PUTRI NUR RAHMAN', 'P', 'Jl. Mitra Batik, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000007', '2008-02-08'),
+(9, '0000000008', 'MOHAMMAD ATALARIK ALI SYAHBANA', 'L', 'Jl. Perintis Kemerdekaan, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000008', '2008-04-17'),
+(10, '0000000009', 'MUHAMAD FAHRIL FAHRUROZI', 'L', 'Jl. Gunung Sabeulah, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000009', '2008-06-29'),
+(11, '0000000010', 'MUHAMMAD ADNAN SYAEFUL ISLAMI', 'L', 'Jl. Letnan Harun, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000010', '2008-08-13'),
+(12, '0000000011', 'MUHAMMAD ZAHRU AQILA FIKRI', 'L', 'Jl. BKR, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000011', '2008-10-21'),
+(13, '0000000012', 'NADIA ZULFA SORAYA', 'P', 'Jl. Cieunteung, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000012', '2008-12-05'),
+(14, '0000000013', 'NAZRIL ILHAM', 'L', 'Jl. Siliwangi, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000013', '2008-01-28'),
+(15, '0000000014', 'PUSPITA DEWI', 'P', 'Jl. Gobras, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000014', '2008-03-14'),
+(16, '0000000015', 'RAKHA MUHAMMAD HAYKAL', 'L', 'Jl. Indihiang, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000015', '2008-05-26'),
+(17, '0000000016', 'RANI MEILANI', 'P', 'Jl. Mangkubumi, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000016', '2008-07-07'),
+(18, '0000000017', 'REIHAN MUZAKI', 'L', 'Jl. Tamansari, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000017', '2008-09-30'),
+(19, '0000000018', 'RESA JULIANSAH', 'L', 'Jl. Kawalu, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000018', '2008-11-11'),
+(20, '0000000019', 'RIZKI PERMATA SUGIANTO', 'L', 'Jl. Cibeureum, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000019', '2008-02-19'),
+(21, '0000000020', 'SAHIRA FIRAJ', 'P', 'Jl. Cipedes, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000020', '2008-04-03'),
+(22, '0000000021', 'SENDI MARDIAN', 'L', 'Jl. Awipari, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000021', '2008-06-16'),
+(23, '0000000022', 'SHAHAIDAN NIZZAR', 'L', 'Jl. Sukarindik, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000022', '2008-08-27'),
+(24, '0000000023', 'SHERLY SATRIANI', 'P', 'Jl. Sukamulya, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000023', '2008-10-09'),
+(25, '0000000024', 'SOFI NURJANAH', 'P', 'Jl. Mulyasari, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000024', '2008-12-18'),
+(26, '0000000025', 'SURAIYA SALSABILA AZZAHRA', 'P', 'Jl. Cikalang, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000025', '2009-02-12'),
+(27, '0000000026', 'TONI ANTONIO', 'L', 'Jl. Sukaraja, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000026', '2009-04-24'),
+(28, '0000000028', 'ALISA RAMADHANI', 'P', 'Jl. Sambongpari, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000028', '2009-02-18'),
+(29, '0000000029', 'AMA AURA LIVIA', 'P', 'Jl. Sukamaju, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000029', '2009-03-21'),
+(30, '0000000030', 'ANIS KHOERUNNISA NUR RAMADANI', 'P', 'Jl. Cibunigeulis, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000030', '2009-04-15'),
+(31, '0000000031', 'AZMIL AMIRA', 'P', 'Jl. Parakannyasag, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000031', '2009-05-09'),
+(32, '0000000032', 'AZRIL AKBAR FAWJI ABDILLAH', 'L', 'Jl. Cibeureum, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000032', '2009-06-24'),
+(33, '0000000033', 'ERLANGGA SAPUTRA HIDAYAT', 'L', 'Jl. Bantarsari, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000033', '2009-07-11'),
+(34, '0000000034', 'HILMA HUMMA TUNNAJAH', 'P', 'Jl. Sukaraja, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000034', '2009-08-19'),
+(35, '0000000035', 'ILMA NAJYA', 'P', 'Jl. Setiajaya, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000035', '2009-09-13'),
+(36, '0000000036', 'JULIANA DHARMA PANGESTU', 'P', 'Jl. Sukahurip, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000036', '2009-10-22'),
+(37, '0000000037', 'KAYLA NUR FADILAH', 'P', 'Jl. Cikadongdong, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000037', '2009-11-16'),
+(38, '0000000038', 'MOZA DINA NABILLAH', 'P', 'Jl. Cintaraja, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000038', '2009-12-05'),
+(39, '0000000039', 'MUHAMAD ALFARIZI', 'L', 'Jl. Mangkubumi, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000039', '2009-01-27'),
+(40, '0000000040', 'MUHAMAD FAHRIN ADAM', 'L', 'Jl. Urug, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000040', '2009-02-14'),
+(41, '0000000041', 'MUHAMMAD ZIDANE MAULANA', 'L', 'Jl. Kawalu, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000041', '2009-03-08'),
+(42, '0000000042', 'MUHAMMAD ZULFAN NURALFANSYAH', 'L', 'Jl. Cibeuti, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000042', '2009-04-26'),
+(43, '0000000043', 'NATIYA NUR AZKIYA', 'P', 'Jl. Sukagalih, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000043', '2009-05-17'),
+(44, '0000000044', 'NOVITA PUSPITASARI', 'P', 'Jl. Leuwidahu, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000044', '2009-06-12'),
+(45, '0000000045', 'NUCKY ANDREAS FEBRIAN', 'L', 'Jl. Sukamaju, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000045', '2009-07-23'),
+(46, '0000000046', 'RADITYA JETI PRASETYA', 'L', 'Jl. Awipari, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000046', '2009-08-07'),
+(47, '0000000047', 'RANGGA RAMADIYANTO NURHAKIM', 'L', 'Jl. Cibunigeulis, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000047', '2009-09-25'),
+(48, '0000000048', 'RISQI MUHAMAD IHWANI', 'L', 'Jl. Setiamulya, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000048', '2009-10-14'),
+(49, '0000000049', 'SALWA SABILATUL ZARKAH', 'P', 'Jl. Sukarindik, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000049', '2009-11-29'),
+(50, '0000000050', 'TAZKIA ZAHRA', 'P', 'Jl. Indihiang, Tasikmalaya', 2026, 'aktif', '2026-11-04 15:20:46', '2026-11-04 15:20:46', '2024000050', '2009-12-19'),
+(51, '0000000051', 'ADAM LASMANA NUGRAHA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000051', '2008-01-12'),
+(52, '0000000052', 'AFEP SAEPUL HIDAYAH', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000052', '2008-02-18'),
+(53, '0000000053', 'AGIS PRATAMA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000053', '2008-03-21'),
+(54, '0000000054', 'DAWAM ARIASA PUTRA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000054', '2008-04-15'),
+(55, '0000000055', 'DIKA ADITYA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000055', '2008-05-09'),
+(56, '0000000056', 'DIKI SAPUTRA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000056', '2008-06-24'),
+(57, '0000000057', 'DIMAS ANUGRAH PRANATAMA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000057', '2008-07-11'),
+(58, '0000000058', 'ERGI ZULVIAN RAZVI', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000058', '2008-08-19'),
+(59, '0000000059', 'EVAN RASENDRIYA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000059', '2008-09-13'),
+(60, '0000000060', 'FAIZ FAUZAN ABDURAHMAN', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000060', '2008-10-22'),
+(61, '0000000061', 'FATIR RIZIKY', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000061', '2008-11-16'),
+(62, '0000000062', 'GUNTUR MUHAMAD AZRIL', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000062', '2008-12-05'),
+(63, '0000000063', 'HIBAN SA\'BAN', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000063', '2008-01-27'),
+(64, '0000000064', 'HILMAN SOHIBUL KIYAM', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000064', '2008-02-14'),
+(65, '0000000065', 'IJAD RAYI NURFAIS ANSORI', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000065', '2008-03-08'),
+(66, '0000000066', 'IQBAL MUHARROM', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000066', '2008-04-26'),
+(67, '0000000067', 'IZAZ SYAKIR', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000067', '2008-05-17'),
+(68, '0000000068', 'MOCH FAIZAL GILANG PERMANA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000068', '2008-06-12'),
+(69, '0000000069', 'MUHAMAD RIZKY GOZALI', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000069', '2008-07-23'),
+(70, '0000000070', 'MUHAMMAD RIKMAN NULHAKIM', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000070', '2008-08-07'),
+(71, '0000000071', 'MUHAMMAD SIDDIQ IBRAHIM SOBARI', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000071', '2008-09-25'),
+(72, '0000000072', 'NIZAR SURYANA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000072', '2008-10-14'),
+(73, '0000000073', 'RASYA ABDUL BASITH', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000073', '2008-11-29'),
+(74, '0000000074', 'RAUSAN VIKRI', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000074', '2008-12-19'),
+(75, '0000000075', 'REVANDI NORWANSHAH', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000075', '2008-01-16'),
+(76, '0000000076', 'REVAN RUDIANSANH', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000076', '2008-02-23'),
+(77, '0000000077', 'RIZKI RADITYA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000077', '2008-03-17'),
+(78, '0000000078', 'ROBY ORIE AL RASYA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000078', '2008-04-11'),
+(79, '0000000079', 'RULY RUDIANSANH', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000079', '2008-05-28'),
+(80, '0000000080', 'SYAHDAN RASDANI', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000080', '2008-06-19'),
+(81, '0000000081', 'TABA HAERUL SALIM', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000081', '2008-07-14'),
+(82, '0000000082', 'TIRTA NUR ZAMZAM', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000082', '2008-08-26'),
+(83, '0000000083', 'ZILHAD AYALTHUHAQ', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:22:48', '2026-11-09 07:22:48', '2024000083', '2008-09-18'),
+(84, '0000000101', 'ADITYA REFAN', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010101', '2008-01-12'),
+(85, '0000000102', 'ADRI FAISAL MUHAMMAD', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010102', '2008-02-18'),
+(86, '0000000103', 'AFRIZA ABDUL MU\'IZ RIF\'AT', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010103', '2008-03-21'),
+(87, '0000000104', 'AGNI AFIANSAN', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010104', '2008-04-15'),
+(88, '0000000105', 'ALIA RAHMAWATI', 'P', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010105', '2008-05-09'),
+(89, '0000000106', 'ALVIN ALVIANSYAH', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010106', '2008-06-24'),
+(90, '0000000107', 'ANDHIKA DISTA FIRDAUS', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010107', '2008-07-11'),
+(91, '0000000108', 'ARYA DIAS PRATAMA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010108', '2008-08-19'),
+(92, '0000000109', 'BRIAN SUNJAYA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010109', '2008-09-13'),
+(93, '0000000110', 'BUNGA NURHALIZA', 'P', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010110', '2008-10-22'),
+(94, '0000000111', 'DAFA FADHLURRAHMAN CHANDRA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010111', '2008-11-16'),
+(95, '0000000112', 'DESYANNA FITRIA RAMADANI', 'P', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010112', '2008-12-05'),
+(96, '0000000113', 'FAHRI FIRMANSYAH', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010113', '2008-01-27'),
+(97, '0000000114', 'ILHAM TASANII RAMDANI', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010114', '2008-02-14'),
+(98, '0000000115', 'IP SYARIF PAHRUROJI', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010115', '2008-03-08'),
+(99, '0000000116', 'KASNAYA NUREZKA', 'P', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010116', '2008-04-26'),
+(100, '0000000117', 'KEVIN NUGRAHA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010117', '2008-05-17'),
+(101, '0000000118', 'KIRANI ALYA NUR AFIFAH', 'P', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010118', '2008-06-12'),
+(102, '0000000119', 'LILA RAMADANI', 'P', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010119', '2008-07-23'),
+(103, '0000000120', 'LUTFIYAN MUHAMMAD SOHIBIL', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010120', '2008-08-07'),
+(104, '0000000121', 'MARISA PUTRI OKTAVIANI', 'P', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010121', '2008-09-25'),
+(105, '0000000122', 'MIFTAHUL JANNAH', 'P', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010122', '2008-10-14'),
+(106, '0000000123', 'MOCHAMAD MIKO ADITYA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010123', '2008-11-29'),
+(107, '0000000124', 'MUHAMMAD ISA ANDARISTA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010124', '2008-12-19'),
+(108, '0000000125', 'MUHAMMAD RIZKI SYABANI', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010125', '2008-01-16'),
+(109, '0000000126', 'RAVELA SAGI', 'P', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010126', '2008-02-23'),
+(110, '0000000127', 'RAZIFA LUTFIA MALIK', 'P', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010127', '2008-03-17'),
+(111, '0000000128', 'RAYHAN REZKY NOORMAHRAN', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010128', '2008-04-11'),
+(112, '0000000129', 'REHAN NURUL AMALIN', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010129', '2008-05-28'),
+(113, '0000000130', 'RIZAH BILQIS KHOERIYAH', 'P', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010130', '2008-06-19'),
+(114, '0000000131', 'SILEN NUR ROFIAH', 'P', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010131', '2008-07-14'),
+(115, '0000000132', 'VINA REZKY NOVITASARI', 'P', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010132', '2008-08-26'),
+(116, '0000000133', 'WAWAN SUMEBAT', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:42:36', '2026-11-09 07:42:36', '2024010133', '2008-09-18'),
+(117, '0000000134', 'AKBAR MAULANA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010134', '2008-01-12'),
+(118, '0000000135', 'DAVIN REYSYA PUTRA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010135', '2008-02-18'),
+(119, '0000000136', 'DIKRI ERIKA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010136', '2008-03-21'),
+(120, '0000000137', 'DIPTA SEPTIANA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010137', '2008-04-15'),
+(121, '0000000138', 'DZIKRI WIGUNA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010138', '2008-05-09'),
+(122, '0000000139', 'FABIAN MAULIDAN SUSANTO', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010139', '2008-06-24'),
+(123, '0000000140', 'FARID NURUL HUDA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010140', '2008-07-11'),
+(124, '0000000141', 'FIRMAN NUR ALAMSYAH', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010141', '2008-08-19'),
+(125, '0000000142', 'INDRA IRANA PUTRA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010142', '2008-09-13'),
+(126, '0000000143', 'KINKIN NURUL YAKIN', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010143', '2008-10-22'),
+(127, '0000000144', 'M IRSYAD NURFALLAH', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010144', '2008-11-16'),
+(128, '0000000145', 'MOCHAMAD FATHAN MUYASAR', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010145', '2008-12-05'),
+(129, '0000000146', 'MOCHAMAD RIZQI ADITYA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010146', '2008-01-27'),
+(130, '0000000147', 'MUHAMAD FAHRUL HENDRAWAN', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010147', '2008-02-14'),
+(131, '0000000148', 'MUHAMAD RIZKI SYAPUTRA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010148', '2008-03-08'),
+(132, '0000000149', 'MUHAMMAD DIVRIAN', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010149', '2008-04-26'),
+(133, '0000000150', 'MUHAMMAD RIDHO AL FATHI', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010150', '2008-05-17'),
+(134, '0000000151', 'MUHAMMAD ZAMZAM AL FARIZHI', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010151', '2008-06-12'),
+(135, '0000000152', 'RAFFA RADITYA RASINO', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010152', '2008-07-23'),
+(136, '0000000153', 'RAHAN RIZKULLOH', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010153', '2008-08-07'),
+(137, '0000000154', 'RANGGA ADITYA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010154', '2008-09-25'),
+(138, '0000000155', 'RAYHAN FIRDAUS RACHMAT', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010155', '2008-10-14'),
+(139, '0000000156', 'REHAN SYAHRUDDIN', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010156', '2008-11-29'),
+(140, '0000000157', 'RIDWANULLOH SETIAWAN', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010157', '2008-12-19'),
+(141, '0000000158', 'RIZKY NUR AKBAR', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010158', '2008-01-16'),
+(142, '0000000159', 'SALMAN ABDULLAH MAULAY', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010159', '2008-02-23'),
+(143, '0000000160', 'SENDY DIMASTIAN', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010160', '2008-03-17'),
+(144, '0000000161', 'SYAHAL SAID AL FAJR', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010161', '2008-04-11'),
+(145, '0000000162', 'TACHA NURFADILAH', 'P', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010162', '2008-05-28'),
+(146, '0000000163', 'WAWAN NOPIANA HIDAYAT', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010163', '2008-06-19'),
+(147, '0000000164', 'YUDHI SYAEFUL ANWAR', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010164', '2008-07-14');
 
 -- --------------------------------------------------------
 
@@ -621,7 +896,7 @@ INSERT INTO `t_siswa` (`id`, `nisn`, `nama`, `jenis_kelamin`, `alamat`, `tahun_m
 
 CREATE TABLE `t_tahun_ajaran` (
   `id` bigint UNSIGNED NOT NULL,
-  `nama_tahun_ajaran` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nama_tahun_ajaran` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `tanggal_mulai` date NOT NULL,
   `tanggal_selesai` date NOT NULL,
   `status_aktif` tinyint(1) NOT NULL DEFAULT '0',
@@ -644,12 +919,12 @@ INSERT INTO `t_tahun_ajaran` (`id`, `nama_tahun_ajaran`, `tanggal_mulai`, `tangg
 
 CREATE TABLE `t_users` (
   `id` bigint UNSIGNED NOT NULL,
-  `nama` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nama` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `role` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL
+  `role` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -658,7 +933,7 @@ CREATE TABLE `t_users` (
 
 INSERT INTO `t_users` (`id`, `nama`, `email`, `password`, `created_at`, `updated_at`, `role`) VALUES
 (1, 'Administrator SekolahKu', 'admin@sekolahku.com', '$2y$12$6XT1uPdDIoaORCDVwJBqoeQmihFbS9PmvQk/cL/gTCYYfp7WqqaxS', '2026-11-04 07:59:23', '2026-11-04 07:59:23', 'admin'),
-(3, 'Wawan Kurniawan, S.Pd.I', 'wawankurniawan@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(3, 'Wawan Kurniawan, S.Pd.I', 'wawankurniawan@sekolahku.com', '$2y$12$/0Y2wi1xsMyTV2sb.Bg9xORBAK2HPwu7sCvznC1SodZwVHEa/PNiS', '2026-11-04 15:01:22', '2026-11-09 00:01:33', 'guru'),
 (4, 'Ai Nuryaidah, S.Pd', 'ainuryaidah@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (5, 'Maya Permata Endah, S. Pd', 'mayapermataendah@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (6, 'Dody Jaenudin, S.Pd.', 'dodyjaenudin@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
@@ -689,7 +964,7 @@ INSERT INTO `t_users` (`id`, `nama`, `email`, `password`, `created_at`, `updated
 (31, 'Yaneu Nurdian, S.Pd., M.Pd', 'yaneunurdian@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (32, 'Ucu Muhammad Khoer N, S.Pd', 'ucumuhammadkhoern@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (33, 'Mira Dwi Rahmawati, S.Ag', 'miradwirahmawati@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
-(34, 'Aldi Maulana, S.Pd', 'aldimaulana@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(34, 'Aldi Maulana, S.Pd', 'aldimaulana@sekolahku.com', '$2y$12$/B.jtFuM.FAeQKAuHjm3.en14GVRlHdRpT8YvJrjzDA5SRSeQFco.', '2026-11-04 15:01:22', '2026-11-08 23:32:26', 'guru'),
 (35, 'Eli Rosliah, S.Pd', 'elirosliah@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (36, 'Isni Nur Fitriani, S.Pd', 'isninurfitriani@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (37, 'Aanisah Putri Nur Aini, S.Pd', 'aanisahputrinuraini@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
@@ -738,7 +1013,10 @@ CREATE TABLE `t_wali_kelas` (
 
 INSERT INTO `t_wali_kelas` (`id`, `guru_id`, `kelas_id`, `tahun_ajaran_id`, `tanggal_mulai`, `tanggal_selesai`, `status_aktif`, `created_at`, `updated_at`) VALUES
 (1, 29, 1, 1, '2026-07-13', NULL, 1, '2026-11-04 08:05:11', '2026-11-04 08:05:11'),
-(2, 33, 2, 1, '2027-06-18', NULL, 1, '2026-11-04 08:05:38', '2026-11-04 08:05:38');
+(2, 33, 2, 1, '2026-07-13', NULL, 1, '2026-11-04 08:05:38', '2026-11-08 23:19:56'),
+(3, 43, 3, 1, '2026-07-13', NULL, 1, '2026-11-09 07:22:48', '2026-11-09 07:22:48'),
+(4, 42, 4, 1, '2026-07-13', NULL, 1, '2026-11-09 07:42:36', '2026-11-09 07:42:36'),
+(5, 53, 5, 1, '2026-07-13', NULL, 1, '2026-11-09 07:49:39', '2026-11-09 07:49:39');
 
 --
 -- Indexes for dumped tables
@@ -804,8 +1082,8 @@ ALTER TABLE `sessions`
 --
 ALTER TABLE `t_guru`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `t_guru_nip_unique` (`nip`),
-  ADD UNIQUE KEY `t_guru_user_id_unique` (`user_id`);
+  ADD UNIQUE KEY `t_guru_user_id_unique` (`user_id`),
+  ADD UNIQUE KEY `t_guru_nip_unique` (`nip`);
 
 --
 -- Indexes for table `t_kelas`
@@ -924,25 +1202,25 @@ ALTER TABLE `t_guru`
 -- AUTO_INCREMENT for table `t_kelas`
 --
 ALTER TABLE `t_kelas`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `t_kelas_siswa`
 --
 ALTER TABLE `t_kelas_siswa`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=208;
 
 --
 -- AUTO_INCREMENT for table `t_log_aktivitas`
 --
 ALTER TABLE `t_log_aktivitas`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=123;
 
 --
 -- AUTO_INCREMENT for table `t_log_pelanggaran`
 --
 ALTER TABLE `t_log_pelanggaran`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `t_pelanggaran`
@@ -960,13 +1238,13 @@ ALTER TABLE `t_pelanggaran_kategori`
 -- AUTO_INCREMENT for table `t_pelanggaran_siswa`
 --
 ALTER TABLE `t_pelanggaran_siswa`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `t_siswa`
 --
 ALTER TABLE `t_siswa`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=171;
 
 --
 -- AUTO_INCREMENT for table `t_tahun_ajaran`
@@ -984,7 +1262,7 @@ ALTER TABLE `t_users`
 -- AUTO_INCREMENT for table `t_wali_kelas`
 --
 ALTER TABLE `t_wali_kelas`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
@@ -1001,7 +1279,7 @@ ALTER TABLE `t_guru`
 --
 ALTER TABLE `t_kelas_siswa`
   ADD CONSTRAINT `t_kelas_siswa_kelas_id_foreign` FOREIGN KEY (`kelas_id`) REFERENCES `t_kelas` (`id`) ON DELETE RESTRICT,
-  ADD CONSTRAINT `t_kelas_siswa_siswa_id_foreign` FOREIGN KEY (`siswa_id`) REFERENCES `t_siswa` (`id`) ON DELETE RESTRICT,
+  ADD CONSTRAINT `t_kelas_siswa_siswa_id_foreign` FOREIGN KEY (`siswa_id`) REFERENCES `t_siswa` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
   ADD CONSTRAINT `t_kelas_siswa_tahun_ajaran_id_foreign` FOREIGN KEY (`tahun_ajaran_id`) REFERENCES `t_tahun_ajaran` (`id`) ON DELETE RESTRICT;
 
 --
