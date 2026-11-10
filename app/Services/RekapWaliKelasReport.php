@@ -31,6 +31,7 @@ class RekapWaliKelasReport
             ->selectRaw('COUNT(t_pelanggaran_siswa.id) AS active_records')
             ->selectRaw('COALESCE(SUM(t_pelanggaran_siswa.poin_saat_dicatat), 0) AS active_points')
             ->selectRaw('COUNT(DISTINCT t_kelas_siswa.siswa_id) AS students_with_active_records')
+            ->get()
             ->first();
 
         $studentCount = DB::query()
@@ -89,6 +90,7 @@ class RekapWaliKelasReport
             ->selectRaw('COUNT(t_pelanggaran_siswa.id) AS active_records')
             ->selectRaw('COALESCE(SUM(t_pelanggaran_siswa.poin_saat_dicatat), 0) AS active_points')
             ->selectRaw('COUNT(DISTINCT t_kelas_siswa.siswa_id) AS students_with_active_records')
+            ->get()
             ->first();
         $studentCount = DB::query()
             ->fromSub((clone $placements)->select('siswa_id')->distinct(), 'recap_students')
@@ -162,11 +164,13 @@ class RekapWaliKelasReport
             ->orderByDesc('t_pelanggaran_siswa.tanggal_pelanggaran')
             ->orderByDesc('t_pelanggaran_siswa.id');
 
-        $totals = (clone $recordsQuery)
+        $totals = $this->notes($context, $placements)
+            ->where('t_kelas_siswa.siswa_id', $student->id)
             ->where('t_pelanggaran_siswa.status', 'aktif')
             ->select([])
             ->selectRaw('COUNT(t_pelanggaran_siswa.id) AS active_records')
             ->selectRaw('COALESCE(SUM(t_pelanggaran_siswa.poin_saat_dicatat), 0) AS active_points')
+            ->get()
             ->first();
 
         return [

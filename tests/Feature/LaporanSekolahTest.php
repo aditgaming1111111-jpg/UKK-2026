@@ -188,6 +188,100 @@ class LaporanSekolahTest extends TestCase
         $this->assertAggregationQueriesAreStrictModeSafe();
     }
 
+    public function test_recap_student_detail_ignores_student_list_page_and_keeps_own_pagination(): void
+    {
+        $teacherUser = User::factory()->create(['role' => 'guru']);
+        $teacher = Guru::factory()->create(['user_id' => $teacherUser->id]);
+        $year = TahunAjaran::factory()->create([
+            'nama_tahun_ajaran' => '2026/2027',
+            'tanggal_mulai' => '2026-07-01',
+            'tanggal_selesai' => '2027-06-30',
+            'status_aktif' => true,
+        ]);
+        $class = Kelas::factory()->create();
+        WaliKelas::factory()->create([
+            'guru_id' => $teacher->id,
+            'kelas_id' => $class->id,
+            'tahun_ajaran_id' => $year->id,
+            'tanggal_mulai' => '2026-07-01',
+            'status_aktif' => true,
+        ]);
+        $students = Siswa::factory()->count(21)->sequence(fn ($sequence): array => [
+            'nama' => sprintf('Siswa %02d', $sequence->index + 1),
+        ])->create();
+
+        foreach ($students as $student) {
+            KelasSiswa::factory()->create([
+                'siswa_id' => $student->id,
+                'kelas_id' => $class->id,
+                'tahun_ajaran_id' => $year->id,
+                'tanggal_mulai' => '2026-07-01',
+            ]);
+        }
+
+        $violation = Pelanggaran::factory()->create();
+        $singleRecordStudent = $students[10];
+        $singleRecordPlacement = KelasSiswa::query()
+            ->where('siswa_id', $singleRecordStudent->id)
+            ->firstOrFail();
+        $singleRecord = PelanggaranSiswa::factory()->create([
+            'kelas_siswa_id' => $singleRecordPlacement->id,
+            'guru_id' => $teacher->id,
+            'pelanggaran_id' => $violation->id,
+            'tanggal_pelanggaran' => '2026-08-12',
+            'keterangan' => 'Satu catatan pada siswa halaman dua',
+            'poin_saat_dicatat' => 5,
+        ]);
+
+        $paginatedStudent = $students[11];
+        $paginatedPlacement = KelasSiswa::query()
+            ->where('siswa_id', $paginatedStudent->id)
+            ->firstOrFail();
+        PelanggaranSiswa::factory()->count(11)->sequence(fn ($sequence): array => [
+            'kelas_siswa_id' => $paginatedPlacement->id,
+            'guru_id' => $teacher->id,
+            'pelanggaran_id' => $violation->id,
+            'tanggal_pelanggaran' => sprintf('2026-08-%02d', $sequence->index + 1),
+            'keterangan' => 'Catatan detail '.$sequence->index,
+        ])->create();
+
+        $listResponse = $this->actingAs($teacherUser)->get(route('guru.class-recap.index', [
+            'tahun_ajaran_id' => $year->id,
+            'kelas_id' => $class->id,
+            'page' => 2,
+        ]))
+            ->assertOk()
+            ->assertViewHas('students', fn ($paginator): bool => $paginator->currentPage() === 2
+                && $paginator->getCollection()->contains(fn (Siswa $student): bool => $student->is($singleRecordStudent)));
+
+        $detailUrl = route('guru.class-recap.show', [
+            'tahunAjaran' => $year->id,
+            'kelas' => $class->id,
+            'siswa' => $singleRecordStudent->id,
+            'tahun_ajaran_id' => $year->id,
+            'kelas_id' => $class->id,
+        ]);
+        $listResponse->assertSee('href="'.e($detailUrl).'"', false);
+
+        $this->get($detailUrl)
+            ->assertOk()
+            ->assertSee($singleRecord->keterangan)
+            ->assertViewHas('records', fn ($paginator): bool => $paginator->currentPage() === 1
+                && $paginator->total() === 1);
+
+        $this->get(route('guru.class-recap.show', [
+            'tahunAjaran' => $year->id,
+            'kelas' => $class->id,
+            'siswa' => $paginatedStudent->id,
+            'page' => 2,
+        ]))
+            ->assertOk()
+            ->assertSee('Catatan detail 0')
+            ->assertViewHas('records', fn ($paginator): bool => $paginator->currentPage() === 2
+                && $paginator->total() === 11
+                && $paginator->count() === 1);
+    }
+
     public function test_teacher_without_assignment_cannot_access_class_recap(): void
     {
         $teacherUser = User::factory()->create(['role' => 'guru']);
@@ -620,11 +714,21 @@ class LaporanSekolahTest extends TestCase
             ->pluck('query')
             ->filter(static fn (string $sql): bool => preg_match('/count\s*\(|sum\s*\(/i', $sql) === 1
                 && str_contains(strtolower($sql), 't_pelanggaran_siswa'));
+        $singleRowAggregateQueries = $aggregateQueries
+            ->filter(static fn (string $sql): bool => str_contains(strtolower($sql), 'count(t_pelanggaran_siswa.id)')
+                && str_contains(strtolower($sql), 'sum(t_pelanggaran_siswa.poin_saat_dicatat)')
+                && ! str_contains(strtolower($sql), 'group by'));
 
         $this->assertNotEmpty($aggregateQueries);
+        $this->assertNotEmpty($singleRowAggregateQueries);
 
         foreach ($aggregateQueries as $sql) {
             $this->assertDoesNotMatchRegularExpression('/select\s+(?:distinct\s+)?t_pelanggaran_siswa\.\*/i', $sql);
+        }
+
+        foreach ($singleRowAggregateQueries as $sql) {
+            $this->assertDoesNotMatchRegularExpression('/\border\s+by\b/i', $sql);
+            $this->assertDoesNotMatchRegularExpression('/\blimit\s+1\b/i', $sql);
         }
     }
 }

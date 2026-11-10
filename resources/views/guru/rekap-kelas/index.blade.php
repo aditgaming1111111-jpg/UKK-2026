@@ -87,7 +87,8 @@
                             <td class="px-4 py-3 text-gray-700">{{ $student->nisn }}</td>
                             <td class="px-4 py-3 text-gray-700">{{ $student->active_records }}</td>
                             <td class="px-4 py-3 text-gray-700">{{ $student->active_points }}</td>
-                            <td class="px-4 py-3 text-right"><a class="font-semibold text-gray-900 underline decoration-gray-300 underline-offset-4 hover:decoration-gray-900" href="{{ route('guru.class-recap.show', ['tahunAjaran' => $selectedYear->id, 'kelas' => $selectedClass->id, 'siswa' => $student->id] + request()->query()) }}">Lihat rincian</a></td>
+                            @php($detailParameters = request()->except('page'))
+                            <td class="px-4 py-3 text-right"><a class="font-semibold text-gray-900 underline decoration-gray-300 underline-offset-4 hover:decoration-gray-900" href="{{ route('guru.class-recap.show', ['tahunAjaran' => $selectedYear->id, 'kelas' => $selectedClass->id, 'siswa' => $student->id] + $detailParameters) }}">Lihat rincian</a></td>
                         </tr>
                     @endforeach
                 </tbody>
