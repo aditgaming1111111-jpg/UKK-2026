@@ -3,22 +3,37 @@
 </div>
 @extends('layouts.guru')
 
-@section('title', 'Detail Catatan Saya')
+@section('title', 'Detail Riwayat')
 
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[
-        ['label' => 'Catatan Saya', 'url' => route('guru.my-notes.index')],
-        ['label' => 'Detail catatan'],
+        ['label' => 'Riwayat', 'url' => route('guru.my-notes.index')],
+        ['label' => 'Detail Riwayat'],
     ]" />
 @endsection
 
 @section('page-heading')
-    <x-ui.page-heading title="Detail Catatan Saya" description="Informasi kejadian dan jejak audit catatan pelanggaran.">
-        <x-ui.button variant="secondary" :href="route('guru.my-notes.index')">Kembali ke Catatan Saya</x-ui.button>
+    <x-ui.page-heading title="Detail Riwayat" description="Informasi kejadian dan jejak audit riwayat pelanggaran.">
+        <div class="flex flex-wrap gap-2">
+            @if ($canManage)
+                <x-ui.button variant="secondary" :href="route('guru.my-notes.edit', $record)">Koreksi riwayat</x-ui.button>
+                <x-ui.button type="button" data-modal-open="cancel-record">Batalkan riwayat</x-ui.button>
+            @endif
+            <x-ui.button variant="secondary" :href="route('guru.my-notes.index')">Kembali ke Riwayat</x-ui.button>
+        </div>
     </x-ui.page-heading>
 @endsection
 
 @section('content')
+    @if (session('success'))
+        <div role="status" class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700">{{ session('success') }}</div>
+    @endif
+    @if ($errors->has('catatan'))
+        <div role="alert" class="rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-800">{{ $errors->first('catatan') }}</div>
+    @endif
+    @if ($errors->has('alasan'))
+        <div role="alert" class="rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-800">{{ $errors->first('alasan') }}</div>
+    @endif
     <section class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <x-ui.card>
             <div class="flex items-start justify-between gap-3">
@@ -114,4 +129,15 @@
             <x-ui.empty-state class="mt-5" title="Belum ada perubahan" description="Log audit akan muncul setelah catatan dikoreksi atau dibatalkan." />
         @endif
     </x-ui.card>
+
+    @if ($canManage)
+        <x-ui.modal id="cancel-record" title="Batalkan catatan pelanggaran?" description="Catatan tetap tersimpan untuk riwayat, tetapi statusnya tidak lagi dihitung sebagai poin aktif.">
+            <form method="POST" action="{{ route('guru.my-notes.cancel', $record) }}" class="space-y-4">
+                @csrf
+                @method('PATCH')
+                <x-ui.textarea label="Alasan pembatalan" name="alasan" rows="3" required placeholder="Jelaskan alasan catatan dibatalkan." />
+                <div class="flex justify-end gap-2"><x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button><x-ui.button type="submit">Konfirmasi pembatalan</x-ui.button></div>
+            </form>
+        </x-ui.modal>
+    @endif
 @endsection

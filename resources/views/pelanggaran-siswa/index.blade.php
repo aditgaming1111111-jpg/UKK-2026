@@ -1,13 +1,13 @@
 @extends($role === 'admin' ? 'layouts.admin' : 'layouts.guru')
 
-@section('title', 'Riwayat Pelanggaran')
+@section('title', 'Catatan Pelanggaran')
 
 @section('breadcrumbs')
-    <x-ui.breadcrumbs :items="[['label' => 'Riwayat Pelanggaran']]" />
+    <x-ui.breadcrumbs :items="[['label' => 'Catatan Pelanggaran']]" />
 @endsection
 
 @section('page-heading')
-    <x-ui.page-heading title="Riwayat Pelanggaran" description="Telusuri catatan kejadian, snapshot poin, status, dan guru pencatat.">
+    <x-ui.page-heading title="Catatan Pelanggaran" description="Telusuri catatan kejadian, snapshot poin, status, dan guru pencatat.">
         @if ($role === 'guru')
             <x-ui.button :href="route('guru.violations.create')">Catat pelanggaran</x-ui.button>
         @endif

@@ -4,7 +4,7 @@
 
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[
-        ['label' => 'Riwayat Pelanggaran', 'url' => route($routePrefix.'.index')],
+        ['label' => 'Catatan Pelanggaran', 'url' => route($routePrefix.'.index')],
         ['label' => 'Detail Catatan'],
     ]" />
 @endsection
@@ -16,7 +16,7 @@
                 <x-ui.button variant="secondary" :href="route($routePrefix.'.edit', $record)">Koreksi catatan</x-ui.button>
                 <x-ui.button type="button" data-modal-open="cancel-record">Batalkan catatan</x-ui.button>
             @endif
-            <x-ui.button variant="secondary" :href="route($routePrefix.'.index')">Kembali ke riwayat</x-ui.button>
+            <x-ui.button variant="secondary" :href="route($routePrefix.'.index')">Kembali ke catatan</x-ui.button>
         </div>
     </x-ui.page-heading>
 @endsection

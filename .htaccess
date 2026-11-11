@@ -1,0 +1,8 @@
+RewriteEngine On
+
+# Keep application source, dependencies, tests, and runtime files private.
+RewriteRule ^(?:app|bootstrap|config|database|resources|routes|storage|vendor|tests)(?:/|$) - [F,L,NC]
+RewriteRule ^(?:\.env(?:\..*)?|composer\.(?:json|lock)|artisan|phpunit\.xml(?:\.dist)?|\.git)(?:/|$) - [F,L,NC]
+
+# InfinityFree serves htdocs as document root; expose only Laravel's public directory.
+RewriteRule (.*) /public/$1 [L]

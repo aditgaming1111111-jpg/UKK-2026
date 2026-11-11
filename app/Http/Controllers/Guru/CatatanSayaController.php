@@ -86,6 +86,7 @@ class CatatanSayaController extends Controller
         return view('guru.catatan-saya.show', [
             'record' => $pelanggaranSiswa,
             'cancellationLog' => $pelanggaranSiswa->logPerubahan->firstWhere('aksi', 'batal'),
+            'canManage' => request()->user()->can('update', $pelanggaranSiswa),
             'routePrefix' => 'guru.my-notes',
         ]);
     }

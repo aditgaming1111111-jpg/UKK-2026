@@ -18,9 +18,9 @@
     $guruMenu = [
         ['label' => 'Dashboard', 'route' => 'guru.dashboard', 'icon' => 'grid'],
         ['label' => 'Input Pelanggaran', 'route' => 'guru.violations.create', 'icon' => 'plus'],
-        ['label' => 'Riwayat Pelanggaran', 'route' => 'guru.violations.index', 'icon' => 'clock'],
+        ['label' => 'Catatan Pelanggaran', 'route' => 'guru.violations.index', 'icon' => 'clock'],
         ['label' => 'Rekap Poin', 'route' => 'guru.point-recap.index', 'icon' => 'chart'],
-        ['label' => 'Catatan Saya', 'route' => 'guru.my-notes.index', 'active' => 'guru.my-notes.*', 'icon' => 'document'],
+        ['label' => 'Riwayat', 'route' => 'guru.my-notes.index', 'active' => 'guru.my-notes.*', 'icon' => 'document'],
         ['label' => 'Profil', 'route' => 'profile.edit', 'icon' => 'user'],
     ];
 

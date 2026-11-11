@@ -189,6 +189,77 @@ class CatatanSayaTest extends TestCase
         $this->get(route('guru.my-notes.show', $otherRecord))->assertForbidden();
     }
 
+    public function test_guru_can_correct_and_cancel_own_active_note_from_catatan_saya(): void
+    {
+        $context = $this->recordingContext();
+        $record = $this->createRecord($context, ['poin_saat_dicatat' => 7]);
+
+        $this->actingAs($context['user'])->get(route('guru.my-notes.show', $record))
+            ->assertSee('Koreksi catatan')
+            ->assertSee('Batalkan catatan')
+            ->assertSee(route('guru.my-notes.edit', $record));
+
+        $this->get(route('guru.my-notes.edit', $record))
+            ->assertOk()
+            ->assertSee('Koreksi Catatan Saya')
+            ->assertSee(route('guru.my-notes.update', $record));
+
+        $this->put(route('guru.my-notes.update', $record), [
+            'pelanggaran_id' => $context['violation']->id,
+            'tanggal_pelanggaran' => today()->toDateString(),
+            'keterangan' => 'Catatan dikoreksi oleh pembuatnya.',
+            'tindakan' => 'Pemanggilan dan pembinaan.',
+            'alasan' => 'Keterangan diperiksa kembali.',
+        ])->assertRedirect(route('guru.my-notes.show', $record));
+
+        $this->assertSame('Catatan dikoreksi oleh pembuatnya.', $record->fresh()->keterangan);
+        $this->assertDatabaseHas('t_log_pelanggaran', [
+            'pelanggaran_siswa_id' => $record->id,
+            'user_id' => $context['user']->id,
+            'aksi' => 'edit',
+            'alasan' => 'Keterangan diperiksa kembali.',
+        ]);
+
+        $reason = 'Catatan ternyata tercatat dua kali.';
+        $this->patch(route('guru.my-notes.cancel', $record), ['alasan' => $reason])
+            ->assertRedirect(route('guru.my-notes.show', $record));
+
+        $this->assertModelExists($record);
+        $this->assertSame('dibatalkan', $record->fresh()->status);
+        $this->assertDatabaseHas('t_log_pelanggaran', [
+            'pelanggaran_siswa_id' => $record->id,
+            'user_id' => $context['user']->id,
+            'aksi' => 'batal',
+            'alasan' => $reason,
+        ]);
+        $this->get(route('guru.my-notes.show', $record))
+            ->assertOk()
+            ->assertSee('Dibatalkan')
+            ->assertSee($reason)
+            ->assertDontSee('Koreksi catatan')
+            ->assertDontSee('Batalkan catatan');
+
+        $this->get(route('guru.point-recap.index', ['tahun_ajaran_id' => $context['year']->id]))
+            ->assertViewHas('students', fn ($students): bool => (int) $students->getCollection()
+                ->firstWhere('id', $context['student']->id)?->active_points === 0);
+    }
+
+    public function test_teacher_cannot_manage_another_teachers_note_through_catatan_saya(): void
+    {
+        $context = $this->recordingContext();
+        $otherContext = $this->recordingContext();
+        $otherRecord = $this->createRecord($otherContext);
+
+        $this->actingAs($context['user'])->get(route('guru.my-notes.edit', $otherRecord))
+            ->assertForbidden();
+        $this->put(route('guru.my-notes.update', $otherRecord), [])->assertForbidden();
+        $this->patch(route('guru.my-notes.cancel', $otherRecord), ['alasan' => 'Tidak berwenang.'])
+            ->assertForbidden();
+
+        $this->assertSame('aktif', $otherRecord->fresh()->status);
+        $this->assertSame(0, LogPelanggaran::query()->count());
+    }
+
     public function test_guest_and_admin_cannot_access_teacher_notes_and_empty_state_is_rendered(): void
     {
         $this->get(route('guru.my-notes.index'))->assertRedirect(route('login'));

@@ -24,10 +24,10 @@ Route::prefix('guru')
         Route::post('pelanggaran', [PelanggaranSiswaController::class, 'store'])->name('violations.store');
         Route::get('pelanggaran/riwayat', [RiwayatPelanggaranController::class, 'index'])->name('violations.index');
         Route::get('pelanggaran/riwayat/{pelanggaranSiswa}', [RiwayatPelanggaranController::class, 'show'])->name('violations.show');
-        Route::get('pelanggaran/riwayat/{pelanggaranSiswa}/edit', [RiwayatPelanggaranController::class, 'edit'])->name('violations.edit');
-        Route::put('pelanggaran/riwayat/{pelanggaranSiswa}', [RiwayatPelanggaranController::class, 'update'])->name('violations.update');
-        Route::patch('pelanggaran/riwayat/{pelanggaranSiswa}/batal', [RiwayatPelanggaranController::class, 'cancel'])->name('violations.cancel');
         Route::get('catatan-saya', [CatatanSayaController::class, 'index'])->name('my-notes.index');
         Route::get('catatan-saya/{pelanggaranSiswa}', [CatatanSayaController::class, 'show'])->name('my-notes.show');
+        Route::get('catatan-saya/{pelanggaranSiswa}/edit', [RiwayatPelanggaranController::class, 'edit'])->name('my-notes.edit');
+        Route::put('catatan-saya/{pelanggaranSiswa}', [RiwayatPelanggaranController::class, 'update'])->name('my-notes.update');
+        Route::patch('catatan-saya/{pelanggaranSiswa}/batal', [RiwayatPelanggaranController::class, 'cancel'])->name('my-notes.cancel');
         Route::get('siswa/{siswa}', [SiswaController::class, 'show'])->name('students.show');
     });

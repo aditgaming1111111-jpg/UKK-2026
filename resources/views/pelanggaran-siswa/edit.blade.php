@@ -4,14 +4,14 @@
 
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[
-        ['label' => 'Riwayat Pelanggaran', 'url' => route($routePrefix.'.index')],
+        ['label' => $routePrefix === 'guru.my-notes' ? 'Catatan Saya' : 'Riwayat Pelanggaran', 'url' => route($routePrefix.'.index')],
         ['label' => 'Detail Catatan', 'url' => route($routePrefix.'.show', $record)],
         ['label' => 'Koreksi'],
     ]" />
 @endsection
 
 @section('page-heading')
-    <x-ui.page-heading title="Koreksi Catatan" description="Siswa, guru, kelas, dan tahun ajaran tetap melekat. Setiap koreksi wajib memiliki alasan audit." />
+    <x-ui.page-heading :title="$routePrefix === 'guru.my-notes' ? 'Koreksi Catatan Saya' : 'Koreksi Catatan Pelanggaran'" description="Siswa, guru, kelas, dan tahun ajaran tetap melekat. Setiap koreksi wajib memiliki alasan audit." />
 @endsection
 
 @section('content')

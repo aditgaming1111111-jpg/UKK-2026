@@ -45,7 +45,7 @@ class RiwayatPelanggaranTest extends TestCase
         ]));
 
         $response->assertOk()
-            ->assertViewHas('records', fn ($records): bool => $records->total() === 1 && $records->getCollection()->first()->is($record))
+            ->assertViewHas('records', fn($records): bool => $records->total() === 1 && $records->getCollection()->first()->is($record))
             ->assertSee($context['student']->nama)
             ->assertSee($context['student']->nisn)
             ->assertSee($context['class']->nama_kelas)
@@ -55,16 +55,16 @@ class RiwayatPelanggaranTest extends TestCase
     public function test_violation_history_paginates_ten_records_without_duplicates(): void
     {
         $context = $this->recordingContext();
-        $records = collect(range(1, 12))->map(fn (): PelanggaranSiswa => $this->createRecord($context));
+        $records = collect(range(1, 12))->map(fn(): PelanggaranSiswa => $this->createRecord($context));
         $administrator = User::factory()->create(['role' => 'admin']);
 
         $firstPage = $this->actingAs($administrator)->get(route('admin.student-violations.index'));
-        $firstPage->assertViewHas('records', fn ($page): bool => $page->count() === 10 && $page->total() === 12)
+        $firstPage->assertViewHas('records', fn($page): bool => $page->count() === 10 && $page->total() === 12)
             ->assertSeeText('');
         $firstPageIds = $firstPage->viewData('records')->getCollection()->modelKeys();
 
         $secondPage = $this->get(route('admin.student-violations.index', ['page' => 2]));
-        $secondPage->assertViewHas('records', fn ($page): bool => $page->count() === 2 && $page->total() === 12);
+        $secondPage->assertViewHas('records', fn($page): bool => $page->count() === 2 && $page->total() === 12);
         $secondPageIds = $secondPage->viewData('records')->getCollection()->modelKeys();
 
         $this->assertSame([], array_values(array_intersect($firstPageIds, $secondPageIds)));
@@ -79,18 +79,18 @@ class RiwayatPelanggaranTest extends TestCase
         foreach (range(1, 12) as $index) {
             LogAktivitas::query()->create([
                 'user_id' => $administrator->id,
-                'aktivitas' => 'Aktivitas paginasi '.$index,
-                'deskripsi' => 'Log Admin Pagination '.$index,
+                'aktivitas' => 'Aktivitas paginasi ' . $index,
+                'deskripsi' => 'Log Admin Pagination ' . $index,
             ]);
         }
         $filters = ['q' => 'Admin Pagination'];
 
         $firstPage = $this->actingAs($administrator)->get(route('admin.audit-logs.index', $filters));
-        $firstPage->assertViewHas('logs', fn ($logs): bool => $logs->count() === 10 && $logs->total() === 12)
+        $firstPage->assertViewHas('logs', fn($logs): bool => $logs->count() === 10 && $logs->total() === 12)
             ->assertSeeText('');
 
         $this->get(route('admin.audit-logs.index', [...$filters, 'page' => 2]))
-            ->assertViewHas('logs', fn ($logs): bool => $logs->count() === 2 && $logs->total() === 12)
+            ->assertViewHas('logs', fn($logs): bool => $logs->count() === 2 && $logs->total() === 12)
             ->assertSee('q=Admin%20Pagination');
     }
 
@@ -112,7 +112,7 @@ class RiwayatPelanggaranTest extends TestCase
 
         $noteDeleteResponse = $this->delete(route('admin.student-violations.show', $record));
         $this->assertContains($noteDeleteResponse->getStatusCode(), [404, 405]);
-        $logDeleteResponse = $this->delete('/admin/log-pelanggaran/'.$log->id);
+        $logDeleteResponse = $this->delete('/admin/log-pelanggaran/' . $log->id);
         $this->assertContains($logDeleteResponse->getStatusCode(), [404, 405]);
         $this->assertModelExists($record);
         $this->assertModelExists($log);
@@ -131,22 +131,27 @@ class RiwayatPelanggaranTest extends TestCase
 
         $this->actingAs($context['user'])->get(route('guru.violations.index'))
             ->assertOk()
-            ->assertViewHas('records', fn ($records): bool => $records->total() === 4
-                && $records->getCollection()->contains(fn (PelanggaranSiswa $record): bool => $record->is($ownRecord))
-                && $records->getCollection()->contains(fn (PelanggaranSiswa $record): bool => $record->is($recordByOtherTeacher))
-                && $records->getCollection()->contains(fn (PelanggaranSiswa $record): bool => $record->is($recordByFirstTeacherInOtherClass))
-                && $records->getCollection()->contains(fn (PelanggaranSiswa $record): bool => $record->is($unrelatedRecord)));
+            ->assertViewHas('records', fn($records): bool => $records->total() === 4
+                && $records->getCollection()->contains(fn(PelanggaranSiswa $record): bool => $record->is($ownRecord))
+                && $records->getCollection()->contains(fn(PelanggaranSiswa $record): bool => $record->is($recordByOtherTeacher))
+                && $records->getCollection()->contains(fn(PelanggaranSiswa $record): bool => $record->is($recordByFirstTeacherInOtherClass))
+                && $records->getCollection()->contains(fn(PelanggaranSiswa $record): bool => $record->is($unrelatedRecord)));
 
         $this->get(route('guru.violations.show', $recordByOtherTeacher))->assertOk();
         $this->get(route('guru.violations.show', $unrelatedRecord))->assertOk();
-        $this->put(route('guru.violations.update', $recordByOtherTeacher), $this->updatePayload($recordByOtherTeacher))
-            ->assertForbidden();
+        $this->get(route('guru.violations.show', $recordByOtherTeacher))
+            ->assertDontSee('Koreksi catatan')
+            ->assertDontSee('Batalkan catatan');
+        $this->get('/guru/pelanggaran/riwayat/' . $recordByOtherTeacher->id . '/edit')
+            ->assertNotFound();
+        $this->put('/guru/pelanggaran/riwayat/' . $recordByOtherTeacher->id, $this->updatePayload($recordByOtherTeacher))
+            ->assertStatus(405);
 
         $this->actingAs($otherContext['user'])->get(route('guru.violations.index'))
-            ->assertViewHas('records', fn ($records): bool => $records->total() === 4
-                && $records->getCollection()->contains(fn (PelanggaranSiswa $record): bool => $record->is($recordByOtherTeacher))
-                && $records->getCollection()->contains(fn (PelanggaranSiswa $record): bool => $record->is($recordByFirstTeacherInOtherClass))
-                && $records->getCollection()->contains(fn (PelanggaranSiswa $record): bool => $record->is($unrelatedRecord)));
+            ->assertViewHas('records', fn($records): bool => $records->total() === 4
+                && $records->getCollection()->contains(fn(PelanggaranSiswa $record): bool => $record->is($recordByOtherTeacher))
+                && $records->getCollection()->contains(fn(PelanggaranSiswa $record): bool => $record->is($recordByFirstTeacherInOtherClass))
+                && $records->getCollection()->contains(fn(PelanggaranSiswa $record): bool => $record->is($unrelatedRecord)));
         $this->get(route('guru.violations.show', $recordByFirstTeacherInOtherClass))->assertOk();
     }
 
@@ -154,7 +159,7 @@ class RiwayatPelanggaranTest extends TestCase
     {
         $context = $this->recordingContext();
         $otherContext = $this->recordingContext();
-        $records = collect(range(1, 12))->map(fn (): PelanggaranSiswa => $this->createRecord($context, $otherContext['teacher']));
+        $records = collect(range(1, 12))->map(fn(): PelanggaranSiswa => $this->createRecord($context, $otherContext['teacher']));
         $cancelledRecord = $this->createRecord($context, $otherContext['teacher'], status: 'dibatalkan');
         $filters = [
             'q' => $context['student']->nisn,
@@ -166,20 +171,20 @@ class RiwayatPelanggaranTest extends TestCase
 
         $firstPage = $this->actingAs($context['user'])->get(route('guru.violations.index', $filters));
         $firstPage->assertOk()
-            ->assertViewHas('records', fn ($page): bool => $page->count() === 10 && $page->total() === 12)
+            ->assertViewHas('records', fn($page): bool => $page->count() === 10 && $page->total() === 12)
             ->assertSee($otherContext['teacher']->nama);
 
         $this->get(route('guru.violations.index', [...$filters, 'page' => 2]))
             ->assertOk()
-            ->assertViewHas('records', fn ($page): bool => $page->count() === 2 && $page->total() === 12)
-            ->assertSee('q='.$context['student']->nisn)
-            ->assertSee('tahun_ajaran_id='.$context['year']->id)
-            ->assertSee('kelas_id='.$context['class']->id)
-            ->assertSee('guru_id='.$otherContext['teacher']->id)
-            ->assertViewHas('records', fn ($page): bool => ! $page->getCollection()->contains(fn (PelanggaranSiswa $record): bool => $record->is($cancelledRecord)));
+            ->assertViewHas('records', fn($page): bool => $page->count() === 2 && $page->total() === 12)
+            ->assertSee('q=' . $context['student']->nisn)
+            ->assertSee('tahun_ajaran_id=' . $context['year']->id)
+            ->assertSee('kelas_id=' . $context['class']->id)
+            ->assertSee('guru_id=' . $otherContext['teacher']->id)
+            ->assertViewHas('records', fn($page): bool => ! $page->getCollection()->contains(fn(PelanggaranSiswa $record): bool => $record->is($cancelledRecord)));
 
         $this->get(route('guru.violations.index', [...$filters, 'status' => 'dibatalkan']))
-            ->assertViewHas('records', fn ($page): bool => $page->total() === 1
+            ->assertViewHas('records', fn($page): bool => $page->total() === 1
                 && $page->getCollection()->first()->is($cancelledRecord))
             ->assertSee('Dibatalkan');
         $this->assertCount(12, $records);
@@ -199,9 +204,9 @@ class RiwayatPelanggaranTest extends TestCase
 
         $this->actingAs($newTeacherUser)->get(route('guru.violations.index'))
             ->assertOk()
-            ->assertViewHas('records', fn ($records): bool => $records->total() === 2
-                && $records->getCollection()->contains(fn (PelanggaranSiswa $record): bool => $record->is($permittedRecord))
-                && $records->getCollection()->contains(fn (PelanggaranSiswa $record): bool => $record->is($outsidePeriodRecord)))
+            ->assertViewHas('records', fn($records): bool => $records->total() === 2
+                && $records->getCollection()->contains(fn(PelanggaranSiswa $record): bool => $record->is($permittedRecord))
+                && $records->getCollection()->contains(fn(PelanggaranSiswa $record): bool => $record->is($outsidePeriodRecord)))
             ->assertSee($permittedRecord->penempatanKelas->siswa->nama);
     }
 
@@ -212,7 +217,7 @@ class RiwayatPelanggaranTest extends TestCase
         $oldDescription = $record->keterangan;
         $reason = 'Tanggal diverifikasi dari laporan guru.';
 
-        $this->actingAs($context['user'])->put(route('guru.violations.update', $record), $this->updatePayload($record, [
+        $this->actingAs($context['user'])->put(route('guru.my-notes.update', $record), $this->updatePayload($record, [
             'tanggal_pelanggaran' => now()->subDay()->toDateString(),
             'keterangan' => 'Keterangan hasil koreksi.',
             'alasan' => $reason,
@@ -220,7 +225,7 @@ class RiwayatPelanggaranTest extends TestCase
             'poin_saat_dicatat' => 999,
             'status' => 'dibatalkan',
             'kelas_siswa_id' => 999999,
-        ]))->assertRedirect(route('guru.violations.show', $record));
+        ]))->assertRedirect(route('guru.my-notes.show', $record));
 
         $record->refresh();
         $this->assertSame('Keterangan hasil koreksi.', $record->keterangan);
@@ -279,12 +284,12 @@ class RiwayatPelanggaranTest extends TestCase
         $inactiveCategory = PelanggaranKategori::factory()->create(['status_aktif' => false]);
         $inactiveViolation = Pelanggaran::factory()->for($inactiveCategory, 'kategori')->create(['status_aktif' => false]);
 
-        $this->actingAs($context['user'])->from(route('guru.violations.edit', $record))
-            ->put(route('guru.violations.update', $record), $this->updatePayload($record, [
+        $this->actingAs($context['user'])->from(route('guru.my-notes.edit', $record))
+            ->put(route('guru.my-notes.update', $record), $this->updatePayload($record, [
                 'pelanggaran_id' => $inactiveViolation->id,
                 'keterangan' => 'Perubahan yang harus ditolak.',
             ]))
-            ->assertRedirect(route('guru.violations.edit', $record))
+            ->assertRedirect(route('guru.my-notes.edit', $record))
             ->assertSessionHasErrors('pelanggaran_id');
 
         $this->assertSame($context['violation']->id, $record->fresh()->pelanggaran_id);
@@ -317,17 +322,19 @@ class RiwayatPelanggaranTest extends TestCase
         ]);
 
         $this->get(route('admin.dashboard', ['tahun_ajaran_id' => $context['year']->id]))
-            ->assertViewHas('stats', fn (array $stats): bool => $stats['active_violations'] === 1 && $stats['active_points'] === 3);
+            ->assertViewHas('stats', fn(array $stats): bool => $stats['active_violations'] === 1 && $stats['active_points'] === 3);
         $this->get(route('admin.student-violations.index', ['status' => 'dibatalkan']))
-            ->assertViewHas('records', fn ($records): bool => $records->total() === 1);
+            ->assertViewHas('records', fn($records): bool => $records->total() === 1);
 
         $this->put(route('admin.student-violations.update', $record), $this->updatePayload($record, [
             'keterangan' => 'Keterangan dikoreksi sesudah pembatalan.',
             'alasan' => 'Memperjelas arsip yang dibatalkan.',
-        ]))->assertRedirect(route('admin.student-violations.show', $record));
+        ]))->assertForbidden();
         $this->assertSame('dibatalkan', $record->fresh()->status);
+        $this->assertSame('Catatan awal', $record->fresh()->keterangan);
+        $this->assertSame(0, LogPelanggaran::query()->where('aksi', 'edit')->count());
         $this->get(route('admin.dashboard', ['tahun_ajaran_id' => $context['year']->id]))
-            ->assertViewHas('stats', fn (array $stats): bool => $stats['active_violations'] === 1 && $stats['active_points'] === 3);
+            ->assertViewHas('stats', fn(array $stats): bool => $stats['active_violations'] === 1 && $stats['active_points'] === 3);
     }
 
     public function test_teacher_can_cancel_own_record_but_cannot_change_another_users_record(): void
@@ -337,12 +344,12 @@ class RiwayatPelanggaranTest extends TestCase
         $otherContext = $this->recordingContext();
         $otherRecord = $this->createRecord($otherContext);
 
-        $this->actingAs($context['user'])->patch(route('guru.violations.cancel', $otherRecord), [
+        $this->actingAs($context['user'])->patch(route('guru.my-notes.cancel', $otherRecord), [
             'alasan' => 'Tidak memiliki akses.',
         ])->assertForbidden();
 
-        $this->patch(route('guru.violations.cancel', $ownRecord), ['alasan' => 'Salah pilih siswa saat input.'])
-            ->assertRedirect(route('guru.violations.show', $ownRecord));
+        $this->patch(route('guru.my-notes.cancel', $ownRecord), ['alasan' => 'Salah pilih siswa saat input.'])
+            ->assertRedirect(route('guru.my-notes.show', $ownRecord));
         $this->assertSame('dibatalkan', $ownRecord->fresh()->status);
         $this->assertSame(1, LogPelanggaran::query()->where('aksi', 'batal')->count());
     }
@@ -378,7 +385,7 @@ class RiwayatPelanggaranTest extends TestCase
         $student = Siswa::factory()->create();
         $class = Kelas::factory()->create();
         $year = TahunAjaran::factory()->create([
-            'nama_tahun_ajaran' => now()->format('Y').'/'.now()->addYear()->format('Y'),
+            'nama_tahun_ajaran' => now()->format('Y') . '/' . now()->addYear()->format('Y'),
             'tanggal_mulai' => now()->subMonth()->toDateString(),
             'tanggal_selesai' => now()->addMonth()->toDateString(),
             'status_aktif' => true,

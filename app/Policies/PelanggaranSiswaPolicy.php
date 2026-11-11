@@ -45,9 +45,10 @@ class PelanggaranSiswaPolicy
      */
     public function update(User $user, PelanggaranSiswa $pelanggaranSiswa): bool
     {
-        return $user->role === 'admin'
-            || ($user->role === 'guru'
-                && $user->guru()->where('status_aktif', true)->whereKey($pelanggaranSiswa->guru_id)->exists());
+        return $pelanggaranSiswa->status === 'aktif'
+            && ($user->role === 'admin'
+                || ($user->role === 'guru'
+                    && $user->guru()->where('status_aktif', true)->whereKey($pelanggaranSiswa->guru_id)->exists()));
     }
 
     /**
