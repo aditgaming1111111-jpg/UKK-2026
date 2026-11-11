@@ -65,14 +65,6 @@ if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 
 Buka `.env` secara lokal dan isi koneksi MySQL untuk database khusus SekolahKu:
 
-```dotenv
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=ukk_pelanggaran_siswa
-DB_USERNAME=isi_user_mysql_lokal
-DB_PASSWORD=isi_password_mysql_lokal
-```
 
 Sesuaikan user dan password dengan Laragon. Jangan menyalin `.env` dari komputer lain, jangan membagikan isinya, dan jangan commit file tersebut.
 
