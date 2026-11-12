@@ -1,6 +1,8 @@
+// Menyimpan animasi yang sedang berjalan dan menandai dialog yang sudah dipasangi handler.
 const modalAnimations = new WeakMap();
 const modalCancelHandlers = new WeakSet();
 
+// Membuka dialog dengan animasi masuk kecuali pengguna memilih pengurangan gerakan.
 const openModal = (dialog) => {
     if (dialog.open) return;
 
@@ -24,6 +26,7 @@ const openModal = (dialog) => {
     };
 };
 
+// Menutup dialog dengan transisi keluar sambil membersihkan animasi yang tertunda.
 const closeModal = (dialog) => {
     if (!dialog.open || dialog.hasAttribute('data-closing')) return;
 
@@ -57,6 +60,7 @@ const closeModal = (dialog) => {
     };
 };
 
+// Mendelegasikan aksi buka/tutup dialog serta tampil/sembunyi notifikasi.
 document.addEventListener('click', (event) => {
     const openButton = event.target.closest('[data-modal-open]');
     if (openButton) {
@@ -93,6 +97,7 @@ document.addEventListener('click', (event) => {
     if (toastClose) toastClose.closest('[data-toast]')?.classList.add('translate-y-2', 'opacity-0', 'pointer-events-none');
 });
 
+// Mencegah pengiriman ganda pada formulir konfirmasi modal.
 document.addEventListener('submit', (event) => {
     const form = event.target;
     if (!(form instanceof HTMLFormElement)) return;
@@ -108,6 +113,27 @@ document.addEventListener('submit', (event) => {
     form.dataset.modalSubmitting = 'true';
 });
 
+// Mencegah klik berulang pada formulir pencatatan dan memberi status simpan.
+document.addEventListener('submit', (event) => {
+    const form = event.target;
+    if (!(form instanceof HTMLFormElement) || !form.hasAttribute('data-submit-once')) return;
+
+    if (form.dataset.submitting === 'true') {
+        event.preventDefault();
+        return;
+    }
+
+    form.dataset.submitting = 'true';
+    const submitButton = form.querySelector('[data-submit-button]');
+    if (!(submitButton instanceof HTMLButtonElement)) return;
+
+    submitButton.disabled = true;
+    submitButton.setAttribute('aria-busy', 'true');
+    const label = submitButton.querySelector('[data-submit-label]');
+    if (label) label.textContent = submitButton.dataset.loadingLabel || 'Menyimpan...';
+});
+
+// Menginisialisasi pencarian siswa dan pilihan pelanggaran pada formulir pencatatan.
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('[data-violation-form]');
     if (!form) return;
@@ -124,12 +150,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let requestSequence = 0;
     let debounceTimer;
 
+    // Mengosongkan siswa terpilih dan mengembalikan tampilan instruksi awal.
     const clearSelection = () => {
         placementInput.value = '';
         resultDetails.forEach((element) => element.classList.add('hidden'));
         placeholder.classList.remove('hidden');
     };
 
+    // Menampilkan hasil pencarian, termasuk keadaan kosong dan pilihan siswa.
     const renderResults = (items) => {
         resultList.replaceChildren();
         resultList.classList.remove('hidden');
@@ -169,6 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    // Meminta siswa yang memiliki penempatan pada tanggal kejadian yang dipilih.
     const searchStudents = async () => {
         const query = queryInput.value.trim();
         if (query.length < 2 || !dateInput.value) {
@@ -201,6 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // Membatasi pilihan jenis pelanggaran pada kategori aktif yang dipilih.
     const filterViolations = () => {
         const categoryId = categorySelect.value;
         const violationOptions = [...violationSelect.options].filter((option) => option.value);
@@ -224,6 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
             : 'Pilih jenis pelanggaran';
     };
 
+    // Menghubungkan perubahan input dengan pencarian tertunda dan filter terkait.
     queryInput.addEventListener('input', () => {
         clearSelection();
         window.clearTimeout(debounceTimer);

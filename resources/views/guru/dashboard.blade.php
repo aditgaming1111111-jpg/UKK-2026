@@ -1,13 +1,17 @@
 @extends('layouts.guru')
 
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Dashboard Guru')
 
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[['label' => 'Dashboard']]" />
 @endsection
 
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')
     <x-ui.page-heading title="Dashboard Guru" :description="'Selamat datang, ' . $teacher->nama . '. Berikut ringkasan catatan Anda.'">
+        {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
         <form method="GET" action="{{ route('guru.dashboard') }}" class="flex flex-col gap-2 sm:flex-row sm:items-end">
             <label for="tahun_ajaran_id" class="space-y-1.5">
                 <span class="block text-xs font-medium text-gray-600">Tahun ajaran</span>
@@ -27,11 +31,13 @@
     </x-ui.page-heading>
 @endsection
 
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
     @if ($errors->has('tahun_ajaran_id'))
         <x-ui.error-state title="Filter tahun ajaran tidak valid" :description="$errors->first('tahun_ajaran_id')" />
     @endif
 
+    {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
     <section aria-label="Pencatatan pelanggaran" class="overflow-hidden rounded-2xl bg-gray-900 text-white shadow-sm">
         <div class="flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
             <div class="max-w-2xl">
@@ -55,6 +61,7 @@
             description="Statistik catatan akan muncul setelah tahun ajaran dibuat." />
     @endif
 
+    {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
     <section aria-label="Statistik catatan saya" class="grid gap-4 sm:grid-cols-3">
         <x-ui.stat-card label="Catatan dibuat" :value="number_format($stats['total_records'], 0, ',', '.')" :note="$selectedAcademicYear?->nama_tahun_ajaran ?? 'Tahun ajaran belum tersedia'" icon="document" />
         <x-ui.stat-card label="Masih aktif" :value="number_format($stats['active_records'], 0, ',', '.')" note="Catatan yang ikut perhitungan poin" icon="check" />

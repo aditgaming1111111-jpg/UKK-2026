@@ -1,9 +1,12 @@
 @extends('layouts.admin')
 
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Detail Guru')
 
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')<x-ui.breadcrumbs :items="[['label' => 'Data Guru', 'url' => route('admin.teachers.index')], ['label' => $teacher->nama]]" />@endsection
 
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')
     <x-ui.page-heading :title="$teacher->nama" description="Identitas Guru dan akun pengguna yang terhubung.">
         <div class="flex flex-wrap gap-2"><x-ui.button variant="secondary" :href="route('admin.teachers.edit', $teacher)">Edit identitas</x-ui.button>
@@ -19,6 +22,7 @@
     </x-ui.page-heading>
 @endsection
 
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
     @if (session('success'))
         <div role="status" class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700">
@@ -36,6 +40,7 @@
         </div>
     @endif
 
+    {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
     <section class="grid gap-5 xl:grid-cols-2">
         <x-ui.card>
             <div class="flex items-start justify-between gap-4">
@@ -82,6 +87,7 @@
                     terhubung memiliki role <strong>{{ $teacher->user->role }}</strong>, bukan Guru. Pengaturan akun dikunci
                     agar hak akses Admin tidak berubah.</div>
             @else
+                {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
                 <form method="POST" action="{{ route('admin.teachers.account.update', $teacher) }}" class="mt-5 space-y-4">
                     @csrf @method('PUT')
                     <p class="text-sm text-gray-800">Email login: <span class="font-medium">{{ $teacher->email }}</span></p>
@@ -102,6 +108,7 @@
         </x-ui.card>
     </section>
 
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card>
         <div class="flex flex-wrap items-end justify-between gap-3">
             <div>
@@ -141,16 +148,20 @@
     </x-ui.card>
 
     @if ($teacher->status_aktif)
+        {{-- Dialog ini memuat informasi atau konfirmasi sebelum tindakan dijalankan. --}}
         <x-ui.modal id="deactivate-guru" title="Nonaktifkan Guru?"
             description="Akun login tidak akan dapat digunakan selama Guru nonaktif. Relasi akun, penugasan, dan catatan pelanggaran tetap disimpan.">
+            {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
             <form method="POST" action="{{ route('admin.teachers.deactivate', $teacher) }}">@csrf @method('PATCH')<div
                     class="flex justify-end gap-2"><x-ui.button variant="secondary" type="button"
                         data-modal-close>Batal</x-ui.button><x-ui.button type="submit">Nonaktifkan Guru</x-ui.button></div>
             </form>
         </x-ui.modal>
     @else
+        {{-- Dialog ini memuat informasi atau konfirmasi sebelum tindakan dijalankan. --}}
         <x-ui.modal id="activate-guru" title="Aktifkan Guru kembali?"
             description="Akun login yang terhubung akan dapat digunakan kembali.">
+            {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
             <form method="POST" action="{{ route('admin.teachers.activate', $teacher) }}">@csrf @method('PATCH')<div
                     class="flex justify-end gap-2"><x-ui.button variant="secondary" type="button"
                         data-modal-close>Batal</x-ui.button><x-ui.button type="submit">Aktifkan Guru</x-ui.button></div>
@@ -159,8 +170,10 @@
     @endif
 
     @if (!$hasHistory)
+        {{-- Dialog ini memuat informasi atau konfirmasi sebelum tindakan dijalankan. --}}
         <x-ui.modal id="delete-guru" title="Hapus Guru dan akun login?"
             description="Guru ini belum memiliki penugasan, catatan pelanggaran, atau aktivitas audit. Identitas dan akun login akan dihapus permanen.">
+            {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
             <form method="POST" action="{{ route('admin.teachers.destroy', $teacher) }}">@csrf @method('DELETE')
                 <div class="flex justify-end gap-2">
                     <x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button>

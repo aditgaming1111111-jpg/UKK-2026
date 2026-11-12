@@ -1,15 +1,18 @@
 @extends('layouts.admin')
 
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[['label' => 'Tahun Ajaran']]" />
 @endsection
 
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')
     <x-ui.page-heading title="Tahun Ajaran" description="Periode lama tetap tersimpan untuk menjaga riwayat penempatan dan wali kelas.">
         <x-ui.button :href="route('admin.academic-years.create')">Tambah tahun ajaran</x-ui.button>
     </x-ui.page-heading>
 @endsection
 
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
     <div class="space-y-6">
         @if (session('success'))
@@ -17,6 +20,7 @@
         @endif
 
         <x-ui.card>
+            {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
             <form method="GET" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
                 <x-ui.input label="Cari nama" name="q" :value="$filters['q'] ?? ''" />
                 <x-ui.select label="Status" name="status">
@@ -33,6 +37,7 @@
 
         <x-ui.card :padding="false">
             @if ($academicYears->isNotEmpty())
+                {{-- Tabel berikut merangkum data dalam susunan kolom yang mudah dipindai. --}}
                 <x-ui.table>
                     <thead class="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                         <tr>

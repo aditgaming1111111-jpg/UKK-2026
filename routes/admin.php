@@ -14,11 +14,14 @@ use App\Http\Controllers\Admin\WaliKelasController;
 use App\Http\Controllers\RiwayatPelanggaranController;
 use Illuminate\Support\Facades\Route;
 
+// Seluruh rute administrasi dibatasi untuk pengguna dengan peran admin.
 Route::prefix('admin')
     ->name('admin.')
     ->middleware('role:admin')
     ->group(function (): void {
         Route::get('/', AdminDashboardController::class)->name('dashboard');
+
+        // Laporan menyediakan tampilan ringkasan serta keluaran cetak dan PDF.
         Route::get('laporan', [LaporanController::class, 'index'])->name('reports.index');
         Route::get('laporan/cetak', [LaporanController::class, 'print'])->name('reports.print');
         Route::get('laporan/pdf', [LaporanController::class, 'pdf'])->name('reports.pdf');
@@ -29,16 +32,22 @@ Route::prefix('admin')
         Route::patch('data-pelanggaran/{pelanggaranSiswa}/batal', [RiwayatPelanggaranController::class, 'cancel'])
             ->name('student-violations.cancel');
         Route::get('log-pelanggaran', [LogAktivitasController::class, 'index'])->name('audit-logs.index');
+
+        // Pengelolaan siswa mencakup status dan penempatan ke kelas.
         Route::resource('siswa', SiswaController::class)->parameters(['siswa' => 'siswa'])->names('students');
         Route::patch('siswa/{siswa}/status', [SiswaController::class, 'updateStatus'])->name('students.status');
         Route::post('siswa/{siswa}/penempatan', [SiswaController::class, 'storePlacement'])->name('students.placements.store');
         Route::patch('siswa/{siswa}/penempatan/{placementId}', [SiswaController::class, 'updatePlacement'])->name('students.placements.update');
         Route::delete('siswa/{siswa}/penempatan/{placementId}', [SiswaController::class, 'destroyPlacement'])->name('students.placements.destroy');
+
+        // Pengelolaan guru dan akun terkaitnya.
         Route::resource('guru', GuruController::class)->parameters(['guru' => 'guru'])->except(['destroy'])->names('teachers');
         Route::delete('guru/{guru}', [GuruController::class, 'destroy'])->name('teachers.destroy');
         Route::patch('guru/{guru}/nonaktifkan', [GuruController::class, 'deactivate'])->name('teachers.deactivate');
         Route::put('guru/{guru}/akun', [GuruController::class, 'updateAccount'])->name('teachers.account.update');
         Route::patch('guru/{guru}/aktifkan', [GuruController::class, 'activate'])->name('teachers.activate');
+
+        // Kelas, tahun ajaran, dan proses perpindahan siswa antar tahun.
         Route::resource('kelas', KelasController::class)->parameters(['kelas' => 'kelas'])->names('classes');
         Route::resource('tahun-ajaran', TahunAjaranController::class)
             ->parameters(['tahun-ajaran' => 'tahunAjaran'])
@@ -47,6 +56,8 @@ Route::prefix('admin')
             ->name('academic-years.student-transitions');
         Route::post('tahun-ajaran/{tahunAjaran}/proses-siswa', [StudentTransitionController::class, 'store'])
             ->name('academic-years.student-transitions.store');
+
+        // Kategori dan jenis pelanggaran dapat dikelola serta diaktifkan ulang.
         Route::resource('kategori-pelanggaran', PelanggaranKategoriController::class)
             ->parameters(['kategori-pelanggaran' => 'pelanggaranKategori'])
             ->names('violation-categories');
@@ -57,6 +68,8 @@ Route::prefix('admin')
             ->names('violations');
         Route::patch('jenis-pelanggaran/{pelanggaran}/status', [PelanggaranController::class, 'toggleStatus'])
             ->name('violations.status');
+
+        // Riwayat penugasan wali kelas per kelas dan tahun ajaran.
         Route::get('wali-kelas', [WaliKelasController::class, 'index'])->name('homeroom-teachers.index');
         Route::get('wali-kelas/create', [WaliKelasController::class, 'create'])->name('homeroom-teachers.create');
         Route::post('wali-kelas', [WaliKelasController::class, 'store'])->name('homeroom-teachers.store');

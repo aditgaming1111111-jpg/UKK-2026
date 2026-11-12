@@ -8,6 +8,7 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * Menambahkan identitas NIS dan tanggal lahir sebagai data opsional siswa.
      */
     public function up(): void
     {
@@ -19,6 +20,7 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
+     * Menghapus kolom identitas tambahan dari tabel siswa.
      */
     public function down(): void
     {

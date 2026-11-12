@@ -12,6 +12,9 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/**
+ * Menguji pratinjau dan pemrosesan kenaikan siswa, pengecualian, kelulusan, pembatalan transaksi, dan akses.
+ */
 class StudentTransitionTest extends TestCase
 {
     use RefreshDatabase;

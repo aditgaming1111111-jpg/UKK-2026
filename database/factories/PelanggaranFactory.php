@@ -13,6 +13,7 @@ class PelanggaranFactory extends Factory
 {
     /**
      * Define the model's default state.
+     * Menghasilkan jenis pelanggaran aktif dengan kode unik dan nilai poin.
      *
      * @return array<string, mixed>
      */

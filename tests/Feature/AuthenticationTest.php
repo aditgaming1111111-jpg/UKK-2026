@@ -7,6 +7,9 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/**
+ * Menguji alur masuk dan keluar, validasi kredensial, pengalihan peran, serta pembatasan akun guru nonaktif.
+ */
 class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;

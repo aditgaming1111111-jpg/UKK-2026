@@ -13,10 +13,17 @@ use App\Services\PencatatanPelanggaranService;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
+/**
+ * Menangani permintaan HTTP untuk catatan pelanggaran siswa, termasuk penyajian data dan perubahan yang diizinkan.
+ */
 class PelanggaranSiswaController extends Controller
 {
+    /**
+     * Menampilkan formulir untuk membuat catatan pelanggaran siswa.
+     */
     public function create(): View
     {
         $violations = Pelanggaran::availableForRecording()
@@ -26,6 +33,7 @@ class PelanggaranSiswaController extends Controller
             ->get(['id', 'kategori_id', 'kode', 'nama_pelanggaran', 'poin']);
 
         return view('guru.pelanggaran.create', [
+            'idempotencyKey' => (string) Str::uuid(),
             'categories' => PelanggaranKategori::query()
                 ->where('status_aktif', true)
                 ->orderBy('nama_kategori')
@@ -34,6 +42,9 @@ class PelanggaranSiswaController extends Controller
         ]);
     }
 
+    /**
+     * Mencari siswa yang dapat dipilih untuk pencatatan pelanggaran.
+     */
     public function searchStudents(SearchSiswaPenempatanRequest $request): JsonResponse
     {
         $validated = $request->validated();
@@ -57,15 +68,15 @@ class PelanggaranSiswaController extends Controller
             ->whereHas('siswa', function ($query) use ($term): void {
                 $query->where('status_siswa', 'aktif')
                     ->where(static function ($searchQuery) use ($term): void {
-                        $searchQuery->where('nisn', 'like', '%'.$term.'%')
-                            ->orWhere('nama', 'like', '%'.$term.'%');
+                        $searchQuery->where('nisn', 'like', '%' . $term . '%')
+                            ->orWhere('nama', 'like', '%' . $term . '%');
                     });
             })
             ->orderByDesc('tanggal_mulai')
             ->limit(20)
             ->get();
 
-        return response()->json($placements->map(static fn (KelasSiswa $placement): array => [
+        return response()->json($placements->map(static fn(KelasSiswa $placement): array => [
             'placement_id' => $placement->id,
             'student' => [
                 'name' => $placement->siswa->nama,
@@ -80,13 +91,20 @@ class PelanggaranSiswaController extends Controller
         ])->values());
     }
 
+    /**
+     * Memvalidasi dan menyimpan catatan pelanggaran siswa baru.
+     */
     public function store(StorePelanggaranSiswaRequest $request, PencatatanPelanggaranService $service, ActivityLogger $activityLogger): RedirectResponse
     {
         $record = $service->record($request->user(), $request->validated());
-        $activityLogger->record($request->user(), $request, 'Pelanggaran dicatat', 'Catatan pelanggaran siswa ID #'.$record->id.' berhasil dibuat.');
+        if ($record->wasRecentlyCreated) {
+            $activityLogger->record($request->user(), $request, 'Pelanggaran dicatat', 'Catatan pelanggaran siswa ID #' . $record->id . ' berhasil dibuat.');
+        }
 
         return redirect()
             ->route('guru.violations.show', $record)
-            ->with('success', 'Catatan pelanggaran berhasil disimpan.');
+            ->with('success', $record->wasRecentlyCreated
+                ? 'Catatan pelanggaran berhasil disimpan.'
+                : 'Permintaan ini sudah diproses sebelumnya; catatan tidak dibuat ulang.');
     }
 }

@@ -12,6 +12,7 @@ class TahunAjaranFactory extends Factory
 {
     /**
      * Define the model's default state.
+     * Menyiapkan tahun ajaran aktif untuk tanggal pada tahun berjalan.
      *
      * @return array<string, mixed>
      */

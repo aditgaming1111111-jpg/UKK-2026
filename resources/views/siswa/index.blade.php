@@ -1,11 +1,14 @@
 @extends(auth()->user()->role === 'admin' ? 'layouts.admin' : 'layouts.guru')
 
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Data Siswa')
 
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[['label' => 'Data Siswa']]" />
 @endsection
 
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')
     <x-ui.page-heading title="Data Siswa" description="Cari siswa, lihat kelas, serta rekap poin aktif per tahun ajaran.">
         @if ($canManageStudents)
@@ -14,13 +17,16 @@
     </x-ui.page-heading>
 @endsection
 
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
     @if (session('success'))
         <div role="status" class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700">
             {{ session('success') }}</div>
     @endif
 
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card>
+        {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
         <form method="GET" action="{{ route(auth()->user()->role . '.students.index') }}"
             class="grid gap-4 sm:grid-cols-2 xl:grid-cols-8">
             <div class="sm:col-span-2"><x-ui.search placeholder="Cari NIS, NISN, atau nama siswa" :value="$filters['q'] ?? null" /></div>
@@ -78,8 +84,10 @@
         </form>
     </x-ui.card>
 
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card :padding="false">
         @if ($students->isNotEmpty())
+            {{-- Tabel berikut merangkum data dalam susunan kolom yang mudah dipindai. --}}
             <x-ui.table>
                 <thead class="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
                     <tr>

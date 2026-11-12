@@ -6,10 +6,13 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/**
+ * Memeriksa kewenangan dan memvalidasi masukan untuk filter rekap pelanggaran kelas.
+ */
 class RekapKelasRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Menentukan apakah pengguna yang sedang masuk berwenang menjalankan permintaan ini.
      */
     public function authorize(): bool
     {
@@ -18,7 +21,7 @@ class RekapKelasRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Menetapkan aturan validasi yang berlaku untuk permintaan ini.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
@@ -33,6 +36,9 @@ class RekapKelasRequest extends FormRequest
         ];
     }
 
+    /**
+     * Menyediakan pesan kesalahan validasi yang ditampilkan kepada pengguna.
+     */
     public function messages(): array
     {
         return [

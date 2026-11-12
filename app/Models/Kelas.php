@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Merepresentasikan kelas beserta relasi dan aturan datanya.
+ */
 #[Fillable(['nama_kelas', 'tingkat', 'jurusan'])]
 class Kelas extends Model
 {

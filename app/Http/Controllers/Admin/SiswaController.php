@@ -23,10 +23,13 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
+/**
+ * Menangani permintaan HTTP untuk siswa, termasuk penyajian data dan perubahan yang diizinkan.
+ */
 class SiswaController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Menampilkan daftar siswa dengan filter dan paginasi yang berlaku.
      */
     public function index(SiswaIndexRequest $request, SiswaReadService $siswaReadService): View
     {
@@ -50,7 +53,7 @@ class SiswaController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Menampilkan formulir untuk membuat siswa.
      */
     public function create(): View
     {
@@ -58,7 +61,7 @@ class SiswaController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Memvalidasi dan menyimpan siswa baru.
      */
     public function store(StoreSiswaRequest $request, ActivityLogger $activityLogger): RedirectResponse
     {
@@ -69,7 +72,7 @@ class SiswaController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Menampilkan rincian siswa yang dipilih.
      */
     public function show(Siswa $siswa, SiswaReadService $siswaReadService): View
     {
@@ -86,7 +89,7 @@ class SiswaController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Menyiapkan formulir perubahan untuk siswa yang dipilih.
      */
     public function edit(Siswa $siswa): View
     {
@@ -96,7 +99,7 @@ class SiswaController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Memvalidasi dan menyimpan perubahan pada siswa.
      */
     public function update(UpdateSiswaRequest $request, Siswa $siswa, ActivityLogger $activityLogger): RedirectResponse
     {
@@ -107,7 +110,7 @@ class SiswaController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Menghapus siswa setelah pemeriksaan otorisasi dan aturan terkait.
      */
     public function destroy(Siswa $siswa, Request $request, ActivityLogger $activityLogger): RedirectResponse
     {
@@ -131,6 +134,9 @@ class SiswaController extends Controller
         return to_route('admin.students.index')->with('success', 'Data siswa tanpa riwayat berhasil dihapus permanen.');
     }
 
+    /**
+     * Memperbarui status siswa melalui alur yang diotorisasi.
+     */
     public function updateStatus(UpdateSiswaStatusRequest $request, Siswa $siswa, ActivityLogger $activityLogger): RedirectResponse
     {
         $status = $request->validated('status_siswa');
@@ -159,6 +165,9 @@ class SiswaController extends Controller
         return to_route('admin.students.show', $siswa)->with('success', $message);
     }
 
+    /**
+     * Menyimpan penempatan kelas baru bagi siswa.
+     */
     public function storePlacement(
         StorePenempatanKelasRequest $request,
         Siswa $siswa,
@@ -171,6 +180,9 @@ class SiswaController extends Controller
         return to_route('admin.students.show', $siswa)->with('success', 'Penempatan kelas berhasil disimpan.');
     }
 
+    /**
+     * Memperbarui penempatan kelas siswa beserta riwayatnya.
+     */
     public function updatePlacement(
         UpdatePenempatanKelasRequest $request,
         Siswa $siswa,
@@ -220,6 +232,9 @@ class SiswaController extends Controller
         return to_route('admin.students.show', $siswa)->with('success', 'Tanggal penempatan berhasil dikoreksi dan dicatat di log aktivitas.');
     }
 
+    /**
+     * Menghapus penempatan siswa setelah aturan koreksi diperiksa.
+     */
     public function destroyPlacement(
         Request $request,
         Siswa $siswa,

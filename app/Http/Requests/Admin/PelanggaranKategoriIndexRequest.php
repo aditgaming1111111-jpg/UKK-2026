@@ -6,10 +6,13 @@ use App\Models\PelanggaranKategori;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/**
+ * Memeriksa kewenangan dan memvalidasi masukan untuk filter daftar kategori pelanggaran.
+ */
 class PelanggaranKategoriIndexRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Menentukan apakah pengguna yang sedang masuk berwenang menjalankan permintaan ini.
      */
     public function authorize(): bool
     {
@@ -17,7 +20,7 @@ class PelanggaranKategoriIndexRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Menetapkan aturan validasi yang berlaku untuk permintaan ini.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
@@ -29,6 +32,9 @@ class PelanggaranKategoriIndexRequest extends FormRequest
         ];
     }
 
+    /**
+     * Menyediakan pesan kesalahan validasi yang ditampilkan kepada pengguna.
+     */
     public function messages(): array
     {
         return ['q.max' => 'Pencarian maksimal 100 karakter.', 'status.in' => 'Filter status kategori tidak valid.'];

@@ -65,6 +65,7 @@ return [
     |
     */
 
+    // Zona waktu bawaan untuk fungsi tanggal dan waktu aplikasi.
     'timezone' => 'UTC',
 
     /*
@@ -99,10 +100,12 @@ return [
 
     'key' => env('APP_KEY'),
 
+    // Kata sandi akun awal hanya dibaca oleh seeder autentikasi.
     'seed_admin_password' => env('SEED_ADMIN_PASSWORD'),
 
     'seed_guru_password' => env('SEED_GURU_PASSWORD'),
 
+    // Kunci lama memungkinkan data terenkripsi tetap dibuka setelah rotasi APP_KEY.
     'previous_keys' => [
         ...array_filter(
             explode(',', (string) env('APP_PREVIOUS_KEYS', ''))

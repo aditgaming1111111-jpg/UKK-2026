@@ -12,6 +12,9 @@ use App\Models\WaliKelas;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/**
+ * Menguji pengelolaan tahun ajaran, benturan periode, perlindungan riwayat, dan batas akses admin.
+ */
 class TahunAjaranManagementTest extends TestCase
 {
     use RefreshDatabase;

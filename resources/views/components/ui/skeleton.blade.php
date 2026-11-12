@@ -1,3 +1,4 @@
+{{-- Menampilkan placeholder beranimasi saat konten masih dimuat. --}}
 @props(['lines' => 3])
 <div aria-label="Memuat" aria-busy="true"
     {{ $attributes->class(['animate-pulse space-y-3 rounded-xl border border-gray-200 bg-white p-5 motion-reduce:animate-none']) }}>

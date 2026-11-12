@@ -1,16 +1,21 @@
 @extends('layouts.guru')
 
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Rincian Rekap Siswa')
 
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[['label' => 'Rekap Kelas Saya', 'url' => route('guru.class-recap.index', ['tahun_ajaran_id' => $selectedYear->id, 'kelas_id' => $selectedClass->id])], ['label' => 'Rincian siswa']]" />
 @endsection
 
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')
     <x-ui.page-heading title="Rincian Pelanggaran Siswa" :description="$student->nama . ' · NISN ' . $student->nisn" />
 @endsection
 
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
+    {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
     <section class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
         <dl class="grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
             <div><dt class="text-gray-500">Siswa</dt><dd class="mt-1 font-semibold text-gray-950">{{ $student->nama }}</dd></div>
@@ -20,6 +25,7 @@
         </dl>
     </section>
 
+    {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
     <section class="grid gap-4 sm:grid-cols-2"><x-ui.stat-card label="Catatan aktif" :value="$summary['active_records']" /><x-ui.stat-card label="Total poin aktif" :value="$summary['active_points']" /></section>
 
     @if ($records->isEmpty())

@@ -7,8 +7,14 @@ use App\Models\LogAktivitas;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
+/**
+ * Menangani permintaan HTTP untuk log aktivitas, termasuk penyajian data dan perubahan yang diizinkan.
+ */
 class LogAktivitasController extends Controller
 {
+    /**
+     * Menampilkan daftar log aktivitas dengan filter dan paginasi yang berlaku.
+     */
     public function index(Request $request): View
     {
         $validated = $request->validate(

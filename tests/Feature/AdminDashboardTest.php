@@ -15,6 +15,9 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/**
+ * Memastikan ringkasan, filter tahun ajaran, tampilan kosong, dan akses dasbor admin berjalan sesuai peran.
+ */
 class AdminDashboardTest extends TestCase
 {
     use RefreshDatabase;

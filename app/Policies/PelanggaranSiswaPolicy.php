@@ -5,6 +5,9 @@ namespace App\Policies;
 use App\Models\PelanggaranSiswa;
 use App\Models\User;
 
+/**
+ * Menentukan izin pengguna untuk catatan pelanggaran siswa.
+ */
 class PelanggaranSiswaPolicy
 {
     /**

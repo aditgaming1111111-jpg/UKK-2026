@@ -1,3 +1,4 @@
+{{-- Menyediakan halaman sambutan aplikasi beserta tautan akses dan informasi awal. --}}
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
@@ -14,6 +15,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @else
         <style>
+            /* Gaya utilitas cadangan dipakai saat aset hasil build belum tersedia. */
             /*! tailwindcss v4.0.7 | MIT License | https://tailwindcss.com */
             @layer properties {
                 @supports (((-webkit-hyphens:none)) and (not (margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g b)))) {
@@ -2166,8 +2168,10 @@
 
 <body
     class="bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#1b1b18] flex p-6 lg:p-8 items-center lg:justify-center min-h-screen flex-col">
+    {{-- Area tautan akses yang bergantung pada status autentikasi. --}}
     <header class="w-full lg:max-w-4xl max-w-[335px] text-sm mb-6 not-has-[nav]:hidden">
         @if (Route::has('login'))
+            {{-- Navigasi ringkas menuju halaman masuk atau dashboard. --}}
             <nav class="flex items-center justify-end gap-4">
                 @auth
                     <a href="{{ url('/dashboard') }}"
@@ -2192,6 +2196,7 @@
     </header>
     <div
         class="flex items-center justify-center w-full transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0">
+        {{-- Konten utama sambutan berisi panduan awal dan informasi aplikasi. --}}
         <main class="flex max-w-[335px] w-full flex-col-reverse lg:max-w-4xl lg:flex-row">
             <div
                 class="text-[13px] leading-[20px] flex-1 p-6 pb-6 lg:p-20 lg:pb-10 bg-white dark:bg-[#161615] dark:text-[#EDEDEC] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d] rounded-bl-lg rounded-br-lg lg:rounded-tl-lg lg:rounded-br-none">

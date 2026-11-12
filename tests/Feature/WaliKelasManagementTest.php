@@ -14,6 +14,9 @@ use App\Models\WaliKelas;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/**
+ * Menguji penetapan wali kelas, koreksi dan riwayat penugasan, konflik periode, serta akses rekap kelas.
+ */
 class WaliKelasManagementTest extends TestCase
 {
     use RefreshDatabase;

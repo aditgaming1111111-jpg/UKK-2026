@@ -15,6 +15,7 @@ class WaliKelasFactory extends Factory
 {
     /**
      * Define the model's default state.
+     * Membuat penugasan wali kelas aktif untuk kelas dan tahun ajaran.
      *
      * @return array<string, mixed>
      */

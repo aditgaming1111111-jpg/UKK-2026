@@ -16,10 +16,13 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
+/**
+ * Menangani permintaan HTTP untuk tahun ajaran, termasuk penyajian data dan perubahan yang diizinkan.
+ */
 class TahunAjaranController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Menampilkan daftar tahun ajaran dengan filter dan paginasi yang berlaku.
      */
     public function index(TahunAjaranIndexRequest $request): View
     {
@@ -38,7 +41,7 @@ class TahunAjaranController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Menampilkan formulir untuk membuat tahun ajaran.
      */
     public function create(): View
     {
@@ -48,7 +51,7 @@ class TahunAjaranController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Memvalidasi dan menyimpan tahun ajaran baru.
      */
     public function store(StoreTahunAjaranRequest $request, TahunAjaranManager $manager, ActivityLogger $activityLogger): RedirectResponse
     {
@@ -59,7 +62,7 @@ class TahunAjaranController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Menampilkan rincian tahun ajaran yang dipilih.
      */
     public function show(TahunAjaran $tahunAjaran): View
     {
@@ -70,7 +73,7 @@ class TahunAjaranController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Menyiapkan formulir perubahan untuk tahun ajaran yang dipilih.
      */
     public function edit(TahunAjaran $tahunAjaran): View
     {
@@ -80,7 +83,7 @@ class TahunAjaranController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Memvalidasi dan menyimpan perubahan pada tahun ajaran.
      */
     public function update(
         UpdateTahunAjaranRequest $request,
@@ -94,6 +97,9 @@ class TahunAjaranController extends Controller
         return to_route('admin.academic-years.show', $tahunAjaran)->with('success', 'Pengaturan tahun ajaran berhasil diperbarui.');
     }
 
+    /**
+     * Menghapus tahun ajaran setelah pemeriksaan otorisasi dan aturan terkait.
+     */
     public function destroy(TahunAjaran $tahunAjaran, Request $request, ActivityLogger $activityLogger): RedirectResponse
     {
         Gate::authorize('delete', $tahunAjaran);

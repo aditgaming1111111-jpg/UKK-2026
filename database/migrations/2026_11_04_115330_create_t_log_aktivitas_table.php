@@ -8,6 +8,7 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * Membuat penyimpanan jejak aktivitas pengguna beserta indeks penelusuran.
      */
     public function up(): void
     {
@@ -26,6 +27,7 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
+     * Menghapus tabel jejak aktivitas.
      */
     public function down(): void
     {

@@ -7,10 +7,13 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 
+/**
+ * Memeriksa kewenangan dan memvalidasi masukan untuk perubahan kata sandi pengguna.
+ */
 class UpdatePasswordRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Menentukan apakah pengguna yang sedang masuk berwenang menjalankan permintaan ini.
      */
     public function authorize(): bool
     {
@@ -20,7 +23,7 @@ class UpdatePasswordRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Menetapkan aturan validasi yang berlaku untuk permintaan ini.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
@@ -32,6 +35,9 @@ class UpdatePasswordRequest extends FormRequest
         ];
     }
 
+    /**
+     * Menyediakan pesan kesalahan validasi yang ditampilkan kepada pengguna.
+     */
     public function messages(): array
     {
         return [

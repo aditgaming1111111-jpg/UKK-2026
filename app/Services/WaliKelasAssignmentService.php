@@ -10,9 +10,14 @@ use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Mengelola penugasan wali kelas dengan pemeriksaan benturan rentang tanggal.
+ */
 class WaliKelasAssignmentService
 {
     /**
+     * Membuat penugasan wali kelas setelah memeriksa benturan periode pada kelas.
+     *
      * @param  array{guru_id: int, kelas_id: int, tahun_ajaran_id: int, tanggal_mulai: string}  $attributes
      */
     public function assign(array $attributes): WaliKelas
@@ -100,6 +105,9 @@ class WaliKelasAssignmentService
         });
     }
 
+    /**
+     * Mengakhiri penugasan wali kelas pada tanggal yang masih berada dalam periode tahun ajaran.
+     */
     public function close(WaliKelas $waliKelas, string $endDate): WaliKelas
     {
         return DB::transaction(function () use ($waliKelas, $endDate): WaliKelas {
@@ -130,6 +138,8 @@ class WaliKelasAssignmentService
     }
 
     /**
+     * Mengubah rentang penugasan sambil memeriksa benturan pada kelas maupun guru.
+     *
      * @param  array{tanggal_mulai: string, tanggal_selesai?: string|null}  $attributes
      * @return array{before: array{tanggal_mulai: string, tanggal_selesai: string|null, status_aktif: bool}, assignment: WaliKelas}
      */

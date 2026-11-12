@@ -1,18 +1,24 @@
 @extends('layouts.admin')
 
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Laporan Pelanggaran')
 
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[['label' => 'Laporan']]" />
 @endsection
 
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')
     <x-ui.page-heading title="Laporan Pelanggaran" description="Rekap catatan berdasarkan tahun ajaran dan filter kejadian." />
 @endsection
 
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
     @php($filterControlClasses = 'mt-1.5 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm outline-none focus:border-gray-500 focus:ring-2 focus:ring-gray-200')
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card :padding="false" class="p-4 sm:p-5">
+        {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
         <form method="GET" action="{{ route('admin.reports.index') }}" class="grid items-end gap-x-4 gap-y-3 sm:grid-cols-2 lg:grid-cols-12">
             <label class="block space-y-1.5 text-sm font-medium text-gray-700 lg:col-span-3">
                 <span>Tahun ajaran</span>
@@ -71,12 +77,14 @@
         @endif
     </x-ui.card>
 
+    {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
     <section class="grid gap-4 sm:grid-cols-3">
         <x-ui.stat-card label="Catatan aktif" :value="$summary['active_records']" />
         <x-ui.stat-card label="Total poin aktif" :value="$summary['active_points']" />
         <x-ui.stat-card label="Catatan dibatalkan" :value="$summary['cancelled_records']" />
     </section>
 
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card :padding="false">
         <div class="flex flex-col gap-3 border-b border-gray-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
             <div>
@@ -93,6 +101,7 @@
                 <x-ui.empty-state title="Tidak ada catatan" description="Belum ada catatan yang sesuai dengan filter ini." />
             </div>
         @else
+            {{-- Tabel berikut merangkum data dalam susunan kolom yang mudah dipindai. --}}
             <x-ui.table>
                 <thead class="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
                     <tr>

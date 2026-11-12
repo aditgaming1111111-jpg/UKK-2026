@@ -1,3 +1,4 @@
+{{-- Menyatukan field agar formulir tambah dan ubah memakai susunan data yang konsisten. --}}
 @csrf
 <div class="grid gap-5 sm:grid-cols-2"><x-ui.input label="Nama tahun ajaran" name="nama_tahun_ajaran" :value="$academicYear->nama_tahun_ajaran ?? null"
         required maxlength="20" placeholder="2026/2027" /><x-ui.input label="Tanggal mulai" name="tanggal_mulai"

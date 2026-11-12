@@ -52,6 +52,7 @@ return [
 
     'channels' => [
 
+        // Stack menggabungkan kanal yang ditentukan oleh LOG_STACK.
         'stack' => [
             'driver' => 'stack',
             'channels' => explode(',', (string) env('LOG_STACK', 'single')),
@@ -126,6 +127,7 @@ return [
             'replace_placeholders' => true,
         ],
 
+        // Kanal null membuang pesan; emergency tetap menyediakan lokasi cadangan.
         'null' => [
             'driver' => 'monolog',
             'handler' => NullHandler::class,

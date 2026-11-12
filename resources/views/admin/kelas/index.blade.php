@@ -1,12 +1,16 @@
 @extends('layouts.admin')
 
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Data Kelas')
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')<x-ui.breadcrumbs :items="[['label' => 'Data Kelas']]" />
 @endsection
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')<x-ui.page-heading title="Data Kelas"
         description="Kelola tingkat dan jurusan kelas. Status pemakaian diturunkan dari penempatan siswa aktif."><x-ui.button
         :href="route('admin.classes.create')">Tambah kelas</x-ui.button></x-ui.page-heading>@endsection
 
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
     @if (session('success'))
         <div role="status" class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700">
@@ -15,7 +19,9 @@
     @if ($errors->has('kelas'))
         <x-ui.error-state title="Kelas tidak dapat dihapus" :description="$errors->first('kelas')" />
     @endif
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card>
+        {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
         <form method="GET" action="{{ route('admin.classes.index') }}"
             class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_14rem_auto]"><x-ui.search
                 placeholder="Cari nama kelas, tingkat, jurusan" :value="$filters['q'] ?? null" /><label class="space-y-1.5"><span
@@ -29,6 +35,7 @@
                     variant="secondary" :href="route('admin.classes.index')">Reset</x-ui.button></div>
         </form>
     </x-ui.card>
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card :padding="false">
         @if ($classes->isNotEmpty())<x-ui.table>
                 <thead class="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">

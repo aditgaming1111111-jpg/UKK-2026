@@ -1,3 +1,4 @@
+{{-- Menyiapkan kerangka bersama untuk merangkai bagian antarmuka dan konten halaman. --}}
 <!DOCTYPE html>
 <html lang="id" class="app-scrollbar-hidden">
 
@@ -14,11 +15,13 @@
     @php($hasActiveWaliKelas = $hasActiveWaliKelas ?? false)
 
     <div class="min-h-screen lg:flex">
+        {{-- Navigasi samping permanen untuk tampilan layar besar. --}}
         <aside class="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-gray-200 bg-white lg:block">
             <x-navigation.sidebar :role="$role" :has-active-wali-kelas="$hasActiveWaliKelas" />
         </aside>
 
         <div class="min-w-0 flex-1 lg:pl-64">
+            {{-- Menu lipat menggantikan navigasi samping pada layar kecil. --}}
             <div class="border-b border-gray-200 bg-white p-3 lg:hidden">
                 <details class="group">
                     <summary
@@ -34,8 +37,10 @@
                 </details>
             </div>
 
+            {{-- Bilah informasi akun berada di atas konten halaman. --}}
             <x-navigation.topbar :role="$role" />
 
+            {{-- Area untuk breadcrumb, judul, dan konten halaman turunan. --}}
             <main class="mx-auto w-full max-w-[1600px] p-4 sm:p-6 lg:p-8">
                 @yield('breadcrumbs')
                 @yield('page-heading')

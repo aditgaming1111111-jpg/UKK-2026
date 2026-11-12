@@ -10,8 +10,14 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Memvalidasi dan mengelola riwayat penempatan siswa.
+ */
 class SiswaPenempatanService
 {
+    /**
+     * Menolak koreksi penempatan yang melanggar urutan dan rentang riwayat siswa.
+     */
     public function assertCorrectionIsValid(
         KelasSiswa $placement,
         CarbonImmutable $startDate,
@@ -60,6 +66,8 @@ class SiswaPenempatanService
     }
 
     /**
+     * Membuat penempatan siswa setelah memeriksa kelas, tahun ajaran, dan riwayat terkait.
+     *
      * @param  array{kelas_id: int, tahun_ajaran_id: int, tanggal_mulai: string}  $attributes
      */
     public function assign(Siswa $siswa, array $attributes): KelasSiswa

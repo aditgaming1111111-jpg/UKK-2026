@@ -8,6 +8,7 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * Menyiapkan penyimpanan antrean, batch pekerjaan, dan pekerjaan gagal.
      */
     public function up(): void
     {
@@ -49,6 +50,7 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
+     * Menghapus seluruh tabel penyimpanan pekerjaan.
      */
     public function down(): void
     {

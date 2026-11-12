@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Merepresentasikan log pelanggaran beserta relasi dan aturan datanya.
+ */
 #[Fillable(['pelanggaran_siswa_id', 'user_id', 'aksi', 'data_sebelum', 'data_sesudah', 'alasan'])]
 class LogPelanggaran extends Model
 {

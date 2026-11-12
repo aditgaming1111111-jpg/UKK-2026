@@ -14,6 +14,7 @@ return [
     |
     */
 
+    // Mailer log menjadi pilihan lokal bawaan agar email tidak dikirim keluar.
     'default' => env('MAIL_MAILER', 'log'),
 
     /*
@@ -79,6 +80,7 @@ return [
             'transport' => 'array',
         ],
 
+        // Jika SMTP gagal, kirim isi email ke log sebagai jalur cadangan.
         'failover' => [
             'transport' => 'failover',
             'mailers' => [

@@ -4,13 +4,22 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Memeriksa kewenangan dan memvalidasi masukan untuk filter dashboard administrator.
+ */
 class DashboardFilterRequest extends FormRequest
 {
+    /**
+     * Menentukan apakah pengguna yang sedang masuk berwenang menjalankan permintaan ini.
+     */
     public function authorize(): bool
     {
         return $this->user()?->role === 'admin';
     }
 
+    /**
+     * Menetapkan aturan validasi untuk masukan permintaan.
+     */
     public function rules(): array
     {
         return [
@@ -18,6 +27,9 @@ class DashboardFilterRequest extends FormRequest
         ];
     }
 
+    /**
+     * Menyediakan pesan kesalahan validasi yang ditampilkan kepada pengguna.
+     */
     public function messages(): array
     {
         return [

@@ -1,16 +1,21 @@
 @extends('layouts.guru')
 
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Rekap Kelas Saya')
 
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[['label' => 'Rekap Kelas Saya']]" />
 @endsection
 
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')
     <x-ui.page-heading title="Rekap Kelas Saya" description="Rekap berdasarkan kelas dan periode penugasan wali kelas Anda." />
 @endsection
 
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
+    {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
     <section class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
         <div class="flex flex-wrap items-start justify-between gap-4 border-b border-gray-100 pb-4">
             <div>
@@ -27,6 +32,7 @@
                 <a href="{{ route('guru.class-recap.excel', $exportParameters) }}" class="inline-flex min-h-10 items-center justify-center rounded-lg border border-gray-300 px-3.5 py-2 text-sm font-semibold text-gray-800 transition hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900">Unduh Excel</a>
             </div>
         </div>
+        {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
         <form method="GET" action="{{ route('guru.class-recap.index') }}" class="mt-5 space-y-4">
             <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 <label for="tahun_ajaran_id" class="block space-y-1.5 text-sm font-medium text-gray-800">
@@ -67,6 +73,7 @@
         </form>
     </section>
 
+    {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
     <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <x-ui.stat-card label="Jumlah siswa" :value="$summary['student_count']" />
         <x-ui.stat-card label="Siswa dengan pelanggaran aktif" :value="$summary['students_with_active_records']" />
@@ -77,6 +84,7 @@
     @if ($students->isEmpty())
         <x-ui.empty-state title="Belum ada siswa" description="Tidak ada siswa yang sesuai dengan penugasan dan pencarian ini." />
     @else
+        {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
         <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
             <div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200 text-left text-sm">
                 <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-600"><tr><th class="px-4 py-3">Siswa</th><th class="px-4 py-3">NISN</th><th class="px-4 py-3">Catatan aktif</th><th class="px-4 py-3">Poin aktif</th><th class="px-4 py-3 text-right">Rincian</th></tr></thead>

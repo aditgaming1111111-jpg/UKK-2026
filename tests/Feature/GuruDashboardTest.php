@@ -15,6 +15,9 @@ use App\Models\WaliKelas;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/**
+ * Menguji ringkasan catatan guru, filter tahun ajaran, rekap wali kelas, dan pembatasan akses dasbor.
+ */
 class GuruDashboardTest extends TestCase
 {
     use RefreshDatabase;

@@ -7,6 +7,9 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
+/**
+ * Menentukan izin pengguna untuk siswa.
+ */
 class SiswaPolicy
 {
     public function viewAny(User $user): bool

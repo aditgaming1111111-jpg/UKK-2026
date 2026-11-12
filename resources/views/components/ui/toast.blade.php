@@ -1,3 +1,4 @@
+{{-- Menampilkan notifikasi status singkat dengan kontrol untuk menutupnya. --}}
 @props(['id' => 'app-toast', 'message' => 'Perubahan berhasil disimpan.'])
 <div id="{{ $id }}" data-toast role="status" aria-live="polite"
     class="pointer-events-none fixed right-4 top-4 z-50 flex max-w-sm items-center gap-3 rounded-xl bg-gray-900 px-4 py-3 text-sm text-white opacity-100 shadow-xl transition duration-200 motion-reduce:transition-none">

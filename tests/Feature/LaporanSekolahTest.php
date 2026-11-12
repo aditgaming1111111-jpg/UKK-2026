@@ -18,6 +18,9 @@ use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Tests\TestCase;
 
+/**
+ * Menguji filter dan ekspor laporan serta rekap wali kelas, termasuk cakupan data dan pembatasan akses.
+ */
 class LaporanSekolahTest extends TestCase
 {
     use RefreshDatabase;

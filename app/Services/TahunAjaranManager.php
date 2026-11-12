@@ -9,9 +9,14 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Menjaga konsistensi nama, periode, dan status tahun ajaran saat pembuatan atau perubahan.
+ */
 class TahunAjaranManager
 {
     /**
+     * Membuat tahun ajaran setelah memeriksa nama, rentang periode, dan status aktif.
+     *
      * @param  array{nama_tahun_ajaran: string, tanggal_mulai: string, tanggal_selesai: string, status_aktif: bool}  $attributes
      */
     public function create(array $attributes): TahunAjaran
@@ -30,6 +35,8 @@ class TahunAjaranManager
     }
 
     /**
+     * Memperbarui tahun ajaran sambil menjaga konsistensi periode dan riwayat terkait.
+     *
      * @param  array{nama_tahun_ajaran: string, tanggal_mulai: string, tanggal_selesai: string, status_aktif: bool}  $attributes
      */
     public function update(TahunAjaran $tahunAjaran, array $attributes): TahunAjaran
@@ -60,6 +67,8 @@ class TahunAjaranManager
     }
 
     /**
+     * Menolak nama tahun ajaran yang sudah dipakai oleh data lain.
+     *
      * @param  Collection<int, TahunAjaran>  $years
      */
     private function ensureUniqueName(Collection $years, string $name, ?int $exceptId = null): void
@@ -75,6 +84,8 @@ class TahunAjaranManager
     }
 
     /**
+     * Menolak rentang tanggal yang bertumpang tindih dengan tahun ajaran lain.
+     *
      * @param  Collection<int, TahunAjaran>  $years
      */
     private function ensurePeriodAvailable(
@@ -102,6 +113,9 @@ class TahunAjaranManager
         }
     }
 
+    /**
+     * Memastikan perubahan periode tetap mencakup riwayat penempatan dan penugasan.
+     */
     private function ensurePeriodContainsHistory(TahunAjaran $tahunAjaran, string $startDate, string $endDate): void
     {
         $start = CarbonImmutable::parse($startDate)->toDateString();

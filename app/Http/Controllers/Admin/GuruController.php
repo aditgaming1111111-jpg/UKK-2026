@@ -21,10 +21,13 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
+/**
+ * Menangani permintaan HTTP untuk guru, termasuk penyajian data dan perubahan yang diizinkan.
+ */
 class GuruController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Menampilkan daftar guru dengan filter dan paginasi yang berlaku.
      */
     public function index(GuruIndexRequest $request, GuruDirectory $guruDirectory): View
     {
@@ -35,7 +38,7 @@ class GuruController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Menampilkan formulir untuk membuat guru.
      */
     public function create(): View
     {
@@ -45,7 +48,7 @@ class GuruController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Memvalidasi dan menyimpan guru baru.
      */
     public function store(StoreGuruRequest $request, ActivityLogger $activityLogger): RedirectResponse
     {
@@ -73,7 +76,7 @@ class GuruController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Menampilkan rincian guru yang dipilih.
      */
     public function show(Guru $guru): View
     {
@@ -87,7 +90,7 @@ class GuruController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Menyiapkan formulir perubahan untuk guru yang dipilih.
      */
     public function edit(Guru $guru): View
     {
@@ -97,7 +100,7 @@ class GuruController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Memvalidasi dan menyimpan perubahan pada guru.
      */
     public function update(UpdateGuruRequest $request, Guru $guru, ActivityLogger $activityLogger): RedirectResponse
     {
@@ -133,7 +136,7 @@ class GuruController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Menghapus guru setelah pemeriksaan otorisasi dan aturan terkait.
      */
     public function destroy(Guru $guru, Request $request, ActivityLogger $activityLogger): RedirectResponse
     {
@@ -161,6 +164,9 @@ class GuruController extends Controller
             ->with('success', 'Data Guru dan akun login tanpa riwayat berhasil dihapus permanen.');
     }
 
+    /**
+     * Menonaktifkan akun guru beserta status aktif yang terkait.
+     */
     public function deactivate(Guru $guru, Request $request, ActivityLogger $activityLogger): RedirectResponse
     {
         Gate::authorize('changeStatus', $guru);
@@ -174,6 +180,9 @@ class GuruController extends Controller
             ->with('success', 'Guru dinonaktifkan. Akun login, penugasan, dan seluruh histori tetap tersimpan.');
     }
 
+    /**
+     * Memperbarui kredensial akun yang terhubung dengan data guru.
+     */
     public function updateAccount(UpdateGuruAccountRequest $request, Guru $guru, ActivityLogger $activityLogger): RedirectResponse
     {
         $data = $request->validated();
@@ -208,6 +217,9 @@ class GuruController extends Controller
         return to_route('admin.teachers.show', $guru)->with('success', 'Pengaturan akun login berhasil diperbarui.');
     }
 
+    /**
+     * Mengaktifkan kembali akun guru melalui pemeriksaan otorisasi.
+     */
     public function activate(Guru $guru, Request $request, ActivityLogger $activityLogger): RedirectResponse
     {
         Gate::authorize('changeStatus', $guru);

@@ -5,10 +5,13 @@ namespace App\Http\Requests\Admin;
 use App\Models\TahunAjaran;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Memeriksa kewenangan dan memvalidasi masukan untuk pembuatan tahun ajaran.
+ */
 class StoreTahunAjaranRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Menentukan apakah pengguna yang sedang masuk berwenang menjalankan permintaan ini.
      */
     public function authorize(): bool
     {
@@ -16,7 +19,7 @@ class StoreTahunAjaranRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Menetapkan aturan validasi yang berlaku untuk permintaan ini.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
@@ -30,6 +33,9 @@ class StoreTahunAjaranRequest extends FormRequest
         ];
     }
 
+    /**
+     * Menormalkan masukan sebelum aturan validasi dijalankan.
+     */
     protected function prepareForValidation(): void
     {
         $this->merge([
@@ -38,6 +44,9 @@ class StoreTahunAjaranRequest extends FormRequest
         ]);
     }
 
+    /**
+     * Menyediakan pesan kesalahan validasi yang ditampilkan kepada pengguna.
+     */
     public function messages(): array
     {
         return [

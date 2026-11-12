@@ -19,10 +19,13 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
+/**
+ * Menangani permintaan HTTP untuk kelas, termasuk penyajian data dan perubahan yang diizinkan.
+ */
 class KelasController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Menampilkan daftar kelas dengan filter dan paginasi yang berlaku.
      */
     public function index(KelasIndexRequest $request): View
     {
@@ -54,7 +57,7 @@ class KelasController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Menampilkan formulir untuk membuat kelas.
      */
     public function create(): View
     {
@@ -64,7 +67,7 @@ class KelasController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Memvalidasi dan menyimpan kelas baru.
      */
     public function store(StoreKelasRequest $request, ActivityLogger $activityLogger): RedirectResponse
     {
@@ -75,7 +78,7 @@ class KelasController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Menampilkan rincian kelas yang dipilih.
      */
     public function show(Request $request, Kelas $kelas): View
     {
@@ -111,7 +114,7 @@ class KelasController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Menyiapkan formulir perubahan untuk kelas yang dipilih.
      */
     public function edit(Kelas $kelas): View
     {
@@ -121,7 +124,7 @@ class KelasController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Memvalidasi dan menyimpan perubahan pada kelas.
      */
     public function update(UpdateKelasRequest $request, Kelas $kelas, ActivityLogger $activityLogger): RedirectResponse
     {
@@ -132,7 +135,7 @@ class KelasController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Menghapus kelas setelah pemeriksaan otorisasi dan aturan terkait.
      */
     public function destroy(Kelas $kelas, Request $request, ActivityLogger $activityLogger): RedirectResponse
     {

@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Merepresentasikan wali kelas beserta relasi dan aturan datanya.
+ */
 #[Fillable(['guru_id', 'kelas_id', 'tahun_ajaran_id', 'tanggal_mulai', 'tanggal_selesai', 'status_aktif'])]
 class WaliKelas extends Model
 {

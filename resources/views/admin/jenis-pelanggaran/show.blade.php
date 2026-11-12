@@ -1,12 +1,16 @@
 @extends('layouts.admin')
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Detail Jenis Pelanggaran')
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')<x-ui.breadcrumbs :items="[
     ['label' => 'Jenis Pelanggaran', 'url' => route('admin.violations.index')],
     ['label' => $pelanggaran->kode],
 ]" />@endsection
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')<x-ui.page-heading title="{{ $pelanggaran->nama_pelanggaran }}"
         description="Kode {{ $pelanggaran->kode }} · {{ $pelanggaran->kategori->nama_kategori }}"><div class="flex flex-wrap gap-2"><x-ui.button
         variant="secondary" :href="route('admin.violations.edit', $pelanggaran)">Edit jenis</x-ui.button>@if($pelanggaran->catatan_siswa_count === 0)<x-ui.button variant="secondary" type="button" data-modal-open="delete-violation">Hapus jenis</x-ui.button>@endif</div></x-ui.page-heading>@endsection
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
     @if (session('success'))
         <x-ui.toast>{{ session('success') }}</x-ui.toast>
@@ -14,6 +18,7 @@
     @if ($errors->any())
         <x-ui.error-state title="Tindakan belum dilakukan" :description="$errors->first()" />
     @endif
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card>
         <div class="flex flex-wrap items-start justify-between gap-4">
             <div class="flex items-center gap-3">
@@ -24,6 +29,7 @@
                     <x-ui.badge variant="outline">Kategori nonaktif</x-ui.badge>
                 @endif
             </div>
+            {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
             <form id="violation-status-form" method="POST" data-modal-confirm-form
                 action="{{ route('admin.violations.status', $pelanggaran) }}">
                 @csrf
@@ -59,6 +65,7 @@
         @if ($pelanggaran->catatan_siswa_count > 0)
             <p class="mt-3 text-sm text-gray-500">Jenis ini sudah digunakan pada catatan siswa. Nonaktifkan agar histori dan snapshot poin tetap terjaga.</p>
         @endif
+        {{-- Dialog ini memuat informasi atau konfirmasi sebelum tindakan dijalankan. --}}
         <x-ui.modal id="violation-status-confirmation" :title="$pelanggaran->status_aktif ? 'Nonaktifkan jenis pelanggaran?' : 'Aktifkan jenis pelanggaran?'" :description="$pelanggaran->status_aktif
             ? 'Catatan lama tetap tersimpan.'
             : 'Jenis ini tersedia untuk pencatatan baru.'">
@@ -70,18 +77,22 @@
             </div>
         </x-ui.modal>
         @if ($pelanggaran->catatan_siswa_count === 0)
+            {{-- Dialog ini memuat informasi atau konfirmasi sebelum tindakan dijalankan. --}}
             <x-ui.modal id="delete-violation" title="Hapus jenis pelanggaran?" description="Jenis ini belum digunakan pada catatan siswa.">
+                {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
                 <form method="POST" action="{{ route('admin.violations.destroy', $pelanggaran) }}">@csrf @method('DELETE')
                     <div class="flex justify-end gap-2"><x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button><x-ui.button type="submit">Hapus permanen</x-ui.button></div>
                 </form>
             </x-ui.modal>
         @endif
     </x-ui.card>
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card :padding="false">
         <div class="border-b border-gray-200 px-5 py-4">
             <h2 class="font-semibold text-gray-900">Riwayat catatan terbaru</h2>
         </div>
         @if ($recentRecords->isNotEmpty())
+            {{-- Tabel berikut merangkum data dalam susunan kolom yang mudah dipindai. --}}
             <x-ui.table>
                 <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
                     <tr>

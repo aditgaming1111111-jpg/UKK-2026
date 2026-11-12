@@ -1,14 +1,20 @@
 @extends('layouts.admin')
 
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Tambah Guru')
 
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')<x-ui.breadcrumbs :items="[['label' => 'Data Guru', 'url' => route('admin.teachers.index')], ['label' => 'Tambah Guru']]" />@endsection
 
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')<x-ui.page-heading title="Tambah Guru"
     description="Buat identitas Guru beserta akun login yang langsung terhubung." />@endsection
 
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card>
+        {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
         <form method="POST" action="{{ route('admin.teachers.store') }}">
             @csrf
             <h2 class="text-base font-semibold text-gray-950">Identitas dan akun Guru</h2>

@@ -1,3 +1,4 @@
+{{-- Membentuk field teks dengan label, nilai lama, petunjuk, dan pesan validasi. --}}
 @props(['label', 'name', 'type' => 'text', 'value' => null, 'hint' => null, 'required' => false])
 <div class="space-y-1.5">
     <label for="{{ $name }}" class="block text-sm font-medium text-gray-700">{{ $label }} @if ($required)

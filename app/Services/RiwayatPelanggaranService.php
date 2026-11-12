@@ -11,9 +11,16 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Menerapkan koreksi dan pembatalan catatan pelanggaran serta mencatat jejak auditnya.
+ */
 class RiwayatPelanggaranService
 {
-    /** @param array{pelanggaran_id: int, tanggal_pelanggaran: string, keterangan?: ?string, tindakan?: ?string, alasan: string} $attributes */
+    /**
+     * Memperbarui catatan secara atomik, memeriksa izin, lalu menyimpan jejak perubahan.
+     *
+     * @param  array{pelanggaran_id: int, tanggal_pelanggaran: string, keterangan?: ?string, tindakan?: ?string, alasan: string}  $attributes
+     */
     public function update(User $user, PelanggaranSiswa $record, array $attributes): PelanggaranSiswa
     {
         return DB::transaction(function () use ($user, $record, $attributes): PelanggaranSiswa {
@@ -52,6 +59,9 @@ class RiwayatPelanggaranService
         }, 3);
     }
 
+    /**
+     * Membatalkan catatan aktif dan mencatat alasan pembatalan dalam satu transaksi.
+     */
     public function cancel(User $user, PelanggaranSiswa $record, string $reason): PelanggaranSiswa
     {
         return DB::transaction(function () use ($user, $record, $reason): PelanggaranSiswa {
@@ -70,7 +80,11 @@ class RiwayatPelanggaranService
         }, 3);
     }
 
-    /** @return array<int, string> */
+    /**
+     * Menentukan relasi rincian catatan yang perlu dimuat untuk respons.
+     *
+     * @return array<int, string>
+     */
     public function detailRelations(): array
     {
         return [
@@ -84,6 +98,9 @@ class RiwayatPelanggaranService
         ];
     }
 
+    /**
+     * Memastikan tanggal kejadian berada dalam masa penempatan dan tahun ajaran catatan.
+     */
     private function ensureIncidentDateIsValid(PelanggaranSiswa $record, string $date): void
     {
         $placement = $record->penempatanKelas()->with('tahunAjaran')->lockForUpdate()->firstOrFail();
@@ -105,6 +122,8 @@ class RiwayatPelanggaranService
     }
 
     /**
+     * Menyimpan keadaan sebelum dan sesudah perubahan beserta pelaku serta alasannya.
+     *
      * @param  array<string, mixed>  $before
      * @param  array<string, mixed>  $after
      */

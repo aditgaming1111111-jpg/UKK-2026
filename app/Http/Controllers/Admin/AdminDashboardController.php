@@ -12,8 +12,14 @@ use App\Models\TahunAjaran;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\View\View;
 
+/**
+ * Menangani permintaan HTTP untuk administrator dashboard, termasuk penyajian data dan perubahan yang diizinkan.
+ */
 class AdminDashboardController extends Controller
 {
+    /**
+     * Menyajikan administrator dashboard melalui satu aksi controller.
+     */
     public function __invoke(DashboardFilterRequest $request): View
     {
         $academicYears = TahunAjaran::query()

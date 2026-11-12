@@ -5,10 +5,13 @@ namespace App\Http\Requests\Admin;
 use App\Models\PelanggaranKategori;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Memeriksa kewenangan dan memvalidasi masukan untuk pembuatan kategori pelanggaran.
+ */
 class StorePelanggaranKategoriRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Menentukan apakah pengguna yang sedang masuk berwenang menjalankan permintaan ini.
      */
     public function authorize(): bool
     {
@@ -16,7 +19,7 @@ class StorePelanggaranKategoriRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Menetapkan aturan validasi yang berlaku untuk permintaan ini.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
@@ -28,11 +31,17 @@ class StorePelanggaranKategoriRequest extends FormRequest
         ];
     }
 
+    /**
+     * Menormalkan masukan sebelum aturan validasi dijalankan.
+     */
     protected function prepareForValidation(): void
     {
         $this->merge(['nama_kategori' => trim((string) $this->input('nama_kategori', ''))]);
     }
 
+    /**
+     * Menyediakan pesan kesalahan validasi yang ditampilkan kepada pengguna.
+     */
     public function messages(): array
     {
         return [

@@ -5,10 +5,13 @@ namespace App\Http\Requests\Admin;
 use App\Models\Guru;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Memeriksa kewenangan dan memvalidasi masukan untuk perubahan akun guru.
+ */
 class UpdateGuruAccountRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Menentukan apakah pengguna yang sedang masuk berwenang menjalankan permintaan ini.
      */
     public function authorize(): bool
     {
@@ -20,7 +23,7 @@ class UpdateGuruAccountRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Menetapkan aturan validasi yang berlaku untuk permintaan ini.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
@@ -31,6 +34,9 @@ class UpdateGuruAccountRequest extends FormRequest
         ];
     }
 
+    /**
+     * Menyediakan pesan kesalahan validasi yang ditampilkan kepada pengguna.
+     */
     public function messages(): array
     {
         return [

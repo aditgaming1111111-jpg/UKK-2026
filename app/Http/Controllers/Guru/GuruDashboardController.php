@@ -11,8 +11,14 @@ use App\Models\WaliKelas;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\View\View;
 
+/**
+ * Menangani permintaan HTTP untuk guru dashboard, termasuk penyajian data dan perubahan yang diizinkan.
+ */
 class GuruDashboardController extends Controller
 {
+    /**
+     * Menyajikan guru dashboard melalui satu aksi controller.
+     */
     public function __invoke(GuruDashboardFilterRequest $request): View
     {
         $teacher = Guru::query()

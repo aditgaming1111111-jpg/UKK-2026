@@ -1,3 +1,4 @@
+{{-- Menyediakan tombol atau tautan dengan variasi gaya dan ukuran yang seragam. --}}
 @props(['variant' => 'primary', 'type' => 'button', 'href' => null, 'size' => 'md'])
 @php
     $styles = [

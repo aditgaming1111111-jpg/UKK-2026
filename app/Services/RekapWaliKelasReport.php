@@ -15,9 +15,14 @@ use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * Menyusun data laporan wali kelas untuk tampilan dan ekspor.
+ */
 class RekapWaliKelasReport
 {
     /**
+     * Menyiapkan data rekap wali kelas untuk tampilan berdasarkan filter yang dipilih.
+     *
      * @param  array<string, int|string|null>  $filters
      * @return array<string, mixed>
      */
@@ -73,7 +78,10 @@ class RekapWaliKelasReport
         ];
     }
 
-    /** @param array<string, int|string|null> $filters
+    /**
+     * Menyediakan data yang siap digunakan untuk ekspor.
+     *
+     * @param  array<string, int|string|null>  $filters
      * @return array<string, mixed>
      */
     public function exportData(User $user, int $yearId, int $classId, array $filters): array
@@ -135,6 +143,8 @@ class RekapWaliKelasReport
     }
 
     /**
+     * Menyusun ringkasan pelanggaran dan poin untuk seorang siswa.
+     *
      * @param  array<string, int|string|null>  $filters
      * @return array<string, mixed>
      */
@@ -185,6 +195,8 @@ class RekapWaliKelasReport
     }
 
     /**
+     * Mengambil konteks kelas, tahun ajaran, dan penugasan wali kelas bagi laporan.
+     *
      * @param  array<string, int|string|null>  $filters
      * @return array<string, mixed>
      */
@@ -262,7 +274,10 @@ class RekapWaliKelasReport
         ];
     }
 
-    /** @param array<string, mixed> $context
+    /**
+     * Mengambil penempatan siswa yang tercakup dalam rentang penugasan wali kelas.
+     *
+     * @param  array<string, mixed>  $context
      * @return Builder<KelasSiswa>
      */
     private function placements(array $context): Builder
@@ -305,7 +320,10 @@ class RekapWaliKelasReport
         return $query;
     }
 
-    /** @param array<string, mixed> $context
+    /**
+     * Mengambil catatan pelanggaran yang berlaku pada penempatan dan periode laporan.
+     *
+     * @param  array<string, mixed>  $context
      * @param  Builder<KelasSiswa>  $placements
      * @return Builder<PelanggaranSiswa>
      */

@@ -15,6 +15,9 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/**
+ * Menguji daftar catatan milik guru, pencarian dan filter, detail, koreksi, pembatalan, serta batas akses.
+ */
 class CatatanSayaTest extends TestCase
 {
     use RefreshDatabase;
@@ -181,10 +184,10 @@ class CatatanSayaTest extends TestCase
             ->assertSeeInOrder([
                 'href="'.route('guru.my-notes.index').'"',
                 'aria-current="page"',
-                'Catatan Saya',
+                'Riwayat',
             ], false)
-            ->assertDontSee('Koreksi catatan')
-            ->assertDontSee('Batalkan catatan');
+            ->assertDontSee('Koreksi riwayat')
+            ->assertDontSee('Batalkan riwayat');
 
         $this->get(route('guru.my-notes.show', $otherRecord))->assertForbidden();
     }
@@ -195,8 +198,8 @@ class CatatanSayaTest extends TestCase
         $record = $this->createRecord($context, ['poin_saat_dicatat' => 7]);
 
         $this->actingAs($context['user'])->get(route('guru.my-notes.show', $record))
-            ->assertSee('Koreksi catatan')
-            ->assertSee('Batalkan catatan')
+            ->assertSee('Koreksi riwayat')
+            ->assertSee('Batalkan riwayat')
             ->assertSee(route('guru.my-notes.edit', $record));
 
         $this->get(route('guru.my-notes.edit', $record))
@@ -236,8 +239,8 @@ class CatatanSayaTest extends TestCase
             ->assertOk()
             ->assertSee('Dibatalkan')
             ->assertSee($reason)
-            ->assertDontSee('Koreksi catatan')
-            ->assertDontSee('Batalkan catatan');
+            ->assertDontSee('Koreksi riwayat')
+            ->assertDontSee('Batalkan riwayat');
 
         $this->get(route('guru.point-recap.index', ['tahun_ajaran_id' => $context['year']->id]))
             ->assertViewHas('students', fn ($students): bool => (int) $students->getCollection()

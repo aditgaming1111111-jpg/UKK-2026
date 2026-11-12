@@ -1,9 +1,15 @@
 @extends('layouts.admin')
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Tugaskan Wali Kelas')
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')<x-ui.breadcrumbs :items="[['label' => 'Wali Kelas', 'url' => route('admin.homeroom-teachers.index')], ['label' => 'Penugasan baru']]" />@endsection
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')<x-ui.page-heading title="Tugaskan Wali Kelas" description="Guru aktif dapat ditugaskan pada kelas dan tahun ajaran yang dipilih." />@endsection
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
+{{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
 <x-ui.card>
+{{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
 <form method="POST" action="{{ route('admin.homeroom-teachers.store') }}" class="space-y-5">
 @csrf
 @if($errors->any())

@@ -13,11 +13,13 @@ class UserFactory extends Factory
 {
     /**
      * The current password being used by the factory.
+     * Hash kata sandi disimpan bersama agar pemanggilan factory berikutnya konsisten.
      */
     protected static ?string $password;
 
     /**
      * Define the model's default state.
+     * Membuat akun contoh berperan guru dengan alamat email unik.
      *
      * @return array<string, mixed>
      */

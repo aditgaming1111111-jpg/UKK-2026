@@ -16,10 +16,13 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
+/**
+ * Menangani permintaan HTTP untuk kategori pelanggaran, termasuk penyajian data dan perubahan yang diizinkan.
+ */
 class PelanggaranKategoriController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Menampilkan daftar kategori pelanggaran dengan filter dan paginasi yang berlaku.
      */
     public function index(PelanggaranKategoriIndexRequest $request): View
     {
@@ -37,7 +40,7 @@ class PelanggaranKategoriController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Menampilkan formulir untuk membuat kategori pelanggaran.
      */
     public function create(): View
     {
@@ -47,7 +50,7 @@ class PelanggaranKategoriController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Memvalidasi dan menyimpan kategori pelanggaran baru.
      */
     public function store(StorePelanggaranKategoriRequest $request, ActivityLogger $activityLogger): RedirectResponse
     {
@@ -58,7 +61,7 @@ class PelanggaranKategoriController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Menampilkan rincian kategori pelanggaran yang dipilih.
      */
     public function show(PelanggaranKategori $pelanggaranKategori): View
     {
@@ -70,7 +73,7 @@ class PelanggaranKategoriController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Menyiapkan formulir perubahan untuk kategori pelanggaran yang dipilih.
      */
     public function edit(PelanggaranKategori $pelanggaranKategori): View
     {
@@ -80,7 +83,7 @@ class PelanggaranKategoriController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Memvalidasi dan menyimpan perubahan pada kategori pelanggaran.
      */
     public function update(UpdatePelanggaranKategoriRequest $request, PelanggaranKategori $pelanggaranKategori, ActivityLogger $activityLogger): RedirectResponse
     {
@@ -90,6 +93,9 @@ class PelanggaranKategoriController extends Controller
         return to_route('admin.violation-categories.show', $pelanggaranKategori)->with('success', 'Kategori pelanggaran berhasil diperbarui.');
     }
 
+    /**
+     * Menghapus kategori pelanggaran setelah pemeriksaan otorisasi dan aturan terkait.
+     */
     public function destroy(PelanggaranKategori $pelanggaranKategori, Request $request, ActivityLogger $activityLogger): RedirectResponse
     {
         Gate::authorize('delete', $pelanggaranKategori);

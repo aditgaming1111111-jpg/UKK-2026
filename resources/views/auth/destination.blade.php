@@ -1,3 +1,4 @@
+{{-- Menyajikan antarmuka autentikasi sesuai alur akses pengguna. --}}
 <!DOCTYPE html>
 <html lang="id" class="app-scrollbar-hidden">
 
@@ -10,10 +11,12 @@
 
 <body class="min-h-screen bg-gray-100 text-gray-900 antialiased">
     <main class="mx-auto max-w-3xl px-4 py-12">
+        {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
         <section class="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
             <p class="text-sm font-semibold uppercase tracking-[0.2em] text-gray-500">SekolahKu</p>
             <h1 class="mt-3 text-2xl font-bold">Tujuan autentikasi {{ $role }}</h1>
             <p class="mt-2 text-sm text-gray-600">Halaman sementara untuk memverifikasi akses berdasarkan role.</p>
+            {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
             <form method="POST" action="{{ route('logout') }}" class="mt-8">
                 @csrf
                 <button type="submit"

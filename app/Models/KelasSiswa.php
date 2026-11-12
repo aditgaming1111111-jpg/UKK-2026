@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Merepresentasikan riwayat penempatan siswa pada kelas dan tahun ajaran beserta relasi datanya.
+ */
 #[Fillable(['siswa_id', 'kelas_id', 'tahun_ajaran_id', 'tanggal_mulai', 'tanggal_selesai', 'status_aktif'])]
 class KelasSiswa extends Model
 {

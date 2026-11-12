@@ -18,8 +18,14 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
+/**
+ * Menangani permintaan HTTP untuk wali kelas, termasuk penyajian data dan perubahan yang diizinkan.
+ */
 class WaliKelasController extends Controller
 {
+    /**
+     * Menampilkan daftar wali kelas dengan filter dan paginasi yang berlaku.
+     */
     public function index(WaliKelasIndexRequest $request): View
     {
         $filters = $request->validated();
@@ -52,6 +58,9 @@ class WaliKelasController extends Controller
         ]);
     }
 
+    /**
+     * Menampilkan formulir untuk membuat wali kelas.
+     */
     public function create(): View
     {
         Gate::authorize('create', WaliKelas::class);
@@ -63,6 +72,9 @@ class WaliKelasController extends Controller
         ]);
     }
 
+    /**
+     * Memvalidasi dan menyimpan wali kelas baru.
+     */
     public function store(StoreWaliKelasRequest $request, WaliKelasAssignmentService $service, ActivityLogger $activityLogger): RedirectResponse
     {
         $assignment = $service->assign($request->validated());
@@ -71,6 +83,9 @@ class WaliKelasController extends Controller
         return to_route('admin.homeroom-teachers.show', $assignment)->with('success', 'Penugasan wali kelas berhasil disimpan.');
     }
 
+    /**
+     * Menampilkan rincian wali kelas yang dipilih.
+     */
     public function show(WaliKelas $waliKelas): View
     {
         Gate::authorize('view', $waliKelas);
@@ -79,6 +94,9 @@ class WaliKelasController extends Controller
         return view('admin.wali-kelas.show', ['assignment' => $waliKelas]);
     }
 
+    /**
+     * Mengakhiri penugasan wali kelas pada tanggal yang divalidasi.
+     */
     public function close(
         CloseWaliKelasRequest $request,
         WaliKelas $waliKelas,
@@ -91,6 +109,9 @@ class WaliKelasController extends Controller
         return to_route('admin.homeroom-teachers.show', $waliKelas)->with('success', 'Penugasan wali kelas diakhiri; riwayat tetap tersimpan.');
     }
 
+    /**
+     * Mengubah tanggal penugasan setelah benturan periode diperiksa.
+     */
     public function updateDates(
         UpdateWaliKelasRequest $request,
         WaliKelas $waliKelas,

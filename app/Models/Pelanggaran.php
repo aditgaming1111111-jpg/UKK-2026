@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Merepresentasikan pelanggaran beserta relasi dan aturan datanya.
+ */
 #[Fillable(['kategori_id', 'kode', 'nama_pelanggaran', 'deskripsi', 'poin', 'status_aktif'])]
 class Pelanggaran extends Model
 {
@@ -36,6 +39,9 @@ class Pelanggaran extends Model
         return $this->hasMany(PelanggaranSiswa::class, 'pelanggaran_id');
     }
 
+    /**
+     * Membatasi kueri pada jenis pelanggaran yang aktif dan dapat dicatat.
+     */
     public function scopeAvailableForRecording(Builder $query): Builder
     {
         return $query->where('status_aktif', true)

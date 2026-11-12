@@ -3,8 +3,10 @@
 </div>
 @extends('layouts.guru')
 
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Detail Riwayat')
 
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[
         ['label' => 'Riwayat', 'url' => route('guru.my-notes.index')],
@@ -12,6 +14,7 @@
     ]" />
 @endsection
 
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')
     <x-ui.page-heading title="Detail Riwayat" description="Informasi kejadian dan jejak audit riwayat pelanggaran.">
         <div class="flex flex-wrap gap-2">
@@ -24,6 +27,7 @@
     </x-ui.page-heading>
 @endsection
 
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
     @if (session('success'))
         <div role="status" class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700">{{ session('success') }}</div>
@@ -34,6 +38,7 @@
     @if ($errors->has('alasan'))
         <div role="alert" class="rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-800">{{ $errors->first('alasan') }}</div>
     @endif
+    {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
     <section class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <x-ui.card>
             <div class="flex items-start justify-between gap-3">
@@ -99,6 +104,7 @@
         </x-ui.card>
     </section>
 
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card>
         <h2 class="text-base font-semibold text-gray-950">Jejak perubahan</h2>
         @if ($record->logPerubahan->isNotEmpty())
@@ -131,7 +137,9 @@
     </x-ui.card>
 
     @if ($canManage)
+        {{-- Dialog ini memuat informasi atau konfirmasi sebelum tindakan dijalankan. --}}
         <x-ui.modal id="cancel-record" title="Batalkan catatan pelanggaran?" description="Catatan tetap tersimpan untuk riwayat, tetapi statusnya tidak lagi dihitung sebagai poin aktif.">
+            {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
             <form method="POST" action="{{ route('guru.my-notes.cancel', $record) }}" class="space-y-4">
                 @csrf
                 @method('PATCH')

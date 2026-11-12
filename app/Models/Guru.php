@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Merepresentasikan guru beserta relasi dan aturan datanya.
+ */
 #[Fillable(['nip', 'status_kepegawaian', 'nama', 'email', 'status_aktif', 'user_id'])]
 class Guru extends Model
 {

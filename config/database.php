@@ -16,6 +16,7 @@ return [
     |
     */
 
+    // SQLite menjadi koneksi bawaan bila DB_CONNECTION tidak ditentukan.
     'default' => env('DB_CONNECTION', 'sqlite'),
 
     /*
@@ -40,6 +41,7 @@ return [
             'busy_timeout' => null,
             'journal_mode' => null,
             'synchronous' => null,
+            // Transaksi SQLite ditunda hingga ada operasi baca atau tulis.
             'transaction_mode' => 'DEFERRED',
         ],
 
@@ -152,6 +154,7 @@ return [
             'persistent' => env('REDIS_PERSISTENT', false),
         ],
 
+        // Koneksi Redis utama dan cache memakai nomor basis data terpisah.
         'default' => [
             'url' => env('REDIS_URL'),
             'host' => env('REDIS_HOST', '127.0.0.1'),

@@ -15,6 +15,7 @@ class KelasSiswaFactory extends Factory
 {
     /**
      * Define the model's default state.
+     * Membuat penempatan siswa aktif pada kelas dan tahun ajaran contoh.
      *
      * @return array<string, mixed>
      */

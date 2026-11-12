@@ -6,9 +6,14 @@ use App\Models\Guru;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * Mengambil dan memaginasi daftar guru sesuai filter.
+ */
 class GuruDirectory
 {
     /**
+     * Mengambil direktori guru sesuai filter dan menyajikannya dengan paginasi.
+     *
      * @param  array{q?: string|null, status?: string|null}  $filters
      * @return LengthAwarePaginator<int, Guru>
      */

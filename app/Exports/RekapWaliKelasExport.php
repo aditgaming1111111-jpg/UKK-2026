@@ -5,6 +5,9 @@ namespace App\Exports;
 use Maatwebsite\Excel\Concerns\Export;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
+/**
+ * Membagi laporan wali kelas ke dalam lembar rincian dan ringkasan.
+ */
 class RekapWaliKelasExport implements Export, WithMultipleSheets
 {
     /** @param array<string, mixed> $report */

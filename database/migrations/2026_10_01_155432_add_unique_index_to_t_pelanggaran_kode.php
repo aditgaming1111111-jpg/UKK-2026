@@ -9,9 +9,11 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * Menjadikan kode jenis pelanggaran unik setelah memeriksa duplikasi.
      */
     public function up(): void
     {
+        // Beri petunjuk data yang perlu diperbaiki sebelum indeks diterapkan.
         $duplicateCode = DB::table('t_pelanggaran')
             ->select('kode')
             ->groupBy('kode')
@@ -29,6 +31,7 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
+     * Menghapus indeks unik kode pelanggaran.
      */
     public function down(): void
     {

@@ -13,6 +13,7 @@ class GuruFactory extends Factory
 {
     /**
      * Define the model's default state.
+     * Membuat data guru contoh beserta akun pengguna berperan guru.
      *
      * @return array<string, mixed>
      */

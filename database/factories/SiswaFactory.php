@@ -12,6 +12,7 @@ class SiswaFactory extends Factory
 {
     /**
      * Define the model's default state.
+     * Menghasilkan identitas, data pribadi, dan status siswa contoh.
      *
      * @return array<string, mixed>
      */

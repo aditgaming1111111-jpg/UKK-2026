@@ -13,8 +13,14 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
+/**
+ * Menangani permintaan HTTP untuk catatan saya, termasuk penyajian data dan perubahan yang diizinkan.
+ */
 class CatatanSayaController extends Controller
 {
+    /**
+     * Menampilkan daftar catatan saya dengan filter dan paginasi yang berlaku.
+     */
     public function index(CatatanSayaIndexRequest $request): View
     {
         $user = $request->user();
@@ -66,6 +72,9 @@ class CatatanSayaController extends Controller
         ]);
     }
 
+    /**
+     * Menampilkan rincian catatan saya yang dipilih.
+     */
     public function show(PelanggaranSiswa $pelanggaranSiswa): View
     {
         Gate::authorize('viewOwn', $pelanggaranSiswa);
@@ -91,6 +100,9 @@ class CatatanSayaController extends Controller
         ]);
     }
 
+    /**
+     * Mengambil data guru aktif yang terkait dengan pengguna saat ini.
+     */
     private function activeTeacherFor(User $user): Guru
     {
         return $user->guru()->where('status_aktif', true)->firstOrFail();

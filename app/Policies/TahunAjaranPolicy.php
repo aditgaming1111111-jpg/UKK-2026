@@ -5,6 +5,9 @@ namespace App\Policies;
 use App\Models\TahunAjaran;
 use App\Models\User;
 
+/**
+ * Menentukan izin pengguna untuk tahun ajaran.
+ */
 class TahunAjaranPolicy
 {
     public function viewAny(User $user): bool

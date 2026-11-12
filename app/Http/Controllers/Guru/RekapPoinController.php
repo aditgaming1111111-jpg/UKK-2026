@@ -7,8 +7,14 @@ use App\Http\Requests\Guru\PointRecapRequest;
 use App\Services\SiswaReadService;
 use Illuminate\View\View;
 
+/**
+ * Menangani permintaan HTTP untuk rekap poin, termasuk penyajian data dan perubahan yang diizinkan.
+ */
 class RekapPoinController extends Controller
 {
+    /**
+     * Menampilkan daftar rekap poin dengan filter dan paginasi yang berlaku.
+     */
     public function index(PointRecapRequest $request, SiswaReadService $siswaReadService): View
     {
         $filters = $request->validated();

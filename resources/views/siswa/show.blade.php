@@ -1,7 +1,9 @@
 @extends(auth()->user()->role === 'admin' ? 'layouts.admin' : 'layouts.guru')
 
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Detail Siswa')
 
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[
         ['label' => auth()->user()->role === 'admin' ? 'Data Siswa' : 'Rekap Kelas Saya', 'url' => route(auth()->user()->role === 'admin' ? 'admin.students.index' : 'guru.class-recap.index')],
@@ -9,6 +11,7 @@
     ]" />
 @endsection
 
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')
     <x-ui.page-heading :title="$student->nama" description="Identitas tetap, riwayat kelas, dan riwayat pelanggaran siswa.">
         @if ($canManageStudents)
@@ -31,6 +34,7 @@
     </x-ui.page-heading>
 @endsection
 
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
     @if (session('success'))
         <div role="status" class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700">
@@ -50,6 +54,7 @@
         </div>
     @endif
 
+    {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
     <section class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <x-ui.card>
             <div class="flex flex-wrap items-start justify-between gap-3">
@@ -109,6 +114,7 @@
         </x-ui.card>
     </section>
 
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card>
         <div class="flex flex-wrap items-end justify-between gap-3">
             <div>
@@ -158,6 +164,7 @@
                                     <td class="px-4 py-3 text-right">
                                         <details class="mb-2 text-left">
                                             <summary class="cursor-pointer text-sm font-medium text-gray-700 underline decoration-gray-300 underline-offset-2">Koreksi tanggal</summary>
+                                            {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
                                             <form method="POST" action="{{ route('admin.students.placements.update', [$student, $placement->id]) }}" class="mt-3 grid gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 sm:grid-cols-2">
                                                 @csrf
                                                 @method('PATCH')
@@ -200,12 +207,14 @@
                         || collect($activePlacementIds)->contains(fn ($activePlacementId) => $activePlacementId !== $placement->id);
                 @endphp
                 @if (!$hasViolationRecords && $hasReplacementPlacement)
+                    {{-- Dialog ini memuat informasi atau konfirmasi sebelum tindakan dijalankan. --}}
                     <x-ui.modal :id="'delete-placement-' . $placement->id" title="Hapus riwayat penempatan?"
                         :description="'Siswa ' . $student->nama . ', kelas ' . ($placement->kelas?->nama_kelas ?? '—')
                             . ', tahun ajaran ' . ($placement->tahunAjaran?->nama_tahun_ajaran ?? '—')
                             . ', periode ' . ($placement->tanggal_mulai?->format('d/m/Y') ?? '—')
                             . ' sampai ' . ($placement->tanggal_selesai?->format('d/m/Y') ?? 'sekarang') . '.'">
                         <p class="mb-4 text-sm text-gray-600">Data penempatan ini akan dihapus permanen. Data siswa, penempatan lain, wali kelas, dan riwayat pelanggaran tidak ikut dihapus.</p>
+                        {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
                         <form method="POST" action="{{ route('admin.students.placements.destroy', [$student, $placement->id]) }}">
                             @csrf
                             @method('DELETE')
@@ -226,6 +235,7 @@
             <p class="mt-1 text-sm text-gray-500">Tanggal mulai harus berada di dalam periode tahun ajaran. Penempatan aktif
                 sebelumnya akan diakhiri sehari sebelum tanggal ini.</p>
             @if ($classes->isNotEmpty() && $academicYears->isNotEmpty())
+                {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
                 <form method="POST" action="{{ route('admin.students.placements.store', $student) }}"
                     class="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">@csrf
                     <label class="space-y-1.5"><span class="block text-sm font-medium text-gray-700">Kelas</span><select
@@ -257,6 +267,7 @@
         </x-ui.card>
     @endif
 
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card>
         <div class="flex flex-wrap items-end justify-between gap-3">
             <div>
@@ -303,8 +314,10 @@
     </x-ui.card>
 
     @if ($canManageStudents && $student->status_siswa === 'aktif')
+        {{-- Dialog ini memuat informasi atau konfirmasi sebelum tindakan dijalankan. --}}
         <x-ui.modal id="deactivate-student" title="Nonaktifkan siswa?"
             description="Identitas dan semua riwayat kelas serta pelanggaran tetap disimpan.">
+            {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
             <form method="POST" action="{{ route('admin.students.status', $student) }}">@csrf @method('PATCH')
                 <input type="hidden" name="status_siswa" value="nonaktif"><div
                     class="flex justify-end gap-2"><x-ui.button variant="secondary" type="button"
@@ -315,8 +328,10 @@
     @endif
 
     @if ($canManageStudents && $canPermanentlyDelete)
+        {{-- Dialog ini memuat informasi atau konfirmasi sebelum tindakan dijalankan. --}}
         <x-ui.modal id="delete-student" title="Hapus siswa permanen?"
             description="Siswa ini belum memiliki riwayat penempatan atau catatan pelanggaran. Data identitas akan dihapus permanen.">
+            {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
             <form method="POST" action="{{ route('admin.students.destroy', $student) }}">@csrf @method('DELETE')
                 <div class="flex justify-end gap-2">
                     <x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button>
@@ -327,8 +342,10 @@
     @endif
 
     @if ($canManageStudents && $student->status_siswa === 'nonaktif')
+        {{-- Dialog ini memuat informasi atau konfirmasi sebelum tindakan dijalankan. --}}
         <x-ui.modal id="activate-student" title="Aktifkan siswa?"
             description="Identitas dan seluruh riwayat kelas serta pelanggaran akan tetap tersimpan.">
+            {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
             <form method="POST" action="{{ route('admin.students.status', $student) }}">
                 @csrf
                 @method('PATCH')
@@ -342,8 +359,10 @@
     @endif
 
     @if ($canManageStudents && $canGraduate)
+        {{-- Dialog ini memuat informasi atau konfirmasi sebelum tindakan dijalankan. --}}
         <x-ui.modal id="graduate-student" title="Tandai siswa lulus?"
             description="Siswa akan masuk arsip alumni dan tidak tersedia untuk pencatatan pelanggaran baru. Riwayat kelas, wali kelas, dan pelanggaran tetap disimpan.">
+            {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
             <form method="POST" action="{{ route('admin.students.status', $student) }}">
                 @csrf
                 @method('PATCH')

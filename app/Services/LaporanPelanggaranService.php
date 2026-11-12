@@ -6,9 +6,15 @@ use App\Models\PelanggaranSiswa;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
+/**
+ * Menyusun kueri laporan pelanggaran dan menghitung ringkasannya.
+ */
 class LaporanPelanggaranService
 {
-    /** @param array<string, int|string|null> $filters
+    /**
+     * Menyusun kueri laporan sesuai filter dan memuat relasi yang dibutuhkan.
+     *
+     * @param  array<string, int|string|null>  $filters
      * @return Builder<PelanggaranSiswa>
      */
     public function query(array $filters): Builder
@@ -42,11 +48,15 @@ class LaporanPelanggaranService
             ->orderByDesc('id');
     }
 
-    /** @param Builder<PelanggaranSiswa> $query
+    /**
+     * Menghitung catatan aktif, poin aktif, dan catatan yang dibatalkan dari kueri laporan.
+     *
+     * @param  Builder<PelanggaranSiswa>  $query
      * @return array{active_records: int, active_points: int, cancelled_records: int}
      */
     public function summary(Builder $query): array
     {
+        // Pertahankan filter laporan, tetapi lepaskan pengurutan dan batas halaman sebelum agregasi.
         $aggregateQuery = clone $query->getQuery();
         $aggregateQuery->columns = null;
         $aggregateQuery->orders = null;
@@ -67,8 +77,7 @@ class LaporanPelanggaranService
     }
 
     /**
-     * Constrain a report to notes that occurred during at least one of the
-     * teacher's selected assignment periods.
+     * Membatasi laporan pada catatan yang terjadi selama periode penugasan wali kelas terpilih.
      *
      * @param  array<int, int>  $assignmentIds
      */

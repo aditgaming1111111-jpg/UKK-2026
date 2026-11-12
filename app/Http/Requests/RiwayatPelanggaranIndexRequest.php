@@ -8,10 +8,13 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
+/**
+ * Memeriksa kewenangan dan memvalidasi masukan untuk filter riwayat catatan pelanggaran.
+ */
 class RiwayatPelanggaranIndexRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Menentukan apakah pengguna yang sedang masuk berwenang menjalankan permintaan ini.
      */
     public function authorize(): bool
     {
@@ -19,7 +22,7 @@ class RiwayatPelanggaranIndexRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Menetapkan aturan validasi yang berlaku untuk permintaan ini.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
@@ -37,6 +40,9 @@ class RiwayatPelanggaranIndexRequest extends FormRequest
         ];
     }
 
+    /**
+     * Memeriksa konsistensi lintas-field setelah validasi dasar selesai.
+     */
     public function after(): array
     {
         return [function (Validator $validator): void {
@@ -53,6 +59,9 @@ class RiwayatPelanggaranIndexRequest extends FormRequest
         }];
     }
 
+    /**
+     * Menyediakan pesan kesalahan validasi yang ditampilkan kepada pengguna.
+     */
     public function messages(): array
     {
         return [

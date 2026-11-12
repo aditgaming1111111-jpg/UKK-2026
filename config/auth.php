@@ -61,6 +61,7 @@ return [
     |
     */
 
+    // Provider Eloquent mengambil akun dari model User aplikasi.
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
@@ -92,6 +93,7 @@ return [
     |
     */
 
+    // Tabel dan batas waktu untuk token pemulihan kata sandi.
     'passwords' => [
         'users' => [
             'provider' => 'users',

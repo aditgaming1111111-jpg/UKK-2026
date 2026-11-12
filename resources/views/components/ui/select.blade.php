@@ -1,3 +1,4 @@
+{{-- Membentuk pilihan berlabel dari slot opsi atau daftar opsi yang diberikan. --}}
 @props(['label', 'name', 'options' => [], 'placeholder' => 'Pilih…', 'required' => false])
 <div class="space-y-1.5">
     <label for="{{ $name }}" class="block text-sm font-medium text-gray-700">{{ $label }} @if ($required)

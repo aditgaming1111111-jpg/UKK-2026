@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Merepresentasikan kategori pelanggaran beserta relasi dan aturan datanya.
+ */
 #[Fillable(['nama_kategori', 'deskripsi', 'status_aktif'])]
 class PelanggaranKategori extends Model
 {

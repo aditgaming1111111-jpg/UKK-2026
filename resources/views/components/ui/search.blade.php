@@ -1,3 +1,4 @@
+{{-- Menyediakan field pencarian berlabel dengan ikon dan nilai pencarian sebelumnya. --}}
 @props(['name' => 'q', 'placeholder' => 'Cari…', 'value' => null, 'label' => 'Pencarian'])
 
 <div {{ $attributes->class(['block min-w-0 space-y-1.5']) }}>

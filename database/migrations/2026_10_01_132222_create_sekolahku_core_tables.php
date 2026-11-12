@@ -9,9 +9,11 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * Membentuk tabel inti siswa, kelas, tahun ajaran, dan pencatatan pelanggaran.
      */
     public function up(): void
     {
+        // Data master siswa dan kelas menjadi acuan penempatan per tahun ajaran.
         Schema::create('t_siswa', function (Blueprint $table): void {
             $table->id();
             $table->string('nisn', 10)->unique();
@@ -48,6 +50,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        // Tabel penempatan menyimpan riwayat kelas siswa dan wali kelas per tahun.
         Schema::create('t_kelas_siswa', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('siswa_id')->constrained('t_siswa')->restrictOnDelete();
@@ -74,6 +77,7 @@ return new class extends Migration
             $table->index(['guru_id', 'tahun_ajaran_id']);
         });
 
+        // Catatan pelanggaran menyimpan poin saat dicatat dan jejak perubahan.
         Schema::create('t_pelanggaran', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('kategori_id')->constrained('t_pelanggaran_kategori')->restrictOnDelete();
@@ -117,9 +121,11 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
+     * Menghapus tabel inti dalam urutan yang menjaga ketergantungan foreign key.
      */
     public function down(): void
     {
+        // Hindari rollback yang menghapus isi tabel yang sudah digunakan.
         foreach ([
             't_log_pelanggaran',
             't_pelanggaran_siswa',

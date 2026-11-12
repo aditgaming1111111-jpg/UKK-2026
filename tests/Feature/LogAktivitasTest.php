@@ -9,6 +9,9 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/**
+ * Memastikan aktivitas penting tercatat tanpa data sensitif dan log hanya dapat diakses admin.
+ */
 class LogAktivitasTest extends TestCase
 {
     use RefreshDatabase;

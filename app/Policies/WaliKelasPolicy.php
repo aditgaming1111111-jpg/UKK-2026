@@ -5,6 +5,9 @@ namespace App\Policies;
 use App\Models\User;
 use App\Models\WaliKelas;
 
+/**
+ * Menentukan izin pengguna untuk wali kelas.
+ */
 class WaliKelasPolicy
 {
     public function viewAny(User $user): bool

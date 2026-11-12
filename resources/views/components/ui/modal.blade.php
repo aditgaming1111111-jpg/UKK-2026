@@ -1,3 +1,4 @@
+{{-- Membingkai dialog dengan judul, deskripsi opsional, tombol tutup, dan isi pemanggil. --}}
 @props(['id', 'title', 'description' => null])
 <dialog id="{{ $id }}" data-modal aria-labelledby="{{ $id }}-title"
     class="fixed inset-0 m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-2xl border border-gray-200 bg-white p-0 text-gray-900 shadow-xl">

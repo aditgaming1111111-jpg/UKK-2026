@@ -1,9 +1,11 @@
+{{-- Menyusun ringkasan rekap kelas dalam format dokumen siap cetak. --}}
 <!doctype html>
 <html lang="id">
 <head>
     <meta charset="utf-8">
     <title>Rekap Wali Kelas {{ $selectedClass->nama_kelas }}</title>
     <style>
+        /* Mengatur tipografi, batas tabel, dan kolom ringkasan pada hasil cetak. */
         body { color: #111827; font-family: DejaVu Sans, sans-serif; font-size: 10px; }
         h1 { font-size: 20px; margin-bottom: 4px; }
         h2 { font-size: 13px; margin: 18px 0 8px; }
@@ -17,6 +19,7 @@
     </style>
 </head>
 <body>
+    {{-- Menampilkan ringkasan identitas kelas dan data pelanggaran untuk dicetak. --}}
     <h1>Rekap Pelanggaran Kelas</h1>
     <p><strong>Kelas:</strong> {{ $selectedClass->nama_kelas }} · <strong>Tahun ajaran:</strong> {{ $selectedYear->nama_tahun_ajaran }}</p>
     <p><strong>Wali kelas:</strong> {{ $teacher->nama }}</p>

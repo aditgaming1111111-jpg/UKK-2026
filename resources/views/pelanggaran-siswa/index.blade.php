@@ -1,11 +1,14 @@
 @extends($role === 'admin' ? 'layouts.admin' : 'layouts.guru')
 
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Catatan Pelanggaran')
 
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[['label' => 'Catatan Pelanggaran']]" />
 @endsection
 
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')
     <x-ui.page-heading title="Catatan Pelanggaran" description="Telusuri catatan kejadian, snapshot poin, status, dan guru pencatat.">
         @if ($role === 'guru')
@@ -14,8 +17,11 @@
     </x-ui.page-heading>
 @endsection
 
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card>
+        {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
         <form method="GET" action="{{ route($routePrefix.'.index') }}" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <x-ui.search placeholder="Cari nama siswa atau NISN" :value="$filters['q'] ?? null" class="lg:col-span-2" />
             <label class="space-y-1.5"><span class="block text-sm font-medium text-gray-700">Tahun ajaran</span>
@@ -72,8 +78,10 @@
         </form>
     </x-ui.card>
 
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card :padding="false">
         @if ($records->isNotEmpty())
+            {{-- Tabel berikut merangkum data dalam susunan kolom yang mudah dipindai. --}}
             <x-ui.table>
                 <thead class="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
                     <tr><th class="px-4 py-3">Tanggal kejadian</th><th class="px-4 py-3">Siswa</th><th class="px-4 py-3">Kelas / Tahun</th><th class="px-4 py-3">Jenis</th><th class="px-4 py-3">Guru</th><th class="px-4 py-3">Poin</th><th class="px-4 py-3">Status</th><th class="px-4 py-3"></th></tr>

@@ -1,15 +1,19 @@
 @extends('layouts.admin')
 
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Proses Siswa '.$tahunAjaran->nama_tahun_ajaran)
 
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[['label' => 'Tahun Ajaran', 'url' => route('admin.academic-years.index')], ['label' => $tahunAjaran->nama_tahun_ajaran, 'url' => route('admin.academic-years.show', $tahunAjaran)], ['label' => 'Proses Siswa']]" />
 @endsection
 
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')
     <x-ui.page-heading title="Kenaikan Kelas & Kelulusan" :description="'Proses siswa dari tahun ajaran '.$tahunAjaran->nama_tahun_ajaran.' dengan pratinjau dan konfirmasi Admin.'" />
 @endsection
 
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
     <div class="space-y-6">
         @if (session('success'))
@@ -35,6 +39,7 @@
 
         <x-ui.card>
             <h2 class="font-semibold text-gray-950">Pilih jenis proses dan tahun tujuan</h2>
+            {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
             <form method="GET" action="{{ route('admin.academic-years.student-transitions', $tahunAjaran) }}" class="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 <x-ui.select label="Jenis proses" name="mode" required>
                     <option value="naik" @selected($mode === 'naik')>Kenaikan kelas</option>
@@ -69,6 +74,7 @@
                 $selectedCount = max(0, $eligibleCount - $excludedCount);
             @endphp
 
+            {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
             <section class="grid gap-4 sm:grid-cols-3">
                 <x-ui.stat-card label="Siswa pada pratinjau" :value="$preview['items']->count()" note="Penempatan yang tercatat pada tahun asal" />
                 <x-ui.stat-card label="Memenuhi syarat" :value="$eligibleCount" note="Status aktif dan penempatan valid" />
@@ -126,6 +132,7 @@
                     <span class="text-xs text-gray-500">{{ $preview['items']->count() }} siswa</span>
                 </div>
                 @if ($preview['items']->isNotEmpty())
+                    {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
                     <form id="student-transition-form" method="POST" action="{{ route('admin.academic-years.student-transitions.store', $tahunAjaran) }}">
                         @csrf
                         <input type="hidden" name="mode" value="{{ $mode }}">
@@ -180,6 +187,7 @@
             </x-ui.card>
 
             @if ($preview['items']->where('eligible', true)->isNotEmpty())
+                {{-- Dialog ini memuat informasi atau konfirmasi sebelum tindakan dijalankan. --}}
                 <x-ui.modal id="confirm-student-transition" title="Konfirmasi proses siswa?"
                     :description="'Aksi ini akan memproses maksimal '.$selectedCount.' siswa yang tidak dikecualikan. Penempatan lama tetap disimpan dan aktivitas dicatat.'">
                     <div class="mb-5 rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700">

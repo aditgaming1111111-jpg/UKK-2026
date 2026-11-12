@@ -15,6 +15,7 @@ class PelanggaranSiswaFactory extends Factory
 {
     /**
      * Define the model's default state.
+     * Menghubungkan pelanggaran contoh dengan penempatan siswa dan guru pencatat.
      *
      * @return array<string, mixed>
      */

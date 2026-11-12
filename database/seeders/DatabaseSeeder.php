@@ -11,6 +11,7 @@ class DatabaseSeeder extends Seeder
 
     /**
      * Seed the application's database.
+     * Menjalankan seeder akun autentikasi untuk data awal aplikasi.
      */
     public function run(): void
     {

@@ -1,3 +1,4 @@
+{{-- Menyatukan field agar formulir tambah dan ubah memakai susunan data yang konsisten. --}}
 @csrf
 <div class="grid gap-5 sm:grid-cols-2"><x-ui.input label="Nama kelas" name="nama_kelas" :value="$kelas->nama_kelas ?? null" required
         maxlength="50" /><x-ui.input label="Tingkat" name="tingkat" :value="$kelas->tingkat ?? null" required maxlength="20" />

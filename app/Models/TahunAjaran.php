@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Merepresentasikan tahun ajaran beserta relasi dan aturan datanya.
+ */
 #[Fillable(['nama_tahun_ajaran', 'tanggal_mulai', 'tanggal_selesai', 'status_aktif'])]
 class TahunAjaran extends Model
 {

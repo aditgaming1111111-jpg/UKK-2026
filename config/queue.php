@@ -13,6 +13,7 @@ return [
     |
     */
 
+    // Antrean database digunakan secara bawaan agar pekerjaan dapat diproses terpisah.
     'default' => env('QUEUE_CONNECTION', 'database'),
 
     /*
@@ -81,6 +82,7 @@ return [
             'driver' => 'background',
         ],
 
+        // Koneksi cadangan meneruskan pekerjaan ke database lalu driver deferred.
         'failover' => [
             'driver' => 'failover',
             'connections' => [

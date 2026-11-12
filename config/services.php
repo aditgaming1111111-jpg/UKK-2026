@@ -2,6 +2,7 @@
 
 return [
 
+    // Kredensial layanan pihak ketiga dibaca dari variabel lingkungan.
     /*
     |--------------------------------------------------------------------------
     | Third Party Services

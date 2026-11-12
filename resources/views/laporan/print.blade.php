@@ -1,3 +1,4 @@
+{{-- Menyusun tampilan cetak laporan agar siap dibaca atau dicetak. --}}
 <!DOCTYPE html>
 <html lang="id">
 <head>

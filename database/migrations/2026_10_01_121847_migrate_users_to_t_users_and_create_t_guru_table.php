@@ -9,9 +9,11 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * Menyesuaikan tabel akun aplikasi dan menghubungkannya dengan profil guru.
      */
     public function up(): void
     {
+        // Migrasi hanya aman untuk dijalankan sebelum akun awal dibuat.
         if (! Schema::hasTable('users')) {
             throw new RuntimeException('Tabel users Laravel tidak ditemukan; migration autentikasi dihentikan.');
         }
@@ -41,6 +43,7 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
+     * Mengembalikan struktur akun hanya jika belum ada data akun atau guru.
      */
     public function down(): void
     {

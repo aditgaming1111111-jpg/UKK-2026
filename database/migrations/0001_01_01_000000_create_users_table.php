@@ -8,6 +8,7 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * Menyiapkan tabel akun, token reset kata sandi, dan sesi.
      */
     public function up(): void
     {
@@ -39,6 +40,7 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
+     * Menghapus tabel autentikasi dan sesi yang dibuat oleh migrasi ini.
      */
     public function down(): void
     {

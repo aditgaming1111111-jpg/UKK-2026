@@ -6,10 +6,13 @@ use App\Models\Guru;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/**
+ * Memeriksa kewenangan dan memvalidasi masukan untuk perubahan data guru.
+ */
 class UpdateGuruRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Menentukan apakah pengguna yang sedang masuk berwenang menjalankan permintaan ini.
      */
     public function authorize(): bool
     {
@@ -17,7 +20,7 @@ class UpdateGuruRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Menetapkan aturan validasi yang berlaku untuk permintaan ini.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
@@ -35,6 +38,9 @@ class UpdateGuruRequest extends FormRequest
         ];
     }
 
+    /**
+     * Menormalkan masukan sebelum aturan validasi dijalankan.
+     */
     protected function prepareForValidation(): void
     {
         $nip = trim((string) $this->input('nip', ''));
@@ -46,6 +52,9 @@ class UpdateGuruRequest extends FormRequest
         ]);
     }
 
+    /**
+     * Menyediakan pesan kesalahan validasi yang ditampilkan kepada pengguna.
+     */
     public function messages(): array
     {
         return [

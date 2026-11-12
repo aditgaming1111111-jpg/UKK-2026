@@ -18,6 +18,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
+/**
+ * Menguji pengelolaan akun dan data guru, validasi, status, riwayat, pencarian, serta hak akses admin.
+ */
 class GuruManagementTest extends TestCase
 {
     use RefreshDatabase;

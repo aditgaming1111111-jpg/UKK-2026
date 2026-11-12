@@ -1,15 +1,21 @@
 @extends('layouts.admin')
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Jenis Pelanggaran')
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')<x-ui.breadcrumbs :items="[['label' => 'Jenis Pelanggaran']]" />
 @endsection
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')<x-ui.page-heading title="Jenis Pelanggaran"
         description="Kelola kode, kategori, nilai poin, serta status jenis pelanggaran."><x-ui.button
         :href="route('admin.violations.create')">Tambah jenis</x-ui.button></x-ui.page-heading>@endsection
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
     @if (session('success'))
         <x-ui.toast>{{ session('success') }}</x-ui.toast>
     @endif
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card>
+        {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
         <form method="GET" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><x-ui.search
                 placeholder="Cari kode atau nama pelanggaran" :value="$filters['q'] ?? null" /><label class="space-y-1.5"><span
                     class="block text-sm font-medium text-gray-700">Kategori</span><select name="kategori_id"
@@ -31,8 +37,10 @@
                     variant="secondary" :href="route('admin.violations.index')">Reset</x-ui.button></div>
         </form>
     </x-ui.card>
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card :padding="false">
         @if ($violations->isNotEmpty())
+            {{-- Tabel berikut merangkum data dalam susunan kolom yang mudah dipindai. --}}
             <x-ui.table>
                 <thead class="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
                     <tr>

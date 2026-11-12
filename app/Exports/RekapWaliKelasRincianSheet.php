@@ -10,6 +10,9 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithTitle;
 
+/**
+ * Memetakan rincian catatan pelanggaran untuk lembar ekspor wali kelas.
+ */
 class RekapWaliKelasRincianSheet implements FromQuery, WithCustomChunkSize, WithHeadings, WithMapping, WithTitle
 {
     /** @param Builder<PelanggaranSiswa> $records */

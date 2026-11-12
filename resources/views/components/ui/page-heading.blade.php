@@ -1,3 +1,4 @@
+{{-- Menyatukan judul halaman, ringkasan, dan aksi yang disediakan pemanggil. --}}
 @props(['title', 'description' => null])
 <div class="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
     <div>

@@ -11,13 +11,16 @@ class AuthenticationSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     * Membuat akun admin dan guru contoh khusus untuk lingkungan lokal.
      */
     public function run(): void
     {
+        // Batasi kredensial bawaan seeder agar tidak digunakan di lingkungan lain.
         if (! app()->environment('local')) {
             throw new \RuntimeException('AuthenticationSeeder hanya boleh dijalankan pada APP_ENV=local.');
         }
 
+        // Ambil kata sandi dari konfigurasi lokal dan pastikan nilainya memadai.
         $adminPassword = config('app.seed_admin_password');
         $guruPassword = config('app.seed_guru_password');
 
@@ -29,6 +32,7 @@ class AuthenticationSeeder extends Seeder
             throw new \RuntimeException('SEED_GURU_PASSWORD wajib diisi minimal 8 karakter di .env lokal.');
         }
 
+        // Perbarui atau buat akun agar seeder aman dijalankan berulang kali.
         $admin = User::updateOrCreate(
             ['email' => 'admin@sekolahku.com'],
             [

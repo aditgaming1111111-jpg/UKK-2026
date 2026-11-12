@@ -1,7 +1,9 @@
 @extends('layouts.guru')
 
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Rekap Poin')
 
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[
         ['label' => 'Dashboard', 'url' => route('guru.dashboard')],
@@ -9,12 +11,16 @@
     ]" />
 @endsection
 
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')
     <x-ui.page-heading title="Rekap Poin" description="Total poin aktif siswa berdasarkan tahun ajaran. Catatan yang dibatalkan tidak dihitung." />
 @endsection
 
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card>
+        {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
         <form method="GET" action="{{ route('guru.point-recap.index') }}" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <x-ui.search placeholder="Cari nama atau NISN" :value="$filters['q'] ?? null" />
             <label class="space-y-1.5">
@@ -36,8 +42,10 @@
         </form>
     </x-ui.card>
 
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card :padding="false">
         @if ($students->isNotEmpty())
+            {{-- Tabel berikut merangkum data dalam susunan kolom yang mudah dipindai. --}}
             <x-ui.table>
                 <thead class="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
                     <tr>

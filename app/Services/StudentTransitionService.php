@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Menyiapkan pratinjau dan memproses kenaikan kelas, tinggal kelas, atau kelulusan siswa.
+ */
 class StudentTransitionService
 {
     public const MODE_PROMOTE = 'naik';
@@ -26,6 +29,8 @@ class StudentTransitionService
     public function __construct(private ActivityLogger $activityLogger) {}
 
     /**
+     * Menghitung kelayakan siswa dan pilihan kelas tujuan tanpa mengubah data.
+     *
      * @return array{items: Collection<int, array{student: Siswa, placement: KelasSiswa, source_class: Kelas, eligible: bool, reason: string|null}>, source_classes: Collection<int, array{class: Kelas, total_count: int, eligible_count: int, target_classes: Collection<int, Kelas>}>}
      */
     public function preview(TahunAjaran $originYear, ?TahunAjaran $targetYear, string $mode): array
@@ -49,6 +54,7 @@ class StudentTransitionService
             ->orderBy('id')
             ->get();
 
+        // Kelayakan dinilai per siswa berdasarkan seluruh penempatan yang berlaku pada akhir tahun asal.
         $placementsByStudent = $placements->groupBy('siswa_id');
         $existingTargetPlacementIds = $targetYear === null
             ? []
@@ -149,6 +155,8 @@ class StudentTransitionService
     }
 
     /**
+     * Memproses transisi siswa dalam satu transaksi setelah mengunci dan memeriksa ulang data.
+     *
      * @param  array<int|string, int|string>  $classMapping
      * @param  list<int|string>  $excludedStudentIds
      * @return array{processed: int, excluded: int, batch_id: string}
@@ -172,6 +180,7 @@ class StudentTransitionService
             $request,
         ): array {
             $yearIds = array_values(array_filter([$originYear->id, $targetYear?->id]));
+            // Kunci kedua periode agar data yang diproses tidak berubah setelah pratinjau dibuat.
             $lockedYears = TahunAjaran::query()
                 ->whereKey($yearIds)
                 ->orderBy('id')
@@ -210,6 +219,7 @@ class StudentTransitionService
 
             $eligibleStudentIds = $eligibleItems->map(static fn (array $item): int => $item['student']->id)->all();
             $excludedIds = array_values(array_unique(array_map('intval', $excludedStudentIds)));
+            // Tolak pengecualian dari daftar lama agar hasil pratinjau tidak dapat dipakai untuk data berbeda.
             $unknownExcludedIds = array_diff($excludedIds, $eligibleStudentIds);
 
             if ($unknownExcludedIds !== []) {
@@ -346,6 +356,9 @@ class StudentTransitionService
         });
     }
 
+    /**
+     * Memastikan tahun tujuan berbeda dan dimulai setelah tahun asal berakhir.
+     */
     private function ensureTargetYearFollowsOrigin(TahunAjaran $originYear, TahunAjaran $targetYear): void
     {
         $originEnd = CarbonImmutable::parse($originYear->tanggal_selesai)->startOfDay();
@@ -359,6 +372,8 @@ class StudentTransitionService
     }
 
     /**
+     * Memastikan setiap kelas asal memiliki kelas tujuan pada tingkat yang sesuai.
+     *
      * @param  Collection<int, array{student: Siswa, placement: KelasSiswa, source_class: Kelas, eligible: bool, reason: string|null}>  $selectedItems
      * @param  Collection<int, array{class: Kelas, total_count: int, eligible_count: int, target_classes: Collection<int, Kelas>}>  $sourceClasses
      * @param  array<int|string, int|string>  $classMapping
@@ -416,6 +431,9 @@ class StudentTransitionService
         return $mapping;
     }
 
+    /**
+     * Menentukan tingkat kelas tujuan berdasarkan jenis transisi.
+     */
     private function targetGradeNumber(Kelas $sourceClass, string $mode): ?int
     {
         $sourceLevel = $this->gradeNumber($sourceClass->tingkat);
@@ -431,7 +449,11 @@ class StudentTransitionService
         };
     }
 
-    /** @return list<string> */
+    /**
+     * Menghasilkan variasi penulisan tingkat kelas untuk pencarian kelas tujuan.
+     *
+     * @return list<string>
+     */
     private function levelAliases(int $level): array
     {
         return match ($level) {
@@ -442,6 +464,9 @@ class StudentTransitionService
         };
     }
 
+    /**
+     * Mengubah label tingkat kelas yang dikenal menjadi nomor tingkat.
+     */
     private function gradeNumber(string $level): ?int
     {
         return match (mb_strtoupper(trim($level))) {
@@ -452,6 +477,9 @@ class StudentTransitionService
         };
     }
 
+    /**
+     * Memeriksa apakah kelas termasuk tingkat XII.
+     */
     private function isGradeTwelve(Kelas $kelas): bool
     {
         return $this->gradeNumber($kelas->tingkat) === 12;

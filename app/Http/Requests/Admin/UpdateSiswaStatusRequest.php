@@ -7,10 +7,13 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
+/**
+ * Memeriksa kewenangan dan memvalidasi masukan untuk perubahan status siswa.
+ */
 class UpdateSiswaStatusRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Menentukan apakah pengguna yang sedang masuk berwenang menjalankan permintaan ini.
      */
     public function authorize(): bool
     {
@@ -20,7 +23,7 @@ class UpdateSiswaStatusRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Menetapkan aturan validasi yang berlaku untuk permintaan ini.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
@@ -29,6 +32,9 @@ class UpdateSiswaStatusRequest extends FormRequest
         return ['status_siswa' => ['required', 'string', Rule::in(['aktif', 'nonaktif', 'pindah', 'keluar', 'lulus'])]];
     }
 
+    /**
+     * Memeriksa konsistensi lintas-field setelah validasi dasar selesai.
+     */
     public function after(): array
     {
         return [function (Validator $validator): void {
@@ -48,6 +54,9 @@ class UpdateSiswaStatusRequest extends FormRequest
         }];
     }
 
+    /**
+     * Menyediakan pesan kesalahan validasi yang ditampilkan kepada pengguna.
+     */
     public function messages(): array
     {
         return [

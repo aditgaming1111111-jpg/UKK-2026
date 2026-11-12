@@ -15,6 +15,9 @@ use App\Models\WaliKelas;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/**
+ * Menguji pengelolaan siswa, validasi dan perubahan status, riwayat penempatan, detail, serta hak akses.
+ */
 class SiswaManagementTest extends TestCase
 {
     use RefreshDatabase;

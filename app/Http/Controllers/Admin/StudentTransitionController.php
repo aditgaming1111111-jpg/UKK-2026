@@ -14,8 +14,14 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
+/**
+ * Menangani permintaan HTTP untuk transisi siswa, termasuk penyajian data dan perubahan yang diizinkan.
+ */
 class StudentTransitionController extends Controller
 {
+    /**
+     * Menampilkan pratinjau kandidat dan kelas tujuan untuk proses transisi.
+     */
     public function show(Request $request, TahunAjaran $tahunAjaran, StudentTransitionService $transitionService): View
     {
         Gate::authorize('view', $tahunAjaran);
@@ -67,6 +73,9 @@ class StudentTransitionController extends Controller
         ));
     }
 
+    /**
+     * Meneruskan pilihan transisi yang telah divalidasi untuk diproses.
+     */
     public function store(
         ProcessStudentTransitionRequest $request,
         TahunAjaran $tahunAjaran,

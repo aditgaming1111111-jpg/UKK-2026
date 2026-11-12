@@ -1,7 +1,9 @@
 @extends(auth()->user()->role === 'admin' ? 'layouts.admin' : 'layouts.guru')
 
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Koreksi Catatan Pelanggaran')
 
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[
         ['label' => $routePrefix === 'guru.my-notes' ? 'Catatan Saya' : 'Riwayat Pelanggaran', 'url' => route($routePrefix.'.index')],
@@ -10,14 +12,17 @@
     ]" />
 @endsection
 
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')
     <x-ui.page-heading :title="$routePrefix === 'guru.my-notes' ? 'Koreksi Catatan Saya' : 'Koreksi Catatan Pelanggaran'" description="Siswa, guru, kelas, dan tahun ajaran tetap melekat. Setiap koreksi wajib memiliki alasan audit." />
 @endsection
 
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
     @if ($errors->has('catatan'))
         <div role="alert" class="mb-4 rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-800">{{ $errors->first('catatan') }}</div>
     @endif
+    {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
     <form method="POST" action="{{ route($routePrefix.'.update', $record) }}" class="space-y-5">
         @csrf
         @method('PUT')

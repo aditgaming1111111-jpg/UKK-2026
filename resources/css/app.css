@@ -1,13 +1,16 @@
+/* Memuat utilitas Tailwind dan sumber template yang perlu dipindai. */
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
+/* Menetapkan keluarga font sans-serif yang digunakan sebagai tema aplikasi. */
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
+/* Menyamakan ukuran dasar kontrol formulir tanpa mengubah tipe pilihan khusus. */
 :where(input:not([type='checkbox']):not([type='radio']):not([type='hidden']), select, textarea) {
     min-height: 2.75rem;
     border-radius: 0.5rem;
@@ -15,6 +18,7 @@
     font-size: 0.875rem;
 }
 
+/* Menyembunyikan scrollbar saat antarmuka mengaktifkan mode tanpa scrollbar. */
 html.app-scrollbar-hidden,
 html.app-scrollbar-hidden body,
 html.app-scrollbar-hidden * {
@@ -27,6 +31,7 @@ html.app-scrollbar-hidden *::-webkit-scrollbar {
     display: none;
 }
 
+/* Menyediakan transisi masuk dan keluar untuk latar belakang dialog. */
 @keyframes modal-backdrop-enter {
     from {
         opacity: 0;
@@ -47,6 +52,7 @@ html.app-scrollbar-hidden *::-webkit-scrollbar {
     }
 }
 
+/* Menghubungkan animasi latar dengan status dialog yang sedang dibuka atau ditutup. */
 dialog[data-modal]::backdrop {
     animation: modal-backdrop-enter 220ms ease-out both;
     background-color: rgb(3 7 18 / 40%);
@@ -56,6 +62,7 @@ dialog[data-modal][data-closing]::backdrop {
     animation: modal-backdrop-exit 220ms ease-in both;
 }
 
+/* Memperpendek animasi ketika pengguna meminta pengurangan gerakan. */
 @media (prefers-reduced-motion: reduce) {
     dialog[data-modal]::backdrop,
     dialog[data-modal][data-closing]::backdrop {

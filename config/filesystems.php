@@ -30,6 +30,7 @@ return [
 
     'disks' => [
 
+        // Penyimpanan privat tidak dipublikasikan langsung ke web.
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
@@ -38,6 +39,7 @@ return [
             'report' => false,
         ],
 
+        // Disk publik dipetakan ke direktori storage yang dapat diakses melalui symlink.
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
@@ -73,6 +75,7 @@ return [
     |
     */
 
+    // Symlink publik mengarah ke direktori berkas yang memang boleh diakses.
     'links' => [
         public_path('storage') => storage_path('app/public'),
     ],

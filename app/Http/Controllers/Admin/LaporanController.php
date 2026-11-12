@@ -13,8 +13,14 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
+/**
+ * Menangani permintaan HTTP untuk laporan, termasuk penyajian data dan perubahan yang diizinkan.
+ */
 class LaporanController extends Controller
 {
+    /**
+     * Menampilkan daftar laporan dengan filter dan paginasi yang berlaku.
+     */
     public function index(LaporanIndexRequest $request, LaporanPelanggaranService $service): View
     {
         $filters = $request->validated();
@@ -35,11 +41,17 @@ class LaporanController extends Controller
         ]);
     }
 
+    /**
+     * Menyiapkan tampilan cetak laporan pelanggaran.
+     */
     public function print(LaporanIndexRequest $request, LaporanPelanggaranService $service): View
     {
         return view('laporan.print', $this->printData($request->validated(), $service));
     }
 
+    /**
+     * Menghasilkan dokumen PDF dari data laporan yang telah difilter.
+     */
     public function pdf(LaporanIndexRequest $request, LaporanPelanggaranService $service): Response
     {
         $generatedAt = now();

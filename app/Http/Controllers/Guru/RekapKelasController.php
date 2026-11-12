@@ -15,8 +15,14 @@ use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
+/**
+ * Menangani permintaan HTTP untuk rekap kelas, termasuk penyajian data dan perubahan yang diizinkan.
+ */
 class RekapKelasController extends Controller
 {
+    /**
+     * Menampilkan daftar rekap kelas dengan filter dan paginasi yang berlaku.
+     */
     public function index(RekapKelasRequest $request, RekapWaliKelasReport $report): View
     {
         return view('guru.rekap-kelas.index', [
@@ -24,6 +30,9 @@ class RekapKelasController extends Controller
         ]);
     }
 
+    /**
+     * Menampilkan rincian rekap kelas yang dipilih.
+     */
     public function show(Request $request, RekapWaliKelasReport $report, int $tahunAjaran, int $kelas, Siswa $siswa): View
     {
         $filters = $request->validate([
@@ -36,6 +45,9 @@ class RekapKelasController extends Controller
         ]);
     }
 
+    /**
+     * Menghasilkan dokumen PDF dari rekap kelas yang dipilih.
+     */
     public function pdf(Request $request, RekapWaliKelasReport $report, int $tahunAjaran, int $kelas): Response
     {
         $data = $report->exportData($request->user(), $tahunAjaran, $kelas, $this->exportFilters($request));
@@ -47,6 +59,9 @@ class RekapKelasController extends Controller
             ->download('rekap-wali-kelas-'.$tahunAjaran.'-'.$kelas.'-'.now()->format('Ymd-His').'.pdf');
     }
 
+    /**
+     * Menghasilkan lembar kerja dari rekap kelas yang dipilih.
+     */
     public function excel(Request $request, RekapWaliKelasReport $report, int $tahunAjaran, int $kelas): BinaryFileResponse
     {
         $data = $report->exportData($request->user(), $tahunAjaran, $kelas, $this->exportFilters($request));

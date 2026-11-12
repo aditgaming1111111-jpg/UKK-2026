@@ -14,6 +14,7 @@ class LogPelanggaranFactory extends Factory
 {
     /**
      * Define the model's default state.
+     * Membuat jejak perubahan contoh untuk catatan pelanggaran siswa.
      *
      * @return array<string, mixed>
      */

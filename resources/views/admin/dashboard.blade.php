@@ -1,13 +1,17 @@
 @extends('layouts.admin')
 
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Dashboard Admin')
 
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[['label' => 'Dashboard']]" />
 @endsection
 
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')
     <x-ui.page-heading title="Dashboard Admin" description="Ringkasan aktivitas dan data pelanggaran SekolahKu.">
+        {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
         <form method="GET" action="{{ route('admin.dashboard') }}" class="flex flex-col gap-2 sm:flex-row sm:items-end">
             <label for="tahun_ajaran_id" class="space-y-1.5">
                 <span class="block text-xs font-medium text-gray-600">Tahun ajaran</span>
@@ -27,11 +31,13 @@
     </x-ui.page-heading>
 @endsection
 
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
     @if ($errors->has('tahun_ajaran_id'))
         <x-ui.error-state title="Filter tahun ajaran tidak valid" :description="$errors->first('tahun_ajaran_id')" />
     @endif
 
+    {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
     <section aria-label="Statistik sekolah" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <x-ui.stat-card label="Siswa aktif" :value="number_format($stats['active_students'], 0, ',', '.')" note="Semua tahun ajaran" icon="users" />
         <x-ui.stat-card label="Guru aktif" :value="number_format($stats['active_teachers'], 0, ',', '.')" note="Akun guru aktif" icon="user-check" />
@@ -47,6 +53,7 @@
             description="Tambahkan tahun ajaran untuk melihat statistik, catatan, dan aktivitas terkait." />
     @endif
 
+    {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
     <section aria-label="Akses cepat">
         <div class="mb-3 flex items-end justify-between gap-3">
             <div>
@@ -82,6 +89,7 @@
 
             @if ($recentViolations->isNotEmpty())
                 <div class="mt-5">
+                    {{-- Tabel berikut merangkum data dalam susunan kolom yang mudah dipindai. --}}
                     <x-ui.table>
                         <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
                             <tr>
@@ -151,6 +159,7 @@
         </x-ui.card>
     </div>
 
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card>
         <div class="flex flex-wrap items-end justify-between gap-3">
             <div>

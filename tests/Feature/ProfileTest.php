@@ -8,6 +8,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
+/**
+ * Menguji tampilan dan perubahan profil, validasi data akun, pembaruan kata sandi, serta akses pengguna.
+ */
 class ProfileTest extends TestCase
 {
     use RefreshDatabase;

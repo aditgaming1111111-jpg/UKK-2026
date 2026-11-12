@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Merepresentasikan log aktivitas beserta relasi dan aturan datanya.
+ */
 #[Fillable(['user_id', 'aktivitas', 'deskripsi', 'ip_address', 'user_agent'])]
 class LogAktivitas extends Model
 {

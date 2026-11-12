@@ -1,26 +1,33 @@
+{{-- Menyajikan pengaturan profil dan data akun pengguna. --}}
 @extends($user->role === 'admin' ? 'layouts.admin' : 'layouts.guru', ['hasActiveWaliKelas' => $hasActiveWaliKelas])
 
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Profil Akun')
 
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[['label' => 'Profil']]" />
 @endsection
 
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')
     <x-ui.page-heading title="Profil Akun" description="Kelola informasi akun dan keamanan kata sandi Anda." />
 @endsection
 
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
     @if (session('success'))
         <div role="status" class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-800">{{ session('success') }}</div>
     @endif
 
     <div class="grid gap-6 xl:grid-cols-2">
+        {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
         <section class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
             <div class="mb-5">
                 <h2 class="font-semibold text-gray-950">Informasi akun</h2>
                 <p class="mt-1 text-sm text-gray-500">Role akun: {{ $user->role === 'admin' ? 'Admin' : 'Guru' }}.</p>
             </div>
+            {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
             <form method="POST" action="{{ route('profile.update') }}" class="space-y-4">
                 @csrf
                 @method('PUT')
@@ -40,11 +47,13 @@
             @endif
         </section>
 
+        {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
         <section class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
             <div class="mb-5">
                 <h2 class="font-semibold text-gray-950">Ganti kata sandi</h2>
                 <p class="mt-1 text-sm text-gray-500">Masukkan kata sandi saat ini dan konfirmasi kata sandi baru.</p>
             </div>
+            {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
             <form method="POST" action="{{ route('profile.password.update') }}" class="space-y-4">
                 @csrf
                 @method('PUT')

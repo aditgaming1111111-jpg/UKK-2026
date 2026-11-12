@@ -7,6 +7,9 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithTitle;
 
+/**
+ * Menyusun ringkasan laporan wali kelas sebagai lembar ekspor.
+ */
 class RekapWaliKelasRingkasanSheet implements FromCollection, WithHeadings, WithTitle
 {
     /** @param array<string, mixed> $report */

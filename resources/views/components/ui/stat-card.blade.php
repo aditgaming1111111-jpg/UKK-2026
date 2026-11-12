@@ -1,4 +1,6 @@
+{{-- Merangkum satu metrik beserta label, catatan, dan ikon pendukung. --}}
 @props(['label', 'value', 'note' => null, 'icon' => 'chart'])
+{{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
 <x-ui.card class="h-full">
     <div class="flex items-start justify-between gap-4">
         <div>

@@ -1,3 +1,4 @@
+{{-- Menyediakan bilah atas dengan identitas pengguna dan peran yang sedang aktif. --}}
 @props(['role' => 'admin'])
 
 <header

@@ -1,3 +1,4 @@
+{{-- Menampilkan rentang data dan tautan navigasi halaman sesuai paginator. --}}
 @props(['paginator' => null, 'current' => 1, 'last' => 1])
 
 @if ($paginator && $paginator->total() > 0)

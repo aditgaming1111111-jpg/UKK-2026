@@ -1,3 +1,4 @@
+{{-- Menjelaskan bahwa data belum tersedia dan menyediakan ruang untuk tindakan lanjutan. --}}
 @props(['title' => 'Belum ada data', 'description' => 'Data yang Anda cari belum tersedia.'])
 <div {{ $attributes->class(['rounded-xl border border-dashed border-gray-300 bg-gray-50 px-6 py-10 text-center']) }}>
     <span

@@ -1,7 +1,9 @@
 @extends('layouts.guru')
 
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Catat Pelanggaran')
 
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[
         ['label' => 'Dashboard', 'url' => route('guru.dashboard')],
@@ -9,20 +11,24 @@
     ]" />
 @endsection
 
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')
     <x-ui.page-heading title="Catat Pelanggaran" description="Poin, guru pencatat, kelas, dan tahun ajaran dikunci berdasarkan data server.">
         <x-ui.button variant="secondary" href="#pencarian_siswa">Cari siswa</x-ui.button>
     </x-ui.page-heading>
 @endsection
 
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
     @if ($errors->has('akun'))
         <div role="alert" class="mb-4 rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-800">{{ $errors->first('akun') }}</div>
     @endif
 
-    <form method="POST" action="{{ route('guru.violations.store') }}" class="space-y-5" data-violation-form
+    {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
+    <form method="POST" action="{{ route('guru.violations.store') }}" class="space-y-5" data-violation-form data-submit-once
         data-search-url="{{ route('guru.violations.student-search') }}">
         @csrf
+        <input type="hidden" name="idempotency_key" value="{{ old('idempotency_key', $idempotencyKey) }}">
         <x-ui.card>
             <div class="mb-5">
                 <h2 class="text-base font-semibold text-gray-950">Siswa dan waktu kejadian</h2>
@@ -104,7 +110,9 @@
 
         <div class="flex flex-col-reverse justify-end gap-2 sm:flex-row">
             <x-ui.button variant="secondary" :href="route('guru.dashboard')">Batal</x-ui.button>
-            <x-ui.button type="submit">Simpan catatan</x-ui.button>
+            <x-ui.button type="submit" data-submit-button data-loading-label="Menyimpan catatan...">
+                <span data-submit-label>Simpan catatan</span>
+            </x-ui.button>
         </div>
     </form>
 @endsection

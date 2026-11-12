@@ -12,6 +12,7 @@ class KelasFactory extends Factory
 {
     /**
      * Define the model's default state.
+     * Memilih nama, tingkat, dan jurusan kelas untuk data contoh.
      *
      * @return array<string, mixed>
      */

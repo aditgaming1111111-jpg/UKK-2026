@@ -12,6 +12,7 @@ class PelanggaranKategoriFactory extends Factory
 {
     /**
      * Define the model's default state.
+     * Menghasilkan kategori pelanggaran aktif dengan nama unik.
      *
      * @return array<string, mixed>
      */

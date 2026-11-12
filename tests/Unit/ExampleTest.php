@@ -4,6 +4,9 @@ namespace Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Memastikan lingkungan pengujian dapat menjalankan pemeriksaan unit dasar.
+ */
 class ExampleTest extends TestCase
 {
     /**

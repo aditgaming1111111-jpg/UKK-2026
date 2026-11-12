@@ -14,8 +14,12 @@ use App\Models\TahunAjaran;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
+/**
+ * Menguji pencatatan pelanggaran oleh guru, kelayakan siswa, validasi, nilai snapshot, dan otorisasi.
+ */
 class GuruPencatatanPelanggaranTest extends TestCase
 {
     use RefreshDatabase;
@@ -33,6 +37,7 @@ class GuruPencatatanPelanggaranTest extends TestCase
         $otherTeacher = Guru::factory()->create();
 
         $response = $this->actingAs($teacherUser)->post(route('guru.violations.store'), [
+            'idempotency_key' => (string) Str::uuid(),
             'kelas_siswa_id' => $placement->id,
             'pelanggaran_id' => $violation->id,
             'tanggal_pelanggaran' => now()->toDateString(),
@@ -168,6 +173,7 @@ class GuruPencatatanPelanggaranTest extends TestCase
 
         foreach ([$firstViolation, $secondViolation] as $violation) {
             $this->post(route('guru.violations.store'), [
+                'idempotency_key' => (string) Str::uuid(),
                 'kelas_siswa_id' => $placement->id,
                 'pelanggaran_id' => $violation->id,
                 'tanggal_pelanggaran' => today()->toDateString(),
@@ -225,6 +231,7 @@ class GuruPencatatanPelanggaranTest extends TestCase
         [$teacherUser, , , $placement, $violation] = $this->recordingContext();
 
         $this->actingAs($teacherUser)->post(route('guru.violations.store'), [
+            'idempotency_key' => (string) Str::uuid(),
             'kelas_siswa_id' => $placement->id,
             'pelanggaran_id' => $violation->id,
             'tanggal_pelanggaran' => now()->toDateString(),
@@ -236,6 +243,47 @@ class GuruPencatatanPelanggaranTest extends TestCase
 
         $this->assertSame(7, $record->poin_saat_dicatat);
         $this->assertSame(24, $violation->fresh()->poin);
+    }
+
+    public function test_duplicate_submission_with_the_same_idempotency_key_creates_one_record_and_keeps_a_new_submission_valid(): void
+    {
+        [$teacherUser, , , $placement, $violation] = $this->recordingContext();
+        $idempotencyKey = (string) Str::uuid();
+        $payload = [
+            'idempotency_key' => $idempotencyKey,
+            'kelas_siswa_id' => $placement->id,
+            'pelanggaran_id' => $violation->id,
+            'tanggal_pelanggaran' => now()->toDateString(),
+            'keterangan' => 'Catatan yang dikirim dua kali.',
+        ];
+
+        $this->actingAs($teacherUser)->get(route('guru.violations.create'))
+            ->assertOk()
+            ->assertSee('data-submit-once', false)
+            ->assertSee('data-submit-button', false)
+            ->assertSee('name="idempotency_key"', false)
+            ->assertSee('Menyimpan catatan...', false);
+
+        $firstResponse = $this->post(route('guru.violations.store'), $payload);
+        $record = PelanggaranSiswa::query()->sole();
+        $firstResponse->assertRedirect(route('guru.violations.show', $record))
+            ->assertSessionHas('success', 'Catatan pelanggaran berhasil disimpan.');
+
+        $this->post(route('guru.violations.store'), $payload)
+            ->assertRedirect(route('guru.violations.show', $record))
+            ->assertSessionHas('success', 'Permintaan ini sudah diproses sebelumnya; catatan tidak dibuat ulang.');
+
+        $this->assertDatabaseCount('t_pelanggaran_siswa', 1);
+        $this->assertDatabaseCount('t_log_pelanggaran', 1);
+        $this->assertDatabaseCount('t_log_aktivitas', 1);
+
+        $newSubmission = $payload;
+        $newSubmission['idempotency_key'] = (string) Str::uuid();
+        $this->post(route('guru.violations.store'), $newSubmission)->assertRedirect();
+
+        $this->assertDatabaseCount('t_pelanggaran_siswa', 2);
+        $this->assertDatabaseCount('t_log_pelanggaran', 2);
+        $this->assertDatabaseCount('t_log_aktivitas', 2);
     }
 
     public function test_recording_routes_require_teacher_role_and_authenticated_account(): void

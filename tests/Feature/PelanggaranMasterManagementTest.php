@@ -14,6 +14,9 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/**
+ * Menguji pengelolaan kategori dan jenis pelanggaran, validasi, perlindungan referensi, dan hak akses.
+ */
 class PelanggaranMasterManagementTest extends TestCase
 {
     use RefreshDatabase;

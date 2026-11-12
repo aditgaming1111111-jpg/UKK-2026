@@ -3,20 +3,26 @@
 </div>
 @extends('layouts.guru')
 
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Catatan Saya')
 
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[['label' => 'Catatan Saya']]" />
 @endsection
 
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')
     <x-ui.page-heading title="Catatan Saya" description="Catatan pelanggaran yang Anda buat, termasuk catatan yang telah dibatalkan.">
         <x-ui.button :href="route('guru.violations.create')">Catat pelanggaran</x-ui.button>
     </x-ui.page-heading>
 @endsection
 
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card>
+        {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
         <form method="GET" action="{{ route('guru.my-notes.index') }}" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <x-ui.search placeholder="Cari nama siswa atau NISN" :value="$filters['q'] ?? null" class="lg:col-span-2" />
             <label class="space-y-1.5">
@@ -65,8 +71,10 @@
         </form>
     </x-ui.card>
 
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card :padding="false">
         @if ($records->isNotEmpty())
+            {{-- Tabel berikut merangkum data dalam susunan kolom yang mudah dipindai. --}}
             <x-ui.table>
                 <thead class="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
                     <tr>

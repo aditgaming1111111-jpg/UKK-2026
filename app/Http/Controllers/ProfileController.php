@@ -13,8 +13,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
+/**
+ * Menangani permintaan HTTP untuk profil, termasuk penyajian data dan perubahan yang diizinkan.
+ */
 class ProfileController extends Controller
 {
+    /**
+     * Menyiapkan data profil dan status penugasan wali kelas untuk formulir pengguna.
+     */
     public function edit(Request $request): View
     {
         $user = $request->user()->load('guru:id,user_id,nip,nama,email,status_aktif');
@@ -33,6 +39,9 @@ class ProfileController extends Controller
         ]);
     }
 
+    /**
+     * Menyimpan perubahan profil setelah validasi dan pemeriksaan otorisasi.
+     */
     public function update(UpdateProfileRequest $request): RedirectResponse
     {
         $attributes = $request->safe()->only(['nama', 'email']);
@@ -51,6 +60,9 @@ class ProfileController extends Controller
         return to_route('profile.edit')->with('success', 'Profil berhasil diperbarui.');
     }
 
+    /**
+     * Memvalidasi kata sandi lama dan menyimpan kata sandi baru pengguna.
+     */
     public function updatePassword(UpdatePasswordRequest $request): RedirectResponse
     {
         $request->user()->update(['password' => $request->validated('password')]);

@@ -4,6 +4,7 @@ import { bunny } from 'laravel-vite-plugin/fonts';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
+    // Mendaftarkan aset aplikasi, pemuatan ulang saat berkas berubah, font, dan integrasi Tailwind.
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.js'],
@@ -16,6 +17,7 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
+    // Mengabaikan tampilan hasil kompilasi agar perubahan internal tidak memicu pemantauan ulang.
     server: {
         watch: {
             ignored: ['**/storage/framework/views/**'],

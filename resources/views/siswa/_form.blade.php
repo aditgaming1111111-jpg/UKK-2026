@@ -1,3 +1,4 @@
+{{-- Menyatukan field agar formulir tambah dan ubah memakai susunan data yang konsisten. --}}
 @csrf
 <div class="grid gap-5 sm:grid-cols-2">
     <x-ui.input label="NIS" name="nis" inputmode="numeric" maxlength="10" pattern="[0-9]{10}"

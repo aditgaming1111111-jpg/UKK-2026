@@ -10,7 +10,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['kelas_siswa_id', 'pelanggaran_id', 'guru_id', 'tanggal_pelanggaran', 'tanggal_dicatat', 'poin_saat_dicatat', 'keterangan', 'tindakan', 'status'])]
+/**
+ * Merepresentasikan catatan pelanggaran siswa beserta relasi dan aturan datanya.
+ */
+#[Fillable(['kelas_siswa_id', 'pelanggaran_id', 'guru_id', 'tanggal_pelanggaran', 'tanggal_dicatat', 'poin_saat_dicatat', 'keterangan', 'tindakan', 'status', 'idempotency_key'])]
 class PelanggaranSiswa extends Model
 {
     /** @use HasFactory<PelanggaranSiswaFactory> */
@@ -47,6 +50,9 @@ class PelanggaranSiswa extends Model
         return $this->hasMany(LogPelanggaran::class, 'pelanggaran_siswa_id');
     }
 
+    /**
+     * Membatasi catatan pada data yang dapat dilihat pengguna sesuai perannya.
+     */
     public function scopeVisibleTo(Builder $query, User $user): Builder
     {
         if (in_array($user->role, ['admin', 'guru'], true)) {

@@ -1,18 +1,24 @@
+{{-- Mengelompokkan contoh komponen antarmuka untuk pemeriksaan visual. --}}
 @extends($layout)
 
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Demo Komponen')
 
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[['label' => 'Beranda', 'url' => '/'], ['label' => 'Fondasi UI']]" />
 @endsection
 
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')
     <x-ui.page-heading title="Fondasi antarmuka" description="Contoh komponen dasar SekolahKu dalam tampilan monochrome.">
         <x-ui.button data-toast-trigger="app-toast"><x-ui.icon name="check" class="size-4" /> Simpan contoh</x-ui.button>
     </x-ui.page-heading>
 @endsection
 
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
+    {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
     <section aria-label="Ringkasan" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <x-ui.stat-card label="Siswa terdata" value="1.248" note="Data contoh" icon="users" />
         <x-ui.stat-card label="Pelanggaran aktif" value="36" note="Tahun ajaran berjalan" icon="warning" />
@@ -35,6 +41,7 @@
                         </select></x-ui.filter></div>
             </div>
             <div class="mt-5 space-y-4">
+                {{-- Tabel berikut merangkum data dalam susunan kolom yang mudah dipindai. --}}
                 <x-ui.table>
                     <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
                         <tr>
@@ -97,6 +104,7 @@
         </x-ui.card>
     </div>
 
+    {{-- Dialog ini memuat informasi atau konfirmasi sebelum tindakan dijalankan. --}}
     <x-ui.modal id="demo-confirmation" title="Batalkan catatan?"
         description="Tindakan ini akan mengubah status catatan contoh.">
         <p class="text-sm text-gray-600">Catatan tetap disimpan untuk kebutuhan riwayat dan audit.</p>

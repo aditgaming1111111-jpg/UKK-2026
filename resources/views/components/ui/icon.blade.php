@@ -1,3 +1,4 @@
+{{-- Memetakan nama ikon ke jalur SVG agar simbol antarmuka dapat digunakan ulang. --}}
 @props(['name' => 'circle'])
 
 @php

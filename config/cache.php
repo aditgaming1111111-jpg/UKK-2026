@@ -97,6 +97,7 @@ return [
             'driver' => 'octane',
         ],
 
+        // Beralih ke penyimpanan array bila cache database tidak tersedia.
         'failover' => [
             'driver' => 'failover',
             'stores' => [
@@ -131,6 +132,7 @@ return [
     |
     */
 
+    // Nonaktifkan pemulihan objek PHP dari cache untuk membatasi risiko deserialisasi.
     'serializable_classes' => false,
 
 ];

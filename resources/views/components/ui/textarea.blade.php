@@ -1,3 +1,4 @@
+{{-- Membentuk field teks multiline dengan label dan pesan validasi. --}}
 @props(['label', 'name', 'rows' => 4, 'required' => false])
 <div class="space-y-1.5">
     <label for="{{ $name }}" class="block text-sm font-medium text-gray-700">{{ $label }} @if ($required)

@@ -9,9 +9,11 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * Menambahkan status kepegawaian dan membatasi panjang NIP.
      */
     public function up(): void
     {
+        // Pastikan data lama sesuai panjang kolom yang akan diterapkan.
         $characterLengthFunction = DB::connection()->getDriverName() === 'sqlite' ? 'LENGTH' : 'CHAR_LENGTH';
 
         if (DB::table('t_guru')->whereNotNull('nip')->whereRaw($characterLengthFunction.'(nip) > ?', [18])->exists()) {
@@ -26,6 +28,7 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
+     * Mengembalikan struktur guru hanya bila data baru tidak akan hilang.
      */
     public function down(): void
     {

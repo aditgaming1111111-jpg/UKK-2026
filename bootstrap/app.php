@@ -14,12 +14,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Alias middleware untuk pemeriksaan status akun dan pembatasan peran.
         $middleware->alias([
             'account.active' => EnsureActiveAccount::class,
             'role' => EnsureUserRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        // Respons exception berbentuk JSON untuk endpoint API atau permintaan JSON.
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );

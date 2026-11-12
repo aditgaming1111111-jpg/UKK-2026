@@ -9,10 +9,13 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
+/**
+ * Memeriksa kewenangan dan memvalidasi masukan untuk pencatatan pelanggaran siswa.
+ */
 class StorePelanggaranSiswaRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Menentukan apakah pengguna yang sedang masuk berwenang menjalankan permintaan ini.
      */
     public function authorize(): bool
     {
@@ -20,13 +23,14 @@ class StorePelanggaranSiswaRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Menetapkan aturan validasi yang berlaku untuk permintaan ini.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
+            'idempotency_key' => ['required', 'uuid'],
             'kelas_siswa_id' => ['required', 'integer', 'exists:t_kelas_siswa,id'],
             'pelanggaran_id' => ['required', 'integer', Rule::exists('t_pelanggaran', 'id')],
             'tanggal_pelanggaran' => ['required', 'date', 'before_or_equal:today'],
@@ -35,6 +39,9 @@ class StorePelanggaranSiswaRequest extends FormRequest
         ];
     }
 
+    /**
+     * Memeriksa konsistensi lintas-field setelah validasi dasar selesai.
+     */
     public function after(): array
     {
         return [function (Validator $validator): void {
@@ -67,8 +74,10 @@ class StorePelanggaranSiswaRequest extends FormRequest
             $yearStart = CarbonImmutable::parse($academicYear->tanggal_mulai)->startOfDay();
             $yearEnd = CarbonImmutable::parse($academicYear->tanggal_selesai)->startOfDay();
 
-            if ($incidentDate->lt($placementStart) || $incidentDate->gt($placementEnd)
-                || $incidentDate->lt($yearStart) || $incidentDate->gt($yearEnd)) {
+            if (
+                $incidentDate->lt($placementStart) || $incidentDate->gt($placementEnd)
+                || $incidentDate->lt($yearStart) || $incidentDate->gt($yearEnd)
+            ) {
                 $validator->errors()->add('kelas_siswa_id', 'Penempatan kelas dan tahun ajaran tidak berlaku pada tanggal kejadian. Pilih siswa atau tanggal lain.');
             }
 
@@ -78,6 +87,9 @@ class StorePelanggaranSiswaRequest extends FormRequest
         }];
     }
 
+    /**
+     * Menormalkan masukan sebelum aturan validasi dijalankan.
+     */
     protected function prepareForValidation(): void
     {
         $this->merge([
@@ -86,9 +98,14 @@ class StorePelanggaranSiswaRequest extends FormRequest
         ]);
     }
 
+    /**
+     * Menyediakan pesan kesalahan validasi yang ditampilkan kepada pengguna.
+     */
     public function messages(): array
     {
         return [
+            'idempotency_key.required' => 'Token formulir tidak tersedia. Muat ulang halaman lalu coba kembali.',
+            'idempotency_key.uuid' => 'Token formulir tidak valid. Muat ulang halaman lalu coba kembali.',
             'kelas_siswa_id.required' => 'Pilih siswa beserta penempatan kelas yang berlaku saat kejadian.',
             'kelas_siswa_id.exists' => 'Penempatan kelas siswa tidak ditemukan.',
             'pelanggaran_id.required' => 'Pilih jenis pelanggaran aktif.',

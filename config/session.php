@@ -18,6 +18,7 @@ return [
     |
     */
 
+    // Sesi disimpan di database secara bawaan agar dapat dibagikan antar proses.
     'driver' => env('SESSION_DRIVER', 'database'),
 
     /*
@@ -169,6 +170,7 @@ return [
     |
     */
 
+    // Pengaturan cookie membatasi pengiriman melalui koneksi tidak aman dan akses JS.
     'secure' => env('SESSION_SECURE_COOKIE'),
 
     /*

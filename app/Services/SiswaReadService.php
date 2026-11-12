@@ -14,9 +14,14 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Collection;
 
+/**
+ * Menyediakan daftar, rincian, dan rekap poin siswa untuk kebutuhan baca.
+ */
 class SiswaReadService
 {
     /**
+     * Menyediakan direktori siswa terfilter, lengkap dengan poin aktif dan akses rincian.
+     *
      * @param  array{q?: string|null, kelas_id?: int|string|null, tingkat?: string|null, jurusan?: string|null, status?: string|null, tahun_ajaran_id?: int|string|null}  $filters
      * @return LengthAwarePaginator<int, Siswa>
      */
@@ -26,6 +31,7 @@ class SiswaReadService
         $level = $filters['tingkat'] ?? null;
         $major = $filters['jurusan'] ?? null;
         $academicYearId = $filters['tahun_ajaran_id'] ?? null;
+        // Poin dihitung dari snapshot catatan aktif pada tahun ajaran yang dipilih.
         $activePoints = PelanggaranSiswa::query()
             ->join('t_kelas_siswa', 't_kelas_siswa.id', '=', 't_pelanggaran_siswa.kelas_siswa_id')
             ->where('t_pelanggaran_siswa.status', 'aktif')
@@ -75,6 +81,8 @@ class SiswaReadService
     }
 
     /**
+     * Menyusun rekap poin aktif siswa untuk tahun ajaran dan pencarian yang dipilih.
+     *
      * @param  array{q?: string|null, tahun_ajaran_id?: int|string|null}  $filters
      * @return LengthAwarePaginator<int, Siswa>
      */
@@ -113,7 +121,11 @@ class SiswaReadService
             });
     }
 
-    /** @return Collection<int, TahunAjaran> */
+    /**
+     * Mengambil pilihan tahun ajaran untuk filter tampilan siswa.
+     *
+     * @return Collection<int, TahunAjaran>
+     */
     public function academicYears(): Collection
     {
         return TahunAjaran::query()
@@ -122,25 +134,39 @@ class SiswaReadService
             ->get(['id', 'nama_tahun_ajaran', 'status_aktif']);
     }
 
-    /** @return Collection<int, Kelas> */
+    /**
+     * Mengambil daftar kelas untuk pilihan filter.
+     *
+     * @return Collection<int, Kelas>
+     */
     public function classes(): Collection
     {
         return Kelas::query()->orderBy('tingkat')->orderBy('nama_kelas')->get();
     }
 
-    /** @return Collection<int, string> */
+    /**
+     * Mengambil tingkat kelas unik yang tersedia.
+     *
+     * @return Collection<int, string>
+     */
     public function levels(): Collection
     {
         return Kelas::query()->whereNotNull('tingkat')->distinct()->orderBy('tingkat')->pluck('tingkat');
     }
 
-    /** @return Collection<int, string> */
+    /**
+     * Mengambil jurusan unik yang tersedia.
+     *
+     * @return Collection<int, string>
+     */
     public function majors(): Collection
     {
         return Kelas::query()->whereNotNull('jurusan')->distinct()->orderBy('jurusan')->pluck('jurusan');
     }
 
     /**
+     * Menggabungkan penempatan, catatan, dan rekap poin untuk rincian seorang siswa.
+     *
      * @return array{placements: Collection, activePlacementIds: list<int>, violations: LengthAwarePaginator, pointRecap: Collection}
      */
     public function detail(Siswa $siswa): array
@@ -207,6 +233,8 @@ class SiswaReadService
     }
 
     /**
+     * Menyusun catatan pelanggaran yang boleh dilihat pengguna pada penempatan siswa.
+     *
      * @return Builder<PelanggaranSiswa>
      */
     private function visibleViolations(Siswa $siswa): Builder
@@ -215,7 +243,10 @@ class SiswaReadService
             ->whereHas('penempatanKelas', static fn (Builder $query): Builder => $query->where('siswa_id', $siswa->id));
     }
 
-    /** @param list<int> $studentIds
+    /**
+     * Menentukan siswa yang rinciannya dapat diakses pengguna berdasarkan peran dan penugasan.
+     *
+     * @param  list<int>  $studentIds
      * @return list<int>
      */
     private function viewableStudentIds(User $user, array $studentIds): array

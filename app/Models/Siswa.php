@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
+/**
+ * Merepresentasikan siswa beserta relasi dan aturan datanya.
+ */
 #[Fillable(['nis', 'nisn', 'nama', 'jenis_kelamin', 'tanggal_lahir', 'alamat', 'tahun_masuk', 'status_siswa'])]
 class Siswa extends Model
 {
@@ -35,6 +38,9 @@ class Siswa extends Model
         return $this->hasManyThrough(PelanggaranSiswa::class, KelasSiswa::class, 'siswa_id', 'kelas_siswa_id');
     }
 
+    /**
+     * Memeriksa apakah siswa telah menyelesaikan penempatan pada tingkat XII.
+     */
     public function hasCompletedGradeTwelvePlacement(): bool
     {
         return $this->penempatanKelas()

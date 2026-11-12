@@ -12,6 +12,9 @@ use App\Models\WaliKelas;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/**
+ * Menguji pengelolaan kelas, perlindungan riwayat, daftar dan detail siswa, serta pembatasan akses.
+ */
 class KelasManagementTest extends TestCase
 {
     use RefreshDatabase;

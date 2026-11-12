@@ -8,6 +8,7 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * Menyediakan tabel untuk nilai cache dan kunci penguncian.
      */
     public function up(): void
     {
@@ -26,6 +27,7 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
+     * Menghapus tabel cache beserta tabel kunci pengunciannya.
      */
     public function down(): void
     {

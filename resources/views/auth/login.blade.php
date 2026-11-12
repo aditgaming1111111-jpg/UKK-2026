@@ -1,3 +1,4 @@
+{{-- Menyajikan antarmuka autentikasi sesuai alur akses pengguna. --}}
 <!DOCTYPE html>
 <html lang="id" class="app-scrollbar-hidden">
 
@@ -10,6 +11,7 @@
 
 <body class="min-h-screen bg-gray-100 text-gray-900 antialiased">
     <main class="flex min-h-screen items-center justify-center px-4 py-12">
+        {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
         <section class="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
             <div class="mb-8 text-center">
                 <p class="text-sm font-semibold uppercase tracking-[0.2em] text-gray-500">SekolahKu</p>
@@ -22,6 +24,7 @@
                     {{ session('status') }}</p>
             @endif
 
+            {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
             <form method="POST" action="{{ route('login.store') }}" class="space-y-5">
                 @csrf
 

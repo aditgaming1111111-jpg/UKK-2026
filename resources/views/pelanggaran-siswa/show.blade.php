@@ -1,7 +1,9 @@
 @extends(auth()->user()->role === 'admin' ? 'layouts.admin' : 'layouts.guru')
 
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Detail Catatan Pelanggaran')
 
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[
         ['label' => 'Catatan Pelanggaran', 'url' => route($routePrefix.'.index')],
@@ -9,6 +11,7 @@
     ]" />
 @endsection
 
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')
     <x-ui.page-heading title="Detail Catatan Pelanggaran" description="Catatan terhubung dengan kelas dan tahun ajaran saat kejadian.">
         <div class="flex flex-wrap gap-2">
@@ -21,6 +24,7 @@
     </x-ui.page-heading>
 @endsection
 
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
     @if (session('success'))
         <div role="status" class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700">{{ session('success') }}</div>
@@ -32,6 +36,7 @@
         <div role="alert" class="rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-800">{{ $errors->first('alasan') }}</div>
     @endif
 
+    {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
     <section class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <x-ui.card>
             <div class="flex items-start justify-between gap-3"><div><h2 class="text-lg font-semibold text-gray-950">{{ $record->pelanggaran->nama_pelanggaran }}</h2><p class="mt-1 text-sm text-gray-500">{{ $record->pelanggaran->kode }} · {{ $record->pelanggaran->kategori->nama_kategori }}</p></div><x-ui.badge :variant="$record->status === 'aktif' ? 'dark' : 'outline'">{{ $record->status === 'aktif' ? 'Aktif' : 'Dibatalkan' }}</x-ui.badge></div>
@@ -57,6 +62,7 @@
         </x-ui.card>
     </section>
 
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card>
         <h2 class="text-base font-semibold text-gray-950">Log audit</h2>
         <p class="mt-1 text-sm text-gray-500">Setiap entri menyimpan pengguna, aksi, alasan, data sebelum dan sesudah, serta waktu.</p>
@@ -81,7 +87,9 @@
     </x-ui.card>
 
     @if ($canManage)
+        {{-- Dialog ini memuat informasi atau konfirmasi sebelum tindakan dijalankan. --}}
         <x-ui.modal id="cancel-record" title="Batalkan catatan pelanggaran?" description="Catatan tetap tersimpan untuk riwayat, tetapi statusnya tidak lagi dihitung sebagai poin aktif.">
+            {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
             <form method="POST" action="{{ route($routePrefix.'.cancel', $record) }}" class="space-y-4">
                 @csrf
                 @method('PATCH')

@@ -1,3 +1,4 @@
+{{-- Menyusun jejak navigasi dari daftar item beserta tautan induknya. --}}
 @props(['items' => []])
 <nav aria-label="Breadcrumb" class="mb-3">
     <ol class="flex flex-wrap items-center gap-2 text-xs text-gray-500">

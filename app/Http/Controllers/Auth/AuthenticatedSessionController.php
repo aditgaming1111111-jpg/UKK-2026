@@ -13,8 +13,14 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
+/**
+ * Menangani permintaan HTTP untuk autentikasi sesi, termasuk penyajian data dan perubahan yang diizinkan.
+ */
 class AuthenticatedSessionController extends Controller
 {
+    /**
+     * Menampilkan formulir untuk membuat autentikasi sesi.
+     */
     public function create(): View|RedirectResponse
     {
         $user = Auth::user();
@@ -26,6 +32,9 @@ class AuthenticatedSessionController extends Controller
         return view('auth.login');
     }
 
+    /**
+     * Memvalidasi dan menyimpan autentikasi sesi baru.
+     */
     public function store(LoginRequest $request, ActivityLogger $activityLogger): RedirectResponse
     {
         $email = Str::lower(trim($request->validated('email')));
@@ -65,6 +74,9 @@ class AuthenticatedSessionController extends Controller
         return to_route($user->dashboardRouteName());
     }
 
+    /**
+     * Menghapus autentikasi sesi setelah pemeriksaan otorisasi dan aturan terkait.
+     */
     public function destroy(Request $request, ActivityLogger $activityLogger): RedirectResponse
     {
         /** @var User $user */

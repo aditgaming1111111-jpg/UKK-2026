@@ -1,9 +1,11 @@
 @extends('layouts.admin')
 
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[['label' => 'Tahun Ajaran', 'url' => route('admin.academic-years.index')], ['label' => $academicYear->nama_tahun_ajaran]]" />
 @endsection
 
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')
     <x-ui.page-heading :title="$academicYear->nama_tahun_ajaran" description="Periode akademik dan riwayat yang terkait.">
         <div class="flex flex-wrap gap-2">
@@ -16,6 +18,7 @@
     </x-ui.page-heading>
 @endsection
 
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
     <div class="space-y-6">
         @if (session('success'))
@@ -38,6 +41,7 @@
             </dl>
         </x-ui.card>
 
+        {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
         <section class="grid gap-4 sm:grid-cols-2">
             <x-ui.stat-card label="Riwayat penempatan siswa" :value="$academicYear->penempatan_siswa_count" />
             <x-ui.stat-card label="Riwayat penugasan wali kelas" :value="$academicYear->penugasan_wali_kelas_count" />
@@ -49,8 +53,10 @@
         @endif
 
         @if ($academicYear->penempatan_siswa_count === 0 && $academicYear->penugasan_wali_kelas_count === 0)
+            {{-- Dialog ini memuat informasi atau konfirmasi sebelum tindakan dijalankan. --}}
             <x-ui.modal id="delete-academic-year" title="Hapus tahun ajaran?"
                 description="Tahun ajaran ini belum digunakan pada penempatan siswa atau penugasan wali kelas.">
+                {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
                 <form method="POST" action="{{ route('admin.academic-years.destroy', $academicYear) }}">@csrf @method('DELETE')
                     <div class="flex justify-end gap-2">
                         <x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button>

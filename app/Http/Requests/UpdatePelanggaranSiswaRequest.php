@@ -11,10 +11,13 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
+/**
+ * Memeriksa kewenangan dan memvalidasi masukan untuk perubahan catatan pelanggaran siswa.
+ */
 class UpdatePelanggaranSiswaRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Menentukan apakah pengguna yang sedang masuk berwenang menjalankan permintaan ini.
      */
     public function authorize(): bool
     {
@@ -22,7 +25,7 @@ class UpdatePelanggaranSiswaRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Menetapkan aturan validasi yang berlaku untuk permintaan ini.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
@@ -37,6 +40,9 @@ class UpdatePelanggaranSiswaRequest extends FormRequest
         ];
     }
 
+    /**
+     * Memeriksa konsistensi lintas-field setelah validasi dasar selesai.
+     */
     public function after(): array
     {
         return [function (Validator $validator): void {
@@ -76,6 +82,9 @@ class UpdatePelanggaranSiswaRequest extends FormRequest
         }];
     }
 
+    /**
+     * Menormalkan masukan sebelum aturan validasi dijalankan.
+     */
     protected function prepareForValidation(): void
     {
         foreach (['keterangan', 'tindakan', 'alasan'] as $field) {
@@ -83,6 +92,9 @@ class UpdatePelanggaranSiswaRequest extends FormRequest
         }
     }
 
+    /**
+     * Menyediakan pesan kesalahan validasi yang ditampilkan kepada pengguna.
+     */
     public function messages(): array
     {
         return [

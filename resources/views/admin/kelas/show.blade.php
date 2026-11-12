@@ -1,6 +1,9 @@
 @extends('layouts.admin')
+{{-- Menetapkan judul halaman yang dipakai oleh kerangka aplikasi. --}}
 @section('title', 'Detail Kelas')
+{{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')<x-ui.breadcrumbs :items="[['label' => 'Data Kelas', 'url' => route('admin.classes.index')], ['label' => $kelas->nama_kelas]]" />@endsection
+{{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')<x-ui.page-heading :title="$kelas->nama_kelas"
         description="Detail kelas dan jumlah riwayat yang terhubung.">
         <div class="flex gap-2"><x-ui.button variant="secondary" :href="route('admin.classes.edit', $kelas)">Edit</x-ui.button>
@@ -9,6 +12,7 @@
             @endif
         </div>
 </x-ui.page-heading>@endsection
+{{-- Memuat konten utama halaman yang ditampilkan di dalam kerangka aplikasi. --}}
 @section('content')
     @if (session('success'))
         <div role="status" class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700">
@@ -17,6 +21,7 @@
     @if ($errors->has('kelas'))
         <x-ui.error-state title="Kelas tidak dapat dihapus" :description="$errors->first('kelas')" />
     @endif
+    {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
     <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><x-ui.stat-card label="Tingkat" :value="$kelas->tingkat"
             note="Tingkat kelas" icon="grid" /><x-ui.stat-card label="Jurusan" :value="$kelas->jurusan ?: '—'"
             note="Sesuai data master" icon="document" /><x-ui.stat-card label="Penempatan aktif" :value="$kelas->active_placement_count"
@@ -28,6 +33,7 @@
                 permanen; ubah nama atau jurusannya jika diperlukan.</p>
         </x-ui.card>
     @endif
+    {{-- Kartu ini membatasi satu kelompok informasi atau kontrol halaman. --}}
     <x-ui.card :padding="false">
         <div class="flex flex-wrap items-start justify-between gap-4 border-b border-gray-200 px-5 py-4">
             <div>
@@ -35,6 +41,7 @@
                 <p class="mt-1 text-sm text-gray-500">Penempatan aktif pada tahun ajaran {{ $academicYear?->nama_tahun_ajaran ?? 'yang aktif' }}.</p>
             </div>
             @if ($academicYear)
+                {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
                 <form method="GET" action="{{ route('admin.classes.show', $kelas) }}" class="flex w-full items-end gap-2 sm:w-auto">
                     <x-ui.search name="q" placeholder="Cari nama atau NISN" :value="$filters['q'] ?? null" />
                     <x-ui.button type="submit">Cari</x-ui.button>
@@ -44,6 +51,7 @@
         @if (!$academicYear)
             <div class="p-5"><x-ui.empty-state title="Belum ada tahun ajaran aktif" description="Daftar siswa saat ini tersedia setelah Admin menetapkan tahun ajaran aktif." /></div>
         @elseif ($placements->isNotEmpty())
+            {{-- Tabel berikut merangkum data dalam susunan kolom yang mudah dipindai. --}}
             <x-ui.table>
                 <thead class="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
                     <tr><th class="px-5 py-3 font-medium">NISN</th><th class="px-5 py-3 font-medium">Nama siswa</th><th class="px-5 py-3 font-medium">Status penempatan</th><th class="px-5 py-3 text-right font-medium">Aksi</th></tr>
@@ -68,7 +76,9 @@
         @endif
     </x-ui.card>
     @if ($kelas->penempatan_siswa_count === 0 && $kelas->penugasan_wali_kelas_count === 0)
+        {{-- Dialog ini memuat informasi atau konfirmasi sebelum tindakan dijalankan. --}}
         <x-ui.modal id="delete-class" title="Hapus kelas?" description="Kelas belum direferensikan oleh histori mana pun.">
+            {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
             <form method="POST" action="{{ route('admin.classes.destroy', $kelas) }}">@csrf @method('DELETE')<div
                     class="flex justify-end gap-2"><x-ui.button variant="secondary" type="button"
                         data-modal-close>Batal</x-ui.button><x-ui.button type="submit">Hapus kelas</x-ui.button></div>

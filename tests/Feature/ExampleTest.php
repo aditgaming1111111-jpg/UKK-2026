@@ -5,6 +5,9 @@ namespace Tests\Feature;
 // use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/**
+ * Memastikan halaman utama mengarahkan pengunjung yang belum masuk ke halaman login.
+ */
 class ExampleTest extends TestCase
 {
     /**
