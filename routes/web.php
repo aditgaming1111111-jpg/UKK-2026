@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // Arahkan pengguna masuk ke dasbor sesuai perannya, atau ke halaman login.
-Route::get('/', fn () => Auth::user() instanceof User
+Route::get('/', fn() => Auth::user() instanceof User
     ? to_route(Auth::user()->dashboardRouteName())
     : to_route('login'));
 
@@ -35,6 +35,6 @@ Route::middleware(['auth', 'account.active'])->group(function (): void {
     })->name('ui-demo');
 
     // Pisahkan definisi rute berdasarkan peran agar mudah dikelola.
-    require __DIR__.'/admin.php';
-    require __DIR__.'/guru.php';
+    require __DIR__ . '/admin.php';
+    require __DIR__ . '/guru.php';
 });

@@ -52,7 +52,7 @@ class StudentTransitionController extends Controller
                 'Proses tinggal kelas massal',
                 'Kelulusan massal',
             ])
-            ->where('deskripsi', 'like', '%Tahun asal ID #'.$tahunAjaran->id.' ('.$tahunAjaran->nama_tahun_ajaran.')%')
+            ->where('deskripsi', 'like', '%Tahun asal ID #' . $tahunAjaran->id . ' (' . $tahunAjaran->nama_tahun_ajaran . ')%')
             ->orderByDesc('created_at')
             ->orderByDesc('id')
             ->paginate(10)

@@ -27,7 +27,9 @@ class UpdateTahunAjaranRequest extends FormRequest
     {
         return [
             'nama_tahun_ajaran' => [
-                'required', 'string', 'max:20',
+                'required',
+                'string',
+                'max:20',
                 Rule::unique('t_tahun_ajaran', 'nama_tahun_ajaran')->ignore($this->route('tahunAjaran')),
             ],
             'tanggal_mulai' => ['required', 'date'],

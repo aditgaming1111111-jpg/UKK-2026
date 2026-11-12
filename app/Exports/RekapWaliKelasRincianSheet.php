@@ -34,9 +34,9 @@ class RekapWaliKelasRincianSheet implements FromQuery, WithCustomChunkSize, With
         assert($record instanceof PelanggaranSiswa);
 
         $auditSummary = $record->logPerubahan
-            ->map(static fn ($log): string => trim(ucfirst($log->aksi).' oleh '.($log->pengguna?->nama ?? 'Pengguna tidak tersedia')
-                .' pada '.($log->created_at?->format('d/m/Y H:i') ?? 'waktu tidak tersedia')
-                .($log->alasan ? ': '.$log->alasan : '')))
+            ->map(static fn($log): string => trim(ucfirst($log->aksi) . ' oleh ' . ($log->pengguna?->nama ?? 'Pengguna tidak tersedia')
+                . ' pada ' . ($log->created_at?->format('d/m/Y H:i') ?? 'waktu tidak tersedia')
+                . ($log->alasan ? ': ' . $log->alasan : '')))
             ->implode(' | ');
 
         return [
@@ -70,6 +70,6 @@ class RekapWaliKelasRincianSheet implements FromQuery, WithCustomChunkSize, With
     {
         $value ??= '';
 
-        return preg_match('/^[=+\-@\t\r]/u', $value) === 1 ? "'".$value : $value;
+        return preg_match('/^[=+\-@\t\r]/u', $value) === 1 ? "'" . $value : $value;
     }
 }

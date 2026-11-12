@@ -40,21 +40,21 @@ class RiwayatPelanggaranController extends Controller
 
         if (($filters['q'] ?? '') !== '') {
             $term = addcslashes(trim($filters['q']), '%_\\');
-            $query->whereHas('penempatanKelas.siswa', static fn ($studentQuery) => $studentQuery
-                ->where('nisn', 'like', '%'.$term.'%')
-                ->orWhere('nama', 'like', '%'.$term.'%'));
+            $query->whereHas('penempatanKelas.siswa', static fn($studentQuery) => $studentQuery
+                ->where('nisn', 'like', '%' . $term . '%')
+                ->orWhere('nama', 'like', '%' . $term . '%'));
         }
 
         $query
-            ->when($filters['tahun_ajaran_id'] ?? null, static fn ($builder, int|string $id) => $builder
-                ->whereHas('penempatanKelas', static fn ($placementQuery) => $placementQuery->where('tahun_ajaran_id', $id)))
-            ->when($filters['kelas_id'] ?? null, static fn ($builder, int|string $id) => $builder
-                ->whereHas('penempatanKelas', static fn ($placementQuery) => $placementQuery->where('kelas_id', $id)))
-            ->when($filters['pelanggaran_id'] ?? null, static fn ($builder, int|string $id) => $builder->where('pelanggaran_id', $id))
-            ->when($filters['guru_id'] ?? null, static fn ($builder, int|string $id) => $builder->where('guru_id', $id))
-            ->when($filters['status'] ?? null, static fn ($builder, string $status) => $builder->where('status', $status))
-            ->when($filters['tanggal_mulai'] ?? null, static fn ($builder, string $date) => $builder->whereDate('tanggal_pelanggaran', '>=', $date))
-            ->when($filters['tanggal_selesai'] ?? null, static fn ($builder, string $date) => $builder->whereDate('tanggal_pelanggaran', '<=', $date));
+            ->when($filters['tahun_ajaran_id'] ?? null, static fn($builder, int|string $id) => $builder
+                ->whereHas('penempatanKelas', static fn($placementQuery) => $placementQuery->where('tahun_ajaran_id', $id)))
+            ->when($filters['kelas_id'] ?? null, static fn($builder, int|string $id) => $builder
+                ->whereHas('penempatanKelas', static fn($placementQuery) => $placementQuery->where('kelas_id', $id)))
+            ->when($filters['pelanggaran_id'] ?? null, static fn($builder, int|string $id) => $builder->where('pelanggaran_id', $id))
+            ->when($filters['guru_id'] ?? null, static fn($builder, int|string $id) => $builder->where('guru_id', $id))
+            ->when($filters['status'] ?? null, static fn($builder, string $status) => $builder->where('status', $status))
+            ->when($filters['tanggal_mulai'] ?? null, static fn($builder, string $date) => $builder->whereDate('tanggal_pelanggaran', '>=', $date))
+            ->when($filters['tanggal_selesai'] ?? null, static fn($builder, string $date) => $builder->whereDate('tanggal_pelanggaran', '<=', $date));
 
         $records = $query->orderByDesc('tanggal_pelanggaran')->orderByDesc('id')->paginate(10)->withQueryString();
 
@@ -105,7 +105,7 @@ class RiwayatPelanggaranController extends Controller
             'pelanggaran:id,kategori_id,kode,nama_pelanggaran,poin,status_aktif',
         ]);
         $violations = Pelanggaran::query()
-            ->where(fn ($query) => $query->where('status_aktif', true)->whereHas('kategori', static fn ($categoryQuery) => $categoryQuery->where('status_aktif', true)))
+            ->where(fn($query) => $query->where('status_aktif', true)->whereHas('kategori', static fn($categoryQuery) => $categoryQuery->where('status_aktif', true)))
             ->orWhereKey($pelanggaranSiswa->pelanggaran_id)
             ->with('kategori:id,nama_kategori')
             ->orderBy('nama_pelanggaran')
@@ -128,9 +128,9 @@ class RiwayatPelanggaranController extends Controller
         ActivityLogger $activityLogger,
     ): RedirectResponse {
         $record = $service->update($request->user(), $pelanggaranSiswa, $request->validated());
-        $activityLogger->record($request->user(), $request, 'Pelanggaran dikoreksi', 'Catatan pelanggaran siswa ID #'.$record->id.' dikoreksi; rincian perubahan tersedia di log pelanggaran.');
+        $activityLogger->record($request->user(), $request, 'Pelanggaran dikoreksi', 'Catatan pelanggaran siswa ID #' . $record->id . ' dikoreksi; rincian perubahan tersedia di log pelanggaran.');
 
-        return to_route($this->managementRoutePrefix($request->user()->role).'.show', $record)
+        return to_route($this->managementRoutePrefix($request->user()->role) . '.show', $record)
             ->with('success', 'Catatan pelanggaran berhasil dikoreksi dan dicatat dalam log audit.');
     }
 
@@ -144,9 +144,9 @@ class RiwayatPelanggaranController extends Controller
         ActivityLogger $activityLogger,
     ): RedirectResponse {
         $record = $service->cancel($request->user(), $pelanggaranSiswa, $request->validated('alasan'));
-        $activityLogger->record($request->user(), $request, 'Pelanggaran dibatalkan', 'Catatan pelanggaran siswa ID #'.$record->id.' dibatalkan; alasan tersimpan pada log pelanggaran.');
+        $activityLogger->record($request->user(), $request, 'Pelanggaran dibatalkan', 'Catatan pelanggaran siswa ID #' . $record->id . ' dibatalkan; alasan tersimpan pada log pelanggaran.');
 
-        return to_route($this->managementRoutePrefix($request->user()->role).'.show', $record)
+        return to_route($this->managementRoutePrefix($request->user()->role) . '.show', $record)
             ->with('success', 'Catatan pelanggaran dibatalkan. Riwayat dan log audit tetap tersimpan.');
     }
 

@@ -39,7 +39,7 @@ class AdminDashboardController extends Controller
 
         $activeTeachers = Guru::query()
             ->where('status_aktif', true)
-            ->whereHas('user', static fn (Builder $userQuery): Builder => $userQuery->where('role', 'guru'))
+            ->whereHas('user', static fn(Builder $userQuery): Builder => $userQuery->where('role', 'guru'))
             ->count();
 
         $violationTotals = ['count' => 0, 'points' => 0];
@@ -86,7 +86,7 @@ class AdminDashboardController extends Controller
                     'pelanggaran:id,nama_pelanggaran',
                     'guru:id,nama',
                 ])
-                ->whereHas('penempatanKelas', static fn (Builder $placementQuery): Builder => $placementQuery
+                ->whereHas('penempatanKelas', static fn(Builder $placementQuery): Builder => $placementQuery
                     ->where('tahun_ajaran_id', $selectedAcademicYear->id))
                 ->orderByDesc('tanggal_dicatat')
                 ->orderByDesc('id')
@@ -101,7 +101,7 @@ class AdminDashboardController extends Controller
                     'catatanPelanggaran.penempatanKelas.siswa:id,nama',
                     'catatanPelanggaran.pelanggaran:id,nama_pelanggaran',
                 ])
-                ->whereHas('catatanPelanggaran.penempatanKelas', static fn (Builder $placementQuery): Builder => $placementQuery
+                ->whereHas('catatanPelanggaran.penempatanKelas', static fn(Builder $placementQuery): Builder => $placementQuery
                     ->where('tahun_ajaran_id', $selectedAcademicYear->id))
                 ->orderByDesc('created_at')
                 ->orderByDesc('id')

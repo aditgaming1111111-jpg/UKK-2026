@@ -40,10 +40,12 @@ class UpdateSiswaStatusRequest extends FormRequest
         return [function (Validator $validator): void {
             $student = $this->route('siswa');
 
-            if ($validator->errors()->has('status_siswa')
+            if (
+                $validator->errors()->has('status_siswa')
                 || $this->input('status_siswa') !== 'lulus'
                 || ! $student instanceof Siswa
-                || $student->hasCompletedGradeTwelvePlacement()) {
+                || $student->hasCompletedGradeTwelvePlacement()
+            ) {
                 return;
             }
 

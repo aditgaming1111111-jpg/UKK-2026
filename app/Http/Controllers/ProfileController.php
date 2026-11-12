@@ -28,10 +28,10 @@ class ProfileController extends Controller
         $hasActiveWaliKelas = $user->role === 'guru'
             && $activeYearId !== null
             && WaliKelas::query()
-                ->where('guru_id', $user->guru?->id)
-                ->where('tahun_ajaran_id', $activeYearId)
-                ->where('status_aktif', true)
-                ->exists();
+            ->where('guru_id', $user->guru?->id)
+            ->where('tahun_ajaran_id', $activeYearId)
+            ->where('status_aktif', true)
+            ->exists();
 
         return view('profile.edit', [
             'user' => $user,

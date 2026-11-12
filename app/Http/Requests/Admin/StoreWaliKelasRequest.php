@@ -28,7 +28,9 @@ class StoreWaliKelasRequest extends FormRequest
     {
         return [
             'guru_id' => [
-                'required', 'integer', Rule::exists('t_guru', 'id')->where(static fn ($query) => $query->where('status_aktif', true)),
+                'required',
+                'integer',
+                Rule::exists('t_guru', 'id')->where(static fn($query) => $query->where('status_aktif', true)),
             ],
             'kelas_id' => ['required', 'integer', 'exists:t_kelas,id'],
             'tahun_ajaran_id' => ['required', 'integer', 'exists:t_tahun_ajaran,id'],

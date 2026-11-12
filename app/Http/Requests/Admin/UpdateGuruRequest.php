@@ -31,7 +31,10 @@ class UpdateGuruRequest extends FormRequest
             'nip' => ['required_if:status_kepegawaian,PNS', 'nullable', 'string', 'digits:18', Rule::unique('t_guru', 'nip')->ignore($this->route('guru'))],
             'nama' => ['required', 'string', 'max:100'],
             'email' => [
-                'required', 'string', 'email', 'max:255',
+                'required',
+                'string',
+                'email',
+                'max:255',
                 Rule::unique('t_guru', 'email')->ignore($this->route('guru')),
                 Rule::unique('t_users', 'email')->ignore($this->route('guru')->user_id),
             ],

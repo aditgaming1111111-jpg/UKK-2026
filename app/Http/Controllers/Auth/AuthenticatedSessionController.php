@@ -38,7 +38,7 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request, ActivityLogger $activityLogger): RedirectResponse
     {
         $email = Str::lower(trim($request->validated('email')));
-        $rateLimitKey = sha1($email.'|'.$request->ip());
+        $rateLimitKey = sha1($email . '|' . $request->ip());
 
         if (RateLimiter::tooManyAttempts($rateLimitKey, 5)) {
             $seconds = RateLimiter::availableIn($rateLimitKey);
@@ -53,7 +53,7 @@ class AuthenticatedSessionController extends Controller
                 'email' => $email,
                 'password' => $request->validated('password'),
             ],
-            static fn (User $user): bool => $user->hasSupportedRole() && $user->isActiveAccount(),
+            static fn(User $user): bool => $user->hasSupportedRole() && $user->isActiveAccount(),
         );
 
         if (! $authenticated) {
@@ -69,7 +69,7 @@ class AuthenticatedSessionController extends Controller
 
         /** @var User $user */
         $user = Auth::user();
-        $activityLogger->record($user, $request, 'Login', 'Pengguna berhasil masuk sebagai '.$user->role.'.');
+        $activityLogger->record($user, $request, 'Login', 'Pengguna berhasil masuk sebagai ' . $user->role . '.');
 
         return to_route($user->dashboardRouteName());
     }
@@ -81,7 +81,7 @@ class AuthenticatedSessionController extends Controller
     {
         /** @var User $user */
         $user = $request->user();
-        $activityLogger->record($user, $request, 'Logout', 'Pengguna keluar dari aplikasi sebagai '.$user->role.'.');
+        $activityLogger->record($user, $request, 'Logout', 'Pengguna keluar dari aplikasi sebagai ' . $user->role . '.');
 
         Auth::logout();
         $request->session()->invalidate();

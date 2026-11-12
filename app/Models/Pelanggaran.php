@@ -45,6 +45,6 @@ class Pelanggaran extends Model
     public function scopeAvailableForRecording(Builder $query): Builder
     {
         return $query->where('status_aktif', true)
-            ->whereHas('kategori', static fn (Builder $categoryQuery): Builder => $categoryQuery->where('status_aktif', true));
+            ->whereHas('kategori', static fn(Builder $categoryQuery): Builder => $categoryQuery->where('status_aktif', true));
     }
 }

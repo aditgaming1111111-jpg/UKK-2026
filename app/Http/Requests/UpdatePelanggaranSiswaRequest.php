@@ -75,8 +75,10 @@ class UpdatePelanggaranSiswaRequest extends FormRequest
 
             $selectedViolationId = $this->integer('pelanggaran_id');
 
-            if ($selectedViolationId !== $record->pelanggaran_id
-                && ! Pelanggaran::availableForRecording()->whereKey($selectedViolationId)->exists()) {
+            if (
+                $selectedViolationId !== $record->pelanggaran_id
+                && ! Pelanggaran::availableForRecording()->whereKey($selectedViolationId)->exists()
+            ) {
                 $validator->errors()->add('pelanggaran_id', 'Jenis pengganti harus aktif dan berada dalam kategori aktif.');
             }
         }];

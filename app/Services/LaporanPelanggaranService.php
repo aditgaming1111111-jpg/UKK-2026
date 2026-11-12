@@ -30,20 +30,20 @@ class LaporanPelanggaranService
 
         if (($filters['q'] ?? '') !== '') {
             $term = addcslashes(trim((string) $filters['q']), '%_\\');
-            $query->whereHas('penempatanKelas.siswa', static fn (Builder $studentQuery): Builder => $studentQuery
-                ->where('nisn', 'like', '%'.$term.'%')
-                ->orWhere('nama', 'like', '%'.$term.'%'));
+            $query->whereHas('penempatanKelas.siswa', static fn(Builder $studentQuery): Builder => $studentQuery
+                ->where('nisn', 'like', '%' . $term . '%')
+                ->orWhere('nama', 'like', '%' . $term . '%'));
         }
 
         return $query
-            ->when($filters['tahun_ajaran_id'] ?? null, static fn (Builder $builder, int|string $yearId): Builder => $builder
-                ->whereHas('penempatanKelas', static fn (Builder $placementQuery): Builder => $placementQuery->where('tahun_ajaran_id', $yearId)))
-            ->when($filters['kelas_id'] ?? null, static fn (Builder $builder, int|string $classId): Builder => $builder
-                ->whereHas('penempatanKelas', static fn (Builder $placementQuery): Builder => $placementQuery->where('kelas_id', $classId)))
-            ->when($filters['pelanggaran_id'] ?? null, static fn (Builder $builder, int|string $violationId): Builder => $builder->where('pelanggaran_id', $violationId))
-            ->when($filters['tanggal_mulai'] ?? null, static fn (Builder $builder, string $date): Builder => $builder->whereDate('tanggal_pelanggaran', '>=', $date))
-            ->when($filters['tanggal_selesai'] ?? null, static fn (Builder $builder, string $date): Builder => $builder->whereDate('tanggal_pelanggaran', '<=', $date))
-            ->when($filters['status'] ?? null, static fn (Builder $builder, string $status): Builder => $builder->where('status', $status))
+            ->when($filters['tahun_ajaran_id'] ?? null, static fn(Builder $builder, int|string $yearId): Builder => $builder
+                ->whereHas('penempatanKelas', static fn(Builder $placementQuery): Builder => $placementQuery->where('tahun_ajaran_id', $yearId)))
+            ->when($filters['kelas_id'] ?? null, static fn(Builder $builder, int|string $classId): Builder => $builder
+                ->whereHas('penempatanKelas', static fn(Builder $placementQuery): Builder => $placementQuery->where('kelas_id', $classId)))
+            ->when($filters['pelanggaran_id'] ?? null, static fn(Builder $builder, int|string $violationId): Builder => $builder->where('pelanggaran_id', $violationId))
+            ->when($filters['tanggal_mulai'] ?? null, static fn(Builder $builder, string $date): Builder => $builder->whereDate('tanggal_pelanggaran', '>=', $date))
+            ->when($filters['tanggal_selesai'] ?? null, static fn(Builder $builder, string $date): Builder => $builder->whereDate('tanggal_pelanggaran', '<=', $date))
+            ->when($filters['status'] ?? null, static fn(Builder $builder, string $status): Builder => $builder->where('status', $status))
             ->orderByDesc('tanggal_pelanggaran')
             ->orderByDesc('id');
     }

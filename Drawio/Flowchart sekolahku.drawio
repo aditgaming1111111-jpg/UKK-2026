@@ -1,0 +1,226 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="z-ePkNNB23a9ZRZ8ZIE3">
+    <mxGraphModel dx="3773" dy="1556" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="YGlYDFZo_xgVytsY07og-577" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=none;fillColor=light-dark(#FFFFFF,#FFFFFF);" value="" vertex="1">
+          <mxGeometry height="1040" width="1610" x="-391" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-578" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;fontSize=20;" value="&lt;h3&gt;Flowchart&amp;nbsp; Sekolahku&lt;br&gt;( Sistem Manajemen Pelanggaran Siswa )&lt;/h3&gt;" vertex="1">
+          <mxGeometry height="80" width="600" x="87" y="566" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-625" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;labelPadding=0 4;strokeColor=light-dark(#000000,#000000);">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="383" y="706" as="sourcePoint" />
+            <mxPoint x="384" y="726" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-583" parent="1" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.terminator;whiteSpace=wrap;labelBackgroundColor=none;" value="Mulai" vertex="1">
+          <mxGeometry height="50" width="128" x="329" y="656" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-628" edge="1" parent="1" source="YGlYDFZo_xgVytsY07og-584" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.484;entryY=-0.026;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;labelPadding=0 4;strokeColor=light-dark(#000000,#000000);" target="YGlYDFZo_xgVytsY07og-585">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-584" parent="1" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;shapeInside=1;fixedSize=1;" value="Akses Website&lt;div&gt;( https://sekolahku.site.je )&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="290" x="249" y="726" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-585" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="&lt;b&gt;Halaman Login&lt;/b&gt;&lt;div&gt;( Masukan Email &amp;amp; Password )&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="300" x="249" y="796" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-629" edge="1" parent="1" source="YGlYDFZo_xgVytsY07og-586" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;labelPadding=0 4;strokeColor=light-dark(#000000,#000000);" target="YGlYDFZo_xgVytsY07og-585">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-630" edge="1" parent="1" source="YGlYDFZo_xgVytsY07og-586" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;labelPadding=0 4;strokeColor=light-dark(#000000,#000000);" target="YGlYDFZo_xgVytsY07og-587">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="849" y="916" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-586" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="&lt;div&gt;&lt;b&gt;Pesan Error&lt;/b&gt;&lt;/div&gt;&lt;div&gt;( Periksa Email &amp;amp; Password )&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="220" x="739" y="786" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-587" parent="1" style="rhombus;whiteSpace=wrap;html=1;shapeInside=1;" value="Login&amp;nbsp;&lt;div&gt;Berhasil?&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="164" x="315" y="876" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-639" edge="1" parent="1" source="YGlYDFZo_xgVytsY07og-589" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;labelPadding=0 4;strokeColor=light-dark(#000000,#000000);" target="YGlYDFZo_xgVytsY07og-597">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="54" y="1116" />
+              <mxPoint x="-291" y="1116" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-640" edge="1" parent="1" source="YGlYDFZo_xgVytsY07og-589" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;labelPadding=0 4;strokeColor=light-dark(#000000,#000000);" target="YGlYDFZo_xgVytsY07og-601">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="54" y="1116" />
+              <mxPoint x="-156" y="1116" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-641" edge="1" parent="1" source="YGlYDFZo_xgVytsY07og-589" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.453;entryY=-0.025;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;labelPadding=0 4;strokeColor=light-dark(#000000,#000000);" target="YGlYDFZo_xgVytsY07og-599">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="54" y="1116" />
+              <mxPoint x="-26.399999999999977" y="1116" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-642" edge="1" parent="1" source="YGlYDFZo_xgVytsY07og-589" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.616;entryY=0.047;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;labelPadding=0 4;strokeColor=light-dark(#000000,#000000);" target="YGlYDFZo_xgVytsY07og-603">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="54" y="1116" />
+              <mxPoint x="134.39999999999998" y="1116" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-643" edge="1" parent="1" source="YGlYDFZo_xgVytsY07og-589" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;labelPadding=0 4;strokeColor=light-dark(#000000,#000000);" target="YGlYDFZo_xgVytsY07og-605">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="54" y="1116" />
+              <mxPoint x="264" y="1116" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-644" edge="1" parent="1" source="YGlYDFZo_xgVytsY07og-589" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;labelPadding=0 4;strokeColor=light-dark(#000000,#000000);" target="YGlYDFZo_xgVytsY07og-612">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="54" y="1116" />
+              <mxPoint x="399" y="1116" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-645" edge="1" parent="1" source="YGlYDFZo_xgVytsY07og-589" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.46;entryY=0.01;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;labelPadding=0 4;strokeColor=light-dark(#000000,#000000);" target="YGlYDFZo_xgVytsY07og-614">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="54" y="1116" />
+              <mxPoint x="524.1" y="1116" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-589" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="&lt;div&gt;&lt;b&gt;Dashboard Admin&lt;/b&gt;&lt;/div&gt;&lt;div&gt;( Ringkasan Data &amp;amp; Statistik )&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="370" x="-131" y="1056" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-632" edge="1" parent="1" source="YGlYDFZo_xgVytsY07og-590" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;labelPadding=0 4;strokeColor=light-dark(#000000,#000000);startArrow=blockThin;startFill=1;" target="YGlYDFZo_xgVytsY07og-594">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="54" y="976" />
+              <mxPoint x="894" y="976" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-590" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="&lt;div&gt;&lt;b&gt;Dashboard Admin&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="240" x="-66" y="1016" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-646" edge="1" parent="1" source="YGlYDFZo_xgVytsY07og-593" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;labelPadding=0 4;strokeColor=light-dark(#000000,#000000);" target="YGlYDFZo_xgVytsY07og-616">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-647" edge="1" parent="1" source="YGlYDFZo_xgVytsY07og-593" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.699;entryY=-0.011;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;labelPadding=0 4;strokeColor=light-dark(#000000,#000000);" target="YGlYDFZo_xgVytsY07og-618">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-648" edge="1" parent="1" source="YGlYDFZo_xgVytsY07og-593" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;labelPadding=0 4;entryX=0.308;entryY=0;entryDx=0;entryDy=0;strokeColor=light-dark(#000000,#000000);" target="YGlYDFZo_xgVytsY07og-620">
+          <mxGeometry relative="1" x="-0.1059" as="geometry">
+            <mxPoint x="939" y="1136" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-649" edge="1" parent="1" source="YGlYDFZo_xgVytsY07og-593" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.385;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;labelPadding=0 4;strokeColor=light-dark(#000000,#000000);" target="YGlYDFZo_xgVytsY07og-622">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-593" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="&lt;div&gt;&lt;b&gt;Dashboard Guru&lt;/b&gt;&lt;/div&gt;&lt;div&gt;( Akses Data Sesuai Hak )&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="370" x="709" y="1056" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-594" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="&lt;div&gt;&lt;b&gt;Dashboard Admin&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="240" x="774" y="1016" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-596" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;align=left;" value="&amp;nbsp; - Tambah Siswa&lt;div&gt;&amp;nbsp; - Edit Siswa&lt;/div&gt;&lt;div&gt;&amp;nbsp; - Hapus Siswa&lt;/div&gt;&lt;div&gt;&amp;nbsp; - Lihat Detail&lt;/div&gt;&lt;div&gt;&amp;nbsp; - Penempatan&lt;/div&gt;" vertex="1">
+          <mxGeometry height="160" width="120" x="-351" y="1196" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-597" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="&lt;b&gt;Kelola Siswa&lt;/b&gt;" vertex="1">
+          <mxGeometry height="80" width="120" x="-351" y="1146" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-598" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;align=left;" value="&amp;nbsp; - Tambah TA&lt;div&gt;&amp;nbsp; - Edit TA&lt;/div&gt;&lt;div&gt;&amp;nbsp; - Hapus TA&lt;/div&gt;&lt;div&gt;&amp;nbsp; - Lihat Detail&lt;/div&gt;&lt;div&gt;&amp;nbsp;&amp;nbsp;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="160" width="120" x="-81" y="1196" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-599" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="&lt;b&gt;Kelola&amp;nbsp;&lt;/b&gt;&lt;div&gt;&lt;b&gt;Tahun Ajaran&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="120" x="-81" y="1146" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-600" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;align=left;" value="&amp;nbsp; - Tambah Kelas&lt;div&gt;&amp;nbsp; - Edit Kelas&lt;/div&gt;&lt;div&gt;&amp;nbsp; - Hapus Kelas&lt;/div&gt;&lt;div&gt;&amp;nbsp; - Lihat Detail&lt;/div&gt;&lt;div&gt;&amp;nbsp;&amp;nbsp;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="160" width="120" x="-216" y="1196" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-601" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="&lt;b&gt;Kelola Kelas&lt;/b&gt;" vertex="1">
+          <mxGeometry height="80" width="120" x="-216" y="1146" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-602" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;align=left;" value="&amp;nbsp; - Tambah Jenis&lt;div&gt;&amp;nbsp; - Edit Jenis&lt;/div&gt;&lt;div&gt;&amp;nbsp; - Hapus Jenis&lt;/div&gt;&lt;div&gt;&amp;nbsp; - Lihat Detail&lt;/div&gt;&lt;div&gt;&amp;nbsp;&amp;nbsp;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="160" width="120" x="59" y="1196" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-603" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="&lt;b&gt;Kelola&amp;nbsp;&lt;/b&gt;&lt;div&gt;&lt;b&gt;Jenis Pelanggaran&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="120" x="59" y="1146" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-604" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;align=left;" value="&amp;nbsp; - Tambah Kategori&lt;div&gt;&amp;nbsp; - Edit Kategori&lt;/div&gt;&lt;div&gt;&amp;nbsp; - Hapus Kategori&lt;/div&gt;&lt;div&gt;&amp;nbsp; - Lihat Detail&lt;/div&gt;&lt;div&gt;&amp;nbsp;&amp;nbsp;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="160" width="130" x="199" y="1196" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-605" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="&lt;b&gt;Kelola&amp;nbsp;&lt;/b&gt;&lt;div&gt;&lt;b&gt;Kategori Pelanggaran&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="130" x="199" y="1146" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-611" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;align=left;" value="&amp;nbsp; - Tambah Guru&lt;div&gt;&amp;nbsp; - Edit Guru&lt;/div&gt;&lt;div&gt;&amp;nbsp; - Hapus Guru&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(#000000, var(--ge-light-color, #ffffff));&quot;&gt;&amp;nbsp; - Atur Wali Kelas&amp;nbsp;&amp;nbsp;&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="160" width="120" x="339" y="1196" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-612" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="&lt;b&gt;Kelola Guru /&lt;/b&gt;&lt;div&gt;&lt;b&gt;Wali Kelas&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="120" x="339" y="1146" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-613" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;align=left;" value="&amp;nbsp; - Rekap Kelas&lt;div&gt;&amp;nbsp; - Rekap siswa&lt;/div&gt;&lt;div&gt;&amp;nbsp; - Ekspor PDF&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(#000000, var(--ge-light-color, #ffffff));&quot;&gt;&amp;nbsp; - Ekspor Excel&amp;nbsp;&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="160" width="120" x="469" y="1196" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-614" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="&lt;b&gt;Laporan&lt;/b&gt;" vertex="1">
+          <mxGeometry height="80" width="120" x="469" y="1146" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-615" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;align=left;" value="&amp;nbsp; - Pilih Siswa&lt;div&gt;&amp;nbsp; - Pilih kategori/jenis&lt;/div&gt;&lt;div&gt;&amp;nbsp; - Isi keterangan&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(#000000, var(--ge-light-color, #ffffff));&quot;&gt;&amp;nbsp; - Isi Tindakan&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp; - Simpan&lt;/div&gt;" vertex="1">
+          <mxGeometry height="160" width="130" x="619" y="1196" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-616" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="&lt;b&gt;Input&amp;nbsp;&lt;/b&gt;&lt;div&gt;&lt;b&gt;Pelanggaran&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="130" x="619" y="1146" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-617" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;align=left;" value="&amp;nbsp; &amp;nbsp;- Data Pelanggaran&amp;nbsp;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; Saya&lt;/div&gt;" vertex="1">
+          <mxGeometry height="160" width="130" x="759" y="1196" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-618" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="&lt;b&gt;Lihat Data&lt;/b&gt;&lt;div&gt;&lt;b&gt;Pelanggaran&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="130" x="759" y="1146" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-619" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;align=left;" value="&amp;nbsp; &amp;nbsp;- Rekap Kelas&lt;div&gt;&amp;nbsp; &amp;nbsp; ( Jika Wali Kelas )&lt;/div&gt;" vertex="1">
+          <mxGeometry height="160" width="130" x="899" y="1196" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-620" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="&lt;b&gt;Laporan Kelas&lt;/b&gt;" vertex="1">
+          <mxGeometry height="80" width="130" x="899" y="1146" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-621" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;align=left;" value="&amp;nbsp; - Export PDF&lt;div&gt;&amp;nbsp; - Export Excel&lt;/div&gt;" vertex="1">
+          <mxGeometry height="160" width="130" x="1039" y="1196" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-622" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="&lt;b&gt;Ekspor Data&lt;/b&gt;" vertex="1">
+          <mxGeometry height="80" width="130" x="1039" y="1146" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-623" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="&lt;b&gt;Logout&lt;/b&gt;&lt;div&gt;( Keluar Dari Sistem )&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="300" x="239" y="1426" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-624" parent="1" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.terminator;whiteSpace=wrap;labelBackgroundColor=none;" value="Mulai" vertex="1">
+          <mxGeometry height="50" width="154" x="322" y="1506" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-631" edge="1" parent="1" source="YGlYDFZo_xgVytsY07og-585" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.525;entryY=0.028;entryDx=0;entryDy=0;entryPerimeter=0;defaultLabelBackgroundColor=page;labelPadding=0 4;strokeColor=light-dark(#000000,#000000);" target="YGlYDFZo_xgVytsY07og-587">
+          <mxGeometry relative="1" x="0.6434" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-635" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontColor=light-dark(#000000,#000000);" value="Tidak" vertex="1">
+          <mxGeometry height="30" width="60" x="599" y="886" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-636" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontColor=light-dark(#000000,#000000);" value="Ya" vertex="1">
+          <mxGeometry height="30" width="60" x="399" y="936" as="geometry" />
+        </mxCell>
+        <mxCell id="YGlYDFZo_xgVytsY07og-638" edge="1" parent="1" source="YGlYDFZo_xgVytsY07og-587" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;labelPadding=0 4;strokeColor=light-dark(#000000,#000000);">
+          <mxGeometry relative="1" x="0.8333" as="geometry">
+            <mxPoint x="397" y="976" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

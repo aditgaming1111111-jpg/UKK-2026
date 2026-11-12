@@ -31,12 +31,12 @@ class LogAktivitasController extends Controller
             ->when($search !== '', static function ($query) use ($search): void {
                 $term = addcslashes($search, '%_\\');
                 $query->where(static function ($logQuery) use ($term): void {
-                    $logQuery->where('aktivitas', 'like', '%'.$term.'%')
-                        ->orWhere('deskripsi', 'like', '%'.$term.'%')
-                        ->orWhere('ip_address', 'like', '%'.$term.'%')
-                        ->orWhereHas('pengguna', static fn ($userQuery) => $userQuery
-                            ->where('nama', 'like', '%'.$term.'%')
-                            ->orWhere('role', 'like', '%'.$term.'%'));
+                    $logQuery->where('aktivitas', 'like', '%' . $term . '%')
+                        ->orWhere('deskripsi', 'like', '%' . $term . '%')
+                        ->orWhere('ip_address', 'like', '%' . $term . '%')
+                        ->orWhereHas('pengguna', static fn($userQuery) => $userQuery
+                            ->where('nama', 'like', '%' . $term . '%')
+                            ->orWhere('role', 'like', '%' . $term . '%'));
                 });
             })
             ->orderByDesc('created_at')

@@ -43,7 +43,7 @@ class SiswaPolicy
                         $query->whereNull('tanggal_selesai')
                             ->orWhereDate('tanggal_selesai', '>=', $today);
                     })
-                    ->whereHas('tahunAjaran', static fn (Builder $yearQuery): Builder => $yearQuery
+                    ->whereHas('tahunAjaran', static fn(Builder $yearQuery): Builder => $yearQuery
                         ->whereDate('tanggal_mulai', '<=', $today)
                         ->whereDate('tanggal_selesai', '>=', $today))
                     ->whereExists(static function (QueryBuilder $placementQuery) use ($siswa, $today): void {

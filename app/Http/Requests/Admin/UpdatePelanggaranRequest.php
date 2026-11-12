@@ -35,7 +35,7 @@ class UpdatePelanggaranRequest extends FormRequest
             'kategori_id' => [
                 'required',
                 'integer',
-                Rule::exists('t_pelanggaran_kategori', 'id')->where(static fn ($query) => $query
+                Rule::exists('t_pelanggaran_kategori', 'id')->where(static fn($query) => $query
                     ->where('status_aktif', true)
                     ->orWhere('id', $pelanggaran->kategori_id)),
             ],

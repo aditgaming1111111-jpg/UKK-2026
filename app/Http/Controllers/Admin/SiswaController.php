@@ -66,7 +66,7 @@ class SiswaController extends Controller
     public function store(StoreSiswaRequest $request, ActivityLogger $activityLogger): RedirectResponse
     {
         $siswa = Siswa::query()->create($request->validated());
-        $activityLogger->record($request->user(), $request, 'Siswa ditambahkan', 'Identitas siswa ID #'.$siswa->id.' berhasil ditambahkan.');
+        $activityLogger->record($request->user(), $request, 'Siswa ditambahkan', 'Identitas siswa ID #' . $siswa->id . ' berhasil ditambahkan.');
 
         return to_route('admin.students.show', $siswa)->with('success', 'Data siswa berhasil ditambahkan.');
     }
@@ -104,7 +104,7 @@ class SiswaController extends Controller
     public function update(UpdateSiswaRequest $request, Siswa $siswa, ActivityLogger $activityLogger): RedirectResponse
     {
         $siswa->update($request->validated());
-        $activityLogger->record($request->user(), $request, 'Siswa diperbarui', 'Data siswa ID #'.$siswa->id.' berhasil diperbarui.');
+        $activityLogger->record($request->user(), $request, 'Siswa diperbarui', 'Data siswa ID #' . $siswa->id . ' berhasil diperbarui.');
 
         return to_route('admin.students.show', $siswa)->with('success', 'Data siswa berhasil diperbarui.');
     }
@@ -119,9 +119,11 @@ class SiswaController extends Controller
         DB::transaction(static function () use ($siswa): void {
             $lockedStudent = Siswa::query()->whereKey($siswa->id)->lockForUpdate()->firstOrFail();
 
-            if ($lockedStudent->status_siswa === 'lulus'
+            if (
+                $lockedStudent->status_siswa === 'lulus'
                 || $lockedStudent->penempatanKelas()->exists()
-                || $lockedStudent->catatanPelanggaran()->exists()) {
+                || $lockedStudent->catatanPelanggaran()->exists()
+            ) {
                 throw ValidationException::withMessages([
                     'siswa' => 'Siswa berstatus lulus atau memiliki riwayat kelas/pelanggaran sehingga tidak dapat dihapus permanen. Arsipkan dengan mempertahankan data siswa.',
                 ]);
@@ -129,7 +131,7 @@ class SiswaController extends Controller
 
             $lockedStudent->delete();
         });
-        $activityLogger->record($request->user(), $request, 'Siswa dihapus', 'Identitas siswa ID #'.$siswa->id.' tanpa histori berhasil dihapus.');
+        $activityLogger->record($request->user(), $request, 'Siswa dihapus', 'Identitas siswa ID #' . $siswa->id . ' tanpa histori berhasil dihapus.');
 
         return to_route('admin.students.index')->with('success', 'Data siswa tanpa riwayat berhasil dihapus permanen.');
     }
@@ -152,7 +154,7 @@ class SiswaController extends Controller
 
             $lockedStudent->update(['status_siswa' => $status]);
         });
-        $activityLogger->record($request->user(), $request, 'Status siswa diubah', 'Status siswa ID #'.$siswa->id.' diubah menjadi '.$status.'.');
+        $activityLogger->record($request->user(), $request, 'Status siswa diubah', 'Status siswa ID #' . $siswa->id . ' diubah menjadi ' . $status . '.');
 
         $message = match ($status) {
             'aktif' => 'Siswa berhasil diaktifkan. Riwayat siswa tetap tersimpan.',
@@ -175,7 +177,7 @@ class SiswaController extends Controller
         ActivityLogger $activityLogger,
     ): RedirectResponse {
         $placement = $siswaPenempatanService->assign($siswa, $request->validated());
-        $activityLogger->record($request->user(), $request, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #'.$siswa->id.' dicatat dengan ID #'.$placement->id.'.');
+        $activityLogger->record($request->user(), $request, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #' . $siswa->id . ' dicatat dengan ID #' . $placement->id . '.');
 
         return to_route('admin.students.show', $siswa)->with('success', 'Penempatan kelas berhasil disimpan.');
     }

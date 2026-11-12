@@ -24,7 +24,7 @@ class RekapWaliKelasRingkasanSheet implements FromCollection, WithHeadings, With
         $filters = $this->report['filters'];
         $printedAt = $this->report['generatedAt']->format('d/m/Y H:i');
 
-        return $this->report['students']->map(static fn ($student): array => [
+        return $this->report['students']->map(static fn($student): array => [
             self::safeText($year),
             self::safeText($class),
             self::safeText($teacher),
@@ -57,6 +57,6 @@ class RekapWaliKelasRingkasanSheet implements FromCollection, WithHeadings, With
     {
         $value ??= '';
 
-        return preg_match('/^[=+\-@\t\r]/u', $value) === 1 ? "'".$value : $value;
+        return preg_match('/^[=+\-@\t\r]/u', $value) === 1 ? "'" . $value : $value;
     }
 }

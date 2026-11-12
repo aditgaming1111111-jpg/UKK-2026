@@ -1,13 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.3
+-- version 4.9.0.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Nov 09, 2026 at 08:57 AM
--- Server version: 8.4.3
--- PHP Version: 8.3.33
+-- Host: sql212.infinityfree.com
+-- Generation Time: Nov 12, 2026 at 07:55 AM
+-- Server version: 11.4.13-MariaDB
+-- PHP Version: 7.2.22
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -18,7 +19,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `ukk_pelanggaran_siswa`
+-- Database: `if0_43399599_db_ukk_2026`
 --
 
 -- --------------------------------------------------------
@@ -28,10 +29,30 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `cache` (
-  `key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `value` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `expiration` bigint NOT NULL
+  `key` varchar(255) NOT NULL,
+  `value` mediumtext NOT NULL,
+  `expiration` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `cache`
+--
+
+INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
+('sekolahku-cache-0a80c28950b34853701d25c2da598c37fd448ed5', 'i:4;', 1794378973),
+('sekolahku-cache-0a80c28950b34853701d25c2da598c37fd448ed5:timer', 'i:1794378973;', 1794378973),
+('sekolahku-cache-252989138f7fce46f093b0839326b9e1a7562cbc', 'i:1;', 1794400436),
+('sekolahku-cache-252989138f7fce46f093b0839326b9e1a7562cbc:timer', 'i:1794400436;', 1794400436),
+('sekolahku-cache-6cc10f9c124210bee0d8f57f469944f822535c72', 'i:2;', 1794365012),
+('sekolahku-cache-6cc10f9c124210bee0d8f57f469944f822535c72:timer', 'i:1794365012;', 1794365012),
+('sekolahku-cache-a4fff596b3ff07a4d2049cabf78d9a2aee1d5a47', 'i:1;', 1794289199),
+('sekolahku-cache-a4fff596b3ff07a4d2049cabf78d9a2aee1d5a47:timer', 'i:1794289199;', 1794289199),
+('sekolahku-cache-a7706915597dcadc683ef36cb841c0e487563778', 'i:2;', 1794378971),
+('sekolahku-cache-a7706915597dcadc683ef36cb841c0e487563778:timer', 'i:1794378971;', 1794378971),
+('sekolahku-cache-ad34d072febaf489d48df3197ece2049a759605e', 'i:2;', 1794314827),
+('sekolahku-cache-ad34d072febaf489d48df3197ece2049a759605e:timer', 'i:1794314827;', 1794314827),
+('sekolahku-cache-c42b9d556b5900d1cb5c62e7dba35f00cf1b59fd', 'i:1;', 1794289249),
+('sekolahku-cache-c42b9d556b5900d1cb5c62e7dba35f00cf1b59fd:timer', 'i:1794289249;', 1794289249);
 
 -- --------------------------------------------------------
 
@@ -40,9 +61,9 @@ CREATE TABLE `cache` (
 --
 
 CREATE TABLE `cache_locks` (
-  `key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `owner` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `expiration` bigint NOT NULL
+  `key` varchar(255) NOT NULL,
+  `owner` varchar(255) NOT NULL,
+  `expiration` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -52,13 +73,13 @@ CREATE TABLE `cache_locks` (
 --
 
 CREATE TABLE `failed_jobs` (
-  `id` bigint UNSIGNED NOT NULL,
-  `uuid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `connection` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `queue` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `exception` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `uuid` varchar(255) NOT NULL,
+  `connection` varchar(255) NOT NULL,
+  `queue` varchar(255) NOT NULL,
+  `payload` longtext NOT NULL,
+  `exception` longtext NOT NULL,
+  `failed_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -68,13 +89,13 @@ CREATE TABLE `failed_jobs` (
 --
 
 CREATE TABLE `jobs` (
-  `id` bigint UNSIGNED NOT NULL,
-  `queue` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `attempts` smallint UNSIGNED NOT NULL,
-  `reserved_at` int UNSIGNED DEFAULT NULL,
-  `available_at` int UNSIGNED NOT NULL,
-  `created_at` int UNSIGNED NOT NULL
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `queue` varchar(255) NOT NULL,
+  `payload` longtext NOT NULL,
+  `attempts` smallint(5) UNSIGNED NOT NULL,
+  `reserved_at` int(10) UNSIGNED DEFAULT NULL,
+  `available_at` int(10) UNSIGNED NOT NULL,
+  `created_at` int(10) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -84,16 +105,16 @@ CREATE TABLE `jobs` (
 --
 
 CREATE TABLE `job_batches` (
-  `id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `total_jobs` int NOT NULL,
-  `pending_jobs` int NOT NULL,
-  `failed_jobs` int NOT NULL,
-  `failed_job_ids` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `options` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `cancelled_at` int DEFAULT NULL,
-  `created_at` int NOT NULL,
-  `finished_at` int DEFAULT NULL
+  `id` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `total_jobs` int(11) NOT NULL,
+  `pending_jobs` int(11) NOT NULL,
+  `failed_jobs` int(11) NOT NULL,
+  `failed_job_ids` longtext NOT NULL,
+  `options` mediumtext DEFAULT NULL,
+  `cancelled_at` int(11) DEFAULT NULL,
+  `created_at` int(11) NOT NULL,
+  `finished_at` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -103,9 +124,9 @@ CREATE TABLE `job_batches` (
 --
 
 CREATE TABLE `migrations` (
-  `id` int UNSIGNED NOT NULL,
-  `migration` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `batch` int NOT NULL
+  `id` int(10) UNSIGNED NOT NULL,
+  `migration` varchar(255) NOT NULL,
+  `batch` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -130,8 +151,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 --
 
 CREATE TABLE `password_reset_tokens` (
-  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `token` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -142,17 +163,23 @@ CREATE TABLE `password_reset_tokens` (
 --
 
 CREATE TABLE `sessions` (
-  `id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_id` bigint UNSIGNED DEFAULT NULL,
-  `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `last_activity` int NOT NULL
+  `id` varchar(255) NOT NULL,
+  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `payload` longtext NOT NULL,
+  `last_activity` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `sessions`
 --
+
+INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
+('ABRh7FRmvKBOHXISAFwtytW5eHvsijMnnuPFuRzO', NULL, '180.245.116.28', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.2 Mobile/15E148 Safari/604.1', 'eyJfdG9rZW4iOiJybUZBMmhLNmVyaEszM0NYS095VVN0aWQ0UXFSeW5FZzBxd09vYXlDIiwiX2ZsYXNoIjp7Im5ldyI6W10sIm9sZCI6W119LCJfcHJldmlvdXMiOnsidXJsIjoiaHR0cHM6XC9cL3Nla29sYWhrdS5zaXRlLmplXC9sb2dpbiIsInJvdXRlIjoibG9naW4ifX0=', 1794457527),
+('cd5Nmond1g2KSseRKECBvxw6vyXv9G6FF34LghXJ', NULL, '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiI3dXVYUG03TXpUWjVzMHBNUFFBZ1pJY2czd2dMZlR0WlZ4bTQwdW90IiwiX2ZsYXNoIjp7Im5ldyI6W10sIm9sZCI6W119LCJfcHJldmlvdXMiOnsidXJsIjoiaHR0cHM6XC9cL3Nla29sYWhrdS5zaXRlLmplXC9sb2dpbiIsInJvdXRlIjoibG9naW4ifX0=', 1794457366),
+('dFbEOLB1mbEPgxqkQENFSBhA5knClRGnqFsb2sai', NULL, '180.245.116.28', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/601.2.4 (KHTML, like Gecko) Version/9.0.1 Safari/601.2.4 facebookexternalhit/1.1 Facebot Twitterbot/1.0', 'eyJfdG9rZW4iOiJqQVpLemhjd3J0NGJySFdqWlNRT1JSQTNoV1FDVTBGSHlNQnFuTHg3IiwidXJsIjp7ImludGVuZGVkIjoiaHR0cHM6XC9cL3Nla29sYWhrdS5zaXRlLmplXC9ndXJ1In0sIl9wcmV2aW91cyI6eyJ1cmwiOiJodHRwczpcL1wvc2Vrb2xhaGt1LnNpdGUuamVcL2xvZ2luIiwicm91dGUiOiJsb2dpbiJ9LCJfZmxhc2giOnsib2xkIjpbXSwibmV3IjpbXX19', 1794457515),
+('qKZubTIQ8UjdX5VHylQJovmEtsFico5ZLHpVwYyz', NULL, '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJnU3k3aTNGalNJbDBIT3lzNEs4b3h1VHV6YmRDNmFBMFo0SFV0QXV3IiwiX3ByZXZpb3VzIjp7InVybCI6Imh0dHBzOlwvXC9zZWtvbGFoa3Uuc2l0ZS5qZVwvbG9naW4iLCJyb3V0ZSI6ImxvZ2luIn0sIl9mbGFzaCI6eyJvbGQiOltdLCJuZXciOltdfX0=', 1794485948);
 
 -- --------------------------------------------------------
 
@@ -161,13 +188,13 @@ CREATE TABLE `sessions` (
 --
 
 CREATE TABLE `t_guru` (
-  `id` bigint UNSIGNED NOT NULL,
-  `nip` varchar(18) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `status_kepegawaian` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `nama` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `status_aktif` tinyint(1) NOT NULL DEFAULT '1',
-  `user_id` bigint UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `nip` varchar(18) DEFAULT NULL,
+  `status_kepegawaian` varchar(20) DEFAULT NULL,
+  `nama` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `status_aktif` tinyint(1) NOT NULL DEFAULT 1,
+  `user_id` bigint(20) UNSIGNED NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -225,7 +252,7 @@ INSERT INTO `t_guru` (`id`, `nip`, `status_kepegawaian`, `nama`, `email`, `statu
 (47, '202600000000000046', NULL, 'Ratnaningsih Hatil Aeni, S.Pd.', 'ratnaningshhatilaeni@sekolahku.com', 1, 48, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
 (48, '202600000000000047', NULL, 'Dheny Darajatul Hasani, S.Pd.', 'dhenydarajatulhasani@sekolahku.com', 1, 49, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
 (49, '202600000000000048', NULL, 'Fahrullah, S.Pd', 'fahrullah@sekolahku.com', 1, 50, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
-(50, '202600000000000049', NULL, 'Aan Andriana, S.T', 'aanandriana@sekolahku.com', 1, 51, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
+(50, '202600000000000049', NULL, 'Aan Andriana, S.T', 'aanandriana@sekolahku.com', 1, 51, '2026-11-04 15:01:22', '2026-11-10 19:56:06'),
 (51, '202600000000000050', NULL, 'Fitri Fauziah, S.T', 'fitrifauziah@sekolahku.com', 1, 52, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
 (52, '202600000000000051', NULL, 'Nida Aulia, S.Pd', 'nidaaulia@sekolahku.com', 1, 53, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
 (53, '202600000000000052', NULL, 'Sri Nurrizki Putri Krisnadi, S.Pd', 'srinurrizkiputrikrisnadi@sekolahku.com', 1, 54, '2026-11-04 15:01:22', '2026-11-04 15:01:22'),
@@ -240,10 +267,10 @@ INSERT INTO `t_guru` (`id`, `nip`, `status_kepegawaian`, `nama`, `email`, `statu
 --
 
 CREATE TABLE `t_kelas` (
-  `id` bigint UNSIGNED NOT NULL,
-  `nama_kelas` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `tingkat` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `jurusan` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `nama_kelas` varchar(50) NOT NULL,
+  `tingkat` varchar(20) NOT NULL,
+  `jurusan` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -266,13 +293,13 @@ INSERT INTO `t_kelas` (`id`, `nama_kelas`, `tingkat`, `jurusan`, `created_at`, `
 --
 
 CREATE TABLE `t_kelas_siswa` (
-  `id` bigint UNSIGNED NOT NULL,
-  `siswa_id` bigint UNSIGNED NOT NULL,
-  `kelas_id` bigint UNSIGNED NOT NULL,
-  `tahun_ajaran_id` bigint UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `siswa_id` bigint(20) UNSIGNED NOT NULL,
+  `kelas_id` bigint(20) UNSIGNED NOT NULL,
+  `tahun_ajaran_id` bigint(20) UNSIGNED NOT NULL,
   `tanggal_mulai` date NOT NULL,
   `tanggal_selesai` date DEFAULT NULL,
-  `status_aktif` tinyint(1) NOT NULL DEFAULT '1',
+  `status_aktif` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -437,13 +464,13 @@ INSERT INTO `t_kelas_siswa` (`id`, `siswa_id`, `kelas_id`, `tahun_ajaran_id`, `t
 --
 
 CREATE TABLE `t_log_aktivitas` (
-  `id` bigint UNSIGNED NOT NULL,
-  `user_id` bigint UNSIGNED NOT NULL,
-  `aktivitas` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `deskripsi` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `aktivitas` varchar(100) NOT NULL,
+  `deskripsi` text NOT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -535,7 +562,8 @@ INSERT INTO `t_log_aktivitas` (`id`, `user_id`, `aktivitas`, `deskripsi`, `ip_ad
 (82, 3, 'Login', 'Pengguna berhasil masuk sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:01:33'),
 (83, 3, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:02:52'),
 (84, 1, 'Login', 'Pengguna berhasil masuk sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:02:58'),
-(85, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:08:13'),
+(85, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:08:13');
+INSERT INTO `t_log_aktivitas` (`id`, `user_id`, `aktivitas`, `deskripsi`, `ip_address`, `user_agent`, `created_at`) VALUES
 (86, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:08:20'),
 (87, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:08:21'),
 (88, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 00:08:57'),
@@ -572,7 +600,104 @@ INSERT INTO `t_log_aktivitas` (`id`, `user_id`, `aktivitas`, `deskripsi`, `ip_ad
 (119, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 01:54:53'),
 (120, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 01:55:01'),
 (121, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 01:55:03'),
-(122, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 01:56:45');
+(122, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-09 01:56:45'),
+(123, 1, 'Login', 'Pengguna berhasil masuk sebagai admin.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-10 11:00:25'),
+(124, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-10 11:02:18'),
+(125, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-10 11:02:42'),
+(126, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '103.162.63.129', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Mobile Safari/537.36', '2026-11-10 11:05:13'),
+(127, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '103.162.63.129', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Mobile Safari/537.36', '2026-11-10 11:05:53'),
+(128, 1, 'Login', 'Pengguna berhasil masuk sebagai admin.', '103.162.63.129', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_6_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1', '2026-11-10 11:13:36'),
+(129, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '103.162.63.129', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_6_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1', '2026-11-10 11:14:54'),
+(130, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-10 11:18:23'),
+(131, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-10 12:17:35'),
+(132, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-10 12:26:57'),
+(133, 1, 'Login', 'Pengguna berhasil masuk sebagai admin.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-10 13:11:36'),
+(134, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-10 13:22:41'),
+(135, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-10 13:28:16'),
+(136, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36', '2026-11-10 13:29:01'),
+(137, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '172.225.78.192', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_6_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1', '2026-11-10 14:44:11'),
+(138, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '172.225.78.192', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_6_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1', '2026-11-10 14:44:59'),
+(139, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 18:28:44'),
+(140, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 18:31:47'),
+(141, 1, 'Login', 'Pengguna berhasil masuk sebagai admin.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 19:48:41'),
+(142, 1, 'Tahun ajaran ditambahkan', 'Periode tahun ajaran ID #2 berhasil ditambahkan.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 19:52:05'),
+(143, 1, 'Guru dinonaktifkan', 'Guru ID #50 berhasil dinonaktifkan.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 19:55:34'),
+(144, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 19:55:42'),
+(145, 1, 'Login', 'Pengguna berhasil masuk sebagai admin.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 19:55:57'),
+(146, 1, 'Guru diaktifkan', 'Guru ID #50 berhasil diaktifkan.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 19:56:06'),
+(147, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 19:56:08'),
+(148, 51, 'Login', 'Pengguna berhasil masuk sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 19:56:14'),
+(149, 51, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 19:56:17'),
+(150, 1, 'Login', 'Pengguna berhasil masuk sebagai admin.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 19:56:24'),
+(151, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 19:57:02'),
+(152, 30, 'Login', 'Pengguna berhasil masuk sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 19:57:10'),
+(153, 30, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 20:10:37'),
+(154, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 20:10:44'),
+(155, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 20:11:31'),
+(156, 30, 'Login', 'Pengguna berhasil masuk sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 20:11:38'),
+(157, 30, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 20:11:52'),
+(158, 1, 'Login', 'Pengguna berhasil masuk sebagai admin.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 20:12:00'),
+(159, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 20:12:40'),
+(160, 43, 'Login', 'Pengguna berhasil masuk sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 20:12:46'),
+(161, 43, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 20:13:17'),
+(162, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 20:13:26'),
+(163, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 20:30:53'),
+(164, 30, 'Login', 'Pengguna berhasil masuk sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 20:31:01'),
+(165, 30, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 20:31:21'),
+(166, 30, 'Login', 'Pengguna berhasil masuk sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 20:31:34'),
+(167, 30, 'Pelanggaran dicatat', 'Catatan pelanggaran siswa ID #9 berhasil dibuat.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 20:32:06'),
+(168, 30, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 20:32:29'),
+(169, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 20:32:36'),
+(170, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-10 20:41:41'),
+(171, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '114.122.79.209', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.2 Mobile/15E148 Safari/604.1', '2026-11-10 20:46:26'),
+(172, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '114.122.79.209', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.2 Mobile/15E148 Safari/604.1', '2026-11-10 20:48:01'),
+(173, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 08:11:06'),
+(174, 34, 'Pelanggaran dicatat', 'Catatan pelanggaran siswa ID #10 berhasil dibuat.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 08:39:22');
+INSERT INTO `t_log_aktivitas` (`id`, `user_id`, `aktivitas`, `deskripsi`, `ip_address`, `user_agent`, `created_at`) VALUES
+(175, 34, 'Pelanggaran dicatat', 'Catatan pelanggaran siswa ID #11 berhasil dibuat.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 09:06:11'),
+(176, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 09:50:57'),
+(177, 1, 'Login', 'Pengguna berhasil masuk sebagai admin.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 09:51:43'),
+(178, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 10:00:43'),
+(179, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 10:00:59'),
+(180, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 10:09:49'),
+(181, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 10:13:29'),
+(182, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 10:15:47'),
+(183, 1, 'Login', 'Pengguna berhasil masuk sebagai admin.', '114.122.78.221', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.2 Mobile/15E148 Safari/604.1', '2026-11-11 10:33:09'),
+(184, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '114.122.78.221', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.2 Mobile/15E148 Safari/604.1', '2026-11-11 10:33:36'),
+(185, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 10:34:18'),
+(186, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 10:35:20'),
+(187, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 12:03:17'),
+(188, 34, 'Pelanggaran dicatat', 'Catatan pelanggaran siswa ID #12 berhasil dibuat.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 12:07:19'),
+(189, 34, 'Pelanggaran dicatat', 'Catatan pelanggaran siswa ID #13 berhasil dibuat.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 12:07:21'),
+(190, 34, 'Pelanggaran dikoreksi', 'Catatan pelanggaran siswa ID #13 dikoreksi; rincian perubahan tersedia di log pelanggaran.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 12:08:51'),
+(191, 34, 'Pelanggaran dibatalkan', 'Catatan pelanggaran siswa ID #12 dibatalkan; alasan tersimpan pada log pelanggaran.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 12:09:31'),
+(192, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 12:12:36'),
+(193, 3, 'Login', 'Pengguna berhasil masuk sebagai guru.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 13:01:38'),
+(194, 3, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 13:01:47'),
+(195, 1, 'Login', 'Pengguna berhasil masuk sebagai admin.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 13:40:43'),
+(196, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '103.162.63.129', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 13:43:59'),
+(197, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 22:25:33'),
+(198, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 22:44:05'),
+(199, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 22:51:29'),
+(200, 34, 'Pelanggaran dikoreksi', 'Catatan pelanggaran siswa ID #13 dikoreksi; rincian perubahan tersedia di log pelanggaran.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 22:59:45'),
+(201, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 23:18:21'),
+(202, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 23:25:35'),
+(203, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 23:29:07'),
+(204, 3, 'Login', 'Pengguna berhasil masuk sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 23:34:29'),
+(205, 3, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-11 23:34:38'),
+(206, 1, 'Login', 'Pengguna berhasil masuk sebagai admin.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-12 11:17:19'),
+(207, 1, 'Logout', 'Pengguna keluar dari aplikasi sebagai admin.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-12 11:17:38'),
+(208, 34, 'Login', 'Pengguna berhasil masuk sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-12 12:03:43'),
+(209, 34, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-12 12:03:46'),
+(210, 13, 'Login', 'Pengguna berhasil masuk sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-12 12:04:05'),
+(211, 13, 'Pelanggaran dicatat', 'Catatan pelanggaran siswa ID #14 berhasil dibuat.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-12 12:05:08'),
+(212, 13, 'Pelanggaran dicatat', 'Catatan pelanggaran siswa ID #15 berhasil dibuat.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-12 12:06:36'),
+(213, 13, 'Pelanggaran dicatat', 'Catatan pelanggaran siswa ID #19 berhasil dibuat.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-12 12:18:50'),
+(214, 13, 'Pelanggaran dicatat', 'Catatan pelanggaran siswa ID #20 berhasil dibuat.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-12 12:22:17'),
+(215, 13, 'Pelanggaran dikoreksi', 'Catatan pelanggaran siswa ID #20 dikoreksi; rincian perubahan tersedia di log pelanggaran.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-12 12:22:36'),
+(216, 13, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36', '2026-11-12 12:22:45'),
+(217, 13, 'Login', 'Pengguna berhasil masuk sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.2 Mobile/15E148 Safari/604.1', '2026-11-12 12:25:12'),
+(218, 13, 'Logout', 'Pengguna keluar dari aplikasi sebagai guru.', '180.245.116.28', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.2 Mobile/15E148 Safari/604.1', '2026-11-12 12:25:26');
 
 -- --------------------------------------------------------
 
@@ -581,14 +706,14 @@ INSERT INTO `t_log_aktivitas` (`id`, `user_id`, `aktivitas`, `deskripsi`, `ip_ad
 --
 
 CREATE TABLE `t_log_pelanggaran` (
-  `id` bigint UNSIGNED NOT NULL,
-  `pelanggaran_siswa_id` bigint UNSIGNED NOT NULL,
-  `user_id` bigint UNSIGNED NOT NULL,
-  `aksi` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `data_sebelum` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `data_sesudah` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `alasan` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `pelanggaran_siswa_id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `aksi` varchar(20) NOT NULL,
+  `data_sebelum` text DEFAULT NULL,
+  `data_sesudah` text DEFAULT NULL,
+  `alasan` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -603,7 +728,20 @@ INSERT INTO `t_log_pelanggaran` (`id`, `pelanggaran_siswa_id`, `user_id`, `aksi`
 (5, 5, 3, 'tambah', NULL, '{\"kelas_siswa_id\":45,\"pelanggaran_id\":18,\"guru_id\":2,\"tanggal_pelanggaran\":\"2026-11-09 00:00:00\",\"tanggal_dicatat\":\"2026-11-09 07:57:16\",\"poin_saat_dicatat\":10,\"keterangan\":\"cuman test ajaa\",\"tindakan\":\"cuman test ajaa\",\"status\":\"aktif\",\"updated_at\":\"2026-11-09 07:57:16\",\"created_at\":\"2026-11-09 07:57:16\",\"id\":5}', 'Pencatatan awal', '2026-11-09 00:57:16'),
 (6, 6, 3, 'tambah', NULL, '{\"kelas_siswa_id\":19,\"pelanggaran_id\":7,\"guru_id\":2,\"tanggal_pelanggaran\":\"2026-11-09 00:00:00\",\"tanggal_dicatat\":\"2026-11-09 07:57:30\",\"poin_saat_dicatat\":5,\"keterangan\":\"cuman test ajaa\",\"tindakan\":\"cuman test ajaa\",\"status\":\"aktif\",\"updated_at\":\"2026-11-09 07:57:30\",\"created_at\":\"2026-11-09 07:57:30\",\"id\":6}', 'Pencatatan awal', '2026-11-09 00:57:31'),
 (7, 7, 30, 'tambah', NULL, '{\"kelas_siswa_id\":19,\"pelanggaran_id\":7,\"guru_id\":29,\"tanggal_pelanggaran\":\"2026-11-09 00:00:00\",\"tanggal_dicatat\":\"2026-11-09 07:58:37\",\"poin_saat_dicatat\":5,\"keterangan\":\"cuman test ajaa\",\"tindakan\":\"cuman test ajaa\",\"status\":\"aktif\",\"updated_at\":\"2026-11-09 07:58:37\",\"created_at\":\"2026-11-09 07:58:37\",\"id\":7}', 'Pencatatan awal', '2026-11-09 00:58:37'),
-(8, 8, 30, 'tambah', NULL, '{\"kelas_siswa_id\":13,\"pelanggaran_id\":1,\"guru_id\":29,\"tanggal_pelanggaran\":\"2026-11-09 00:00:00\",\"tanggal_dicatat\":\"2026-11-09 07:58:55\",\"poin_saat_dicatat\":5,\"keterangan\":\"cuman test ajaa\",\"tindakan\":\"cuman test ajaa\",\"status\":\"aktif\",\"updated_at\":\"2026-11-09 07:58:55\",\"created_at\":\"2026-11-09 07:58:55\",\"id\":8}', 'Pencatatan awal', '2026-11-09 00:58:55');
+(8, 8, 30, 'tambah', NULL, '{\"kelas_siswa_id\":13,\"pelanggaran_id\":1,\"guru_id\":29,\"tanggal_pelanggaran\":\"2026-11-09 00:00:00\",\"tanggal_dicatat\":\"2026-11-09 07:58:55\",\"poin_saat_dicatat\":5,\"keterangan\":\"cuman test ajaa\",\"tindakan\":\"cuman test ajaa\",\"status\":\"aktif\",\"updated_at\":\"2026-11-09 07:58:55\",\"created_at\":\"2026-11-09 07:58:55\",\"id\":8}', 'Pencatatan awal', '2026-11-09 00:58:55'),
+(9, 9, 30, 'tambah', NULL, '{\"kelas_siswa_id\":43,\"pelanggaran_id\":6,\"guru_id\":29,\"tanggal_pelanggaran\":\"2026-11-10 00:00:00\",\"tanggal_dicatat\":\"2026-11-10 12:32:06\",\"poin_saat_dicatat\":5,\"keterangan\":\"cuman test aja\",\"tindakan\":\"cuman test aja\",\"status\":\"aktif\",\"updated_at\":\"2026-11-10 12:32:06\",\"created_at\":\"2026-11-10 12:32:06\",\"id\":9}', 'Pencatatan awal', '2026-11-10 20:32:06'),
+(10, 10, 34, 'tambah', NULL, '{\"kelas_siswa_id\":23,\"pelanggaran_id\":13,\"guru_id\":33,\"tanggal_pelanggaran\":\"2026-11-11 00:00:00\",\"tanggal_dicatat\":\"2026-11-11 00:39:22\",\"poin_saat_dicatat\":10,\"keterangan\":\"cuman test ajaa\",\"tindakan\":\"cuman test ajaa\",\"status\":\"aktif\",\"updated_at\":\"2026-11-11 00:39:22\",\"created_at\":\"2026-11-11 00:39:22\",\"id\":10}', 'Pencatatan awal', '2026-11-11 08:39:22'),
+(11, 11, 34, 'tambah', NULL, '{\"kelas_siswa_id\":50,\"pelanggaran_id\":23,\"guru_id\":33,\"tanggal_pelanggaran\":\"2026-11-11 00:00:00\",\"tanggal_dicatat\":\"2026-11-11 01:06:11\",\"poin_saat_dicatat\":10,\"keterangan\":null,\"tindakan\":null,\"status\":\"aktif\",\"updated_at\":\"2026-11-11 01:06:11\",\"created_at\":\"2026-11-11 01:06:11\",\"id\":11}', 'Pencatatan awal', '2026-11-11 09:06:11'),
+(12, 12, 34, 'tambah', NULL, '{\"kelas_siswa_id\":18,\"pelanggaran_id\":24,\"guru_id\":33,\"tanggal_pelanggaran\":\"2026-11-11 00:00:00\",\"tanggal_dicatat\":\"2026-11-11 04:07:19\",\"poin_saat_dicatat\":10,\"keterangan\":\"fgfgh\",\"tindakan\":null,\"status\":\"aktif\",\"updated_at\":\"2026-11-11 04:07:19\",\"created_at\":\"2026-11-11 04:07:19\",\"id\":12}', 'Pencatatan awal', '2026-11-11 12:07:19'),
+(13, 13, 34, 'tambah', NULL, '{\"kelas_siswa_id\":18,\"pelanggaran_id\":24,\"guru_id\":33,\"tanggal_pelanggaran\":\"2026-11-11 00:00:00\",\"tanggal_dicatat\":\"2026-11-11 04:07:21\",\"poin_saat_dicatat\":10,\"keterangan\":\"fgfgh\",\"tindakan\":null,\"status\":\"aktif\",\"updated_at\":\"2026-11-11 04:07:21\",\"created_at\":\"2026-11-11 04:07:21\",\"id\":13}', 'Pencatatan awal', '2026-11-11 12:07:21'),
+(14, 13, 34, 'edit', '{\"id\":13,\"kelas_siswa_id\":18,\"pelanggaran_id\":24,\"guru_id\":33,\"tanggal_pelanggaran\":\"2026-11-11\",\"tanggal_dicatat\":\"2026-11-11 04:07:21\",\"poin_saat_dicatat\":10,\"keterangan\":\"fgfgh\",\"tindakan\":null,\"status\":\"aktif\",\"created_at\":\"2026-11-11 04:07:21\",\"updated_at\":\"2026-11-11 04:07:21\"}', '{\"id\":13,\"kelas_siswa_id\":18,\"pelanggaran_id\":24,\"guru_id\":33,\"tanggal_pelanggaran\":\"2026-11-11 00:00:00\",\"tanggal_dicatat\":\"2026-11-11 04:07:21\",\"poin_saat_dicatat\":10,\"keterangan\":\"fgfgh\",\"tindakan\":\"tess aja\",\"status\":\"aktif\",\"created_at\":\"2026-11-11 04:07:21\",\"updated_at\":\"2026-11-11 04:08:51\"}', 'tindakan', '2026-11-11 12:08:51'),
+(15, 12, 34, 'batal', '{\"id\":12,\"kelas_siswa_id\":18,\"pelanggaran_id\":24,\"guru_id\":33,\"tanggal_pelanggaran\":\"2026-11-11\",\"tanggal_dicatat\":\"2026-11-11 04:07:19\",\"poin_saat_dicatat\":10,\"keterangan\":\"fgfgh\",\"tindakan\":null,\"status\":\"aktif\",\"created_at\":\"2026-11-11 04:07:19\",\"updated_at\":\"2026-11-11 04:07:19\"}', '{\"id\":12,\"kelas_siswa_id\":18,\"pelanggaran_id\":24,\"guru_id\":33,\"tanggal_pelanggaran\":\"2026-11-11\",\"tanggal_dicatat\":\"2026-11-11 04:07:19\",\"poin_saat_dicatat\":10,\"keterangan\":\"fgfgh\",\"tindakan\":null,\"status\":\"dibatalkan\",\"created_at\":\"2026-11-11 04:07:19\",\"updated_at\":\"2026-11-11 04:09:31\"}', 'tes aja', '2026-11-11 12:09:31'),
+(16, 13, 34, 'edit', '{\"id\":13,\"kelas_siswa_id\":18,\"pelanggaran_id\":24,\"guru_id\":33,\"tanggal_pelanggaran\":\"2026-11-11\",\"tanggal_dicatat\":\"2026-11-11 04:07:21\",\"poin_saat_dicatat\":10,\"keterangan\":\"fgfgh\",\"tindakan\":\"tess aja\",\"status\":\"aktif\",\"created_at\":\"2026-11-11 04:07:21\",\"updated_at\":\"2026-11-11 04:08:51\"}', '{\"id\":13,\"kelas_siswa_id\":18,\"pelanggaran_id\":24,\"guru_id\":33,\"tanggal_pelanggaran\":\"2026-11-11 00:00:00\",\"tanggal_dicatat\":\"2026-11-11 04:07:21\",\"poin_saat_dicatat\":10,\"keterangan\":\"fgfghwd\",\"tindakan\":\"tess aja\",\"status\":\"aktif\",\"created_at\":\"2026-11-11 04:07:21\",\"updated_at\":\"2026-11-11 14:59:45\"}', 'adasds', '2026-11-11 22:59:45'),
+(17, 14, 13, 'tambah', NULL, '{\"idempotency_key\":\"1d9e9aaf-ccf2-4864-b018-8a007ccba8ac\",\"kelas_siswa_id\":188,\"pelanggaran_id\":7,\"guru_id\":12,\"tanggal_pelanggaran\":\"2026-11-12 00:00:00\",\"tanggal_dicatat\":\"2026-11-12 04:05:08\",\"poin_saat_dicatat\":5,\"keterangan\":\"menggunakan seragam batik di hari senin\",\"tindakan\":\"membaca surat\",\"status\":\"aktif\",\"updated_at\":\"2026-11-12 04:05:08\",\"created_at\":\"2026-11-12 04:05:08\",\"id\":14}', 'Pencatatan awal', '2026-11-12 12:05:08'),
+(18, 15, 13, 'tambah', NULL, '{\"idempotency_key\":\"89334611-b626-406e-b8fc-f54a572f81e3\",\"kelas_siswa_id\":138,\"pelanggaran_id\":16,\"guru_id\":12,\"tanggal_pelanggaran\":\"2026-11-12 00:00:00\",\"tanggal_dicatat\":\"2026-11-12 04:06:36\",\"poin_saat_dicatat\":5,\"keterangan\":null,\"tindakan\":null,\"status\":\"aktif\",\"updated_at\":\"2026-11-12 04:06:36\",\"created_at\":\"2026-11-12 04:06:36\",\"id\":15}', 'Pencatatan awal', '2026-11-12 12:06:36'),
+(19, 19, 13, 'tambah', NULL, '{\"idempotency_key\":\"87ea4414-21e6-48ec-a24f-78f45b276b82\",\"kelas_siswa_id\":195,\"pelanggaran_id\":1,\"guru_id\":12,\"tanggal_pelanggaran\":\"2026-11-12 00:00:00\",\"tanggal_dicatat\":\"2026-11-12 04:18:50\",\"poin_saat_dicatat\":5,\"keterangan\":\"dddd\",\"tindakan\":\"dddd\",\"status\":\"aktif\",\"updated_at\":\"2026-11-12 04:18:50\",\"created_at\":\"2026-11-12 04:18:50\",\"id\":19}', 'Pencatatan awal', '2026-11-12 12:18:50'),
+(20, 20, 13, 'tambah', NULL, '{\"idempotency_key\":\"423d6c07-4c7e-4cc5-88c3-4c7b34d5fa30\",\"kelas_siswa_id\":42,\"pelanggaran_id\":16,\"guru_id\":12,\"tanggal_pelanggaran\":\"2026-11-12 00:00:00\",\"tanggal_dicatat\":\"2026-11-12 04:22:17\",\"poin_saat_dicatat\":5,\"keterangan\":\"test aja\",\"tindakan\":\"test aja\",\"status\":\"aktif\",\"updated_at\":\"2026-11-12 04:22:17\",\"created_at\":\"2026-11-12 04:22:17\",\"id\":20}', 'Pencatatan awal', '2026-11-12 12:22:17'),
+(21, 20, 13, 'edit', '{\"id\":20,\"kelas_siswa_id\":42,\"pelanggaran_id\":16,\"guru_id\":12,\"tanggal_pelanggaran\":\"2026-11-12\",\"tanggal_dicatat\":\"2026-11-12 04:22:17\",\"poin_saat_dicatat\":5,\"keterangan\":\"test aja\",\"tindakan\":\"test aja\",\"status\":\"aktif\",\"created_at\":\"2026-11-12 04:22:17\",\"updated_at\":\"2026-11-12 04:22:17\",\"idempotency_key\":\"423d6c07-4c7e-4cc5-88c3-4c7b34d5fa30\"}', '{\"id\":20,\"kelas_siswa_id\":42,\"pelanggaran_id\":16,\"guru_id\":12,\"tanggal_pelanggaran\":\"2026-11-12 00:00:00\",\"tanggal_dicatat\":\"2026-11-12 04:22:17\",\"poin_saat_dicatat\":5,\"keterangan\":\"test aja\",\"tindakan\":\"test ajaaaa\",\"status\":\"aktif\",\"created_at\":\"2026-11-12 04:22:17\",\"updated_at\":\"2026-11-12 04:22:36\",\"idempotency_key\":\"423d6c07-4c7e-4cc5-88c3-4c7b34d5fa30\"}', 'test aja', '2026-11-12 12:22:36');
 
 -- --------------------------------------------------------
 
@@ -612,13 +750,13 @@ INSERT INTO `t_log_pelanggaran` (`id`, `pelanggaran_siswa_id`, `user_id`, `aksi`
 --
 
 CREATE TABLE `t_pelanggaran` (
-  `id` bigint UNSIGNED NOT NULL,
-  `kategori_id` bigint UNSIGNED NOT NULL,
-  `kode` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `nama_pelanggaran` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `deskripsi` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `poin` smallint UNSIGNED NOT NULL,
-  `status_aktif` tinyint(1) NOT NULL DEFAULT '1',
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `kategori_id` bigint(20) UNSIGNED NOT NULL,
+  `kode` varchar(30) NOT NULL,
+  `nama_pelanggaran` varchar(255) NOT NULL,
+  `deskripsi` text DEFAULT NULL,
+  `poin` smallint(5) UNSIGNED NOT NULL,
+  `status_aktif` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -661,10 +799,10 @@ INSERT INTO `t_pelanggaran` (`id`, `kategori_id`, `kode`, `nama_pelanggaran`, `d
 --
 
 CREATE TABLE `t_pelanggaran_kategori` (
-  `id` bigint UNSIGNED NOT NULL,
-  `nama_kategori` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `deskripsi` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `status_aktif` tinyint(1) NOT NULL DEFAULT '1',
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `nama_kategori` varchar(255) NOT NULL,
+  `deskripsi` text DEFAULT NULL,
+  `status_aktif` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -687,33 +825,43 @@ INSERT INTO `t_pelanggaran_kategori` (`id`, `nama_kategori`, `deskripsi`, `statu
 --
 
 CREATE TABLE `t_pelanggaran_siswa` (
-  `id` bigint UNSIGNED NOT NULL,
-  `kelas_siswa_id` bigint UNSIGNED NOT NULL,
-  `pelanggaran_id` bigint UNSIGNED NOT NULL,
-  `guru_id` bigint UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `kelas_siswa_id` bigint(20) UNSIGNED NOT NULL,
+  `pelanggaran_id` bigint(20) UNSIGNED NOT NULL,
+  `guru_id` bigint(20) UNSIGNED NOT NULL,
   `tanggal_pelanggaran` date NOT NULL,
   `tanggal_dicatat` datetime NOT NULL,
-  `poin_saat_dicatat` smallint UNSIGNED NOT NULL,
-  `keterangan` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `tindakan` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'aktif',
+  `poin_saat_dicatat` smallint(5) UNSIGNED NOT NULL,
+  `keterangan` text DEFAULT NULL,
+  `tindakan` text DEFAULT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'aktif',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `idempotency_key` char(36) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `t_pelanggaran_siswa`
 --
 
-INSERT INTO `t_pelanggaran_siswa` (`id`, `kelas_siswa_id`, `pelanggaran_id`, `guru_id`, `tanggal_pelanggaran`, `tanggal_dicatat`, `poin_saat_dicatat`, `keterangan`, `tindakan`, `status`, `created_at`, `updated_at`) VALUES
-(1, 19, 4, 33, '2026-11-09', '2026-11-09 07:54:42', 10, 'Bolos pelajaran matematika', 'Cuman test ajaa', 'aktif', '2026-11-09 00:54:42', '2026-11-09 00:54:42'),
-(2, 34, 19, 33, '2026-11-09', '2026-11-09 07:55:22', 15, 'cuman test ajaa', 'cuman test ajaa', 'aktif', '2026-11-09 00:55:22', '2026-11-09 00:55:22'),
-(3, 125, 7, 33, '2026-11-09', '2026-11-09 07:56:07', 5, 'cuman test ajaa', 'cuman test ajaa', 'aktif', '2026-11-09 00:56:07', '2026-11-09 00:56:07'),
-(4, 25, 7, 2, '2026-11-09', '2026-11-09 07:56:40', 5, 'cuman test ajaa', 'cuman test ajaa', 'aktif', '2026-11-09 00:56:40', '2026-11-09 00:56:40'),
-(5, 45, 18, 2, '2026-11-09', '2026-11-09 07:57:16', 10, 'cuman test ajaa', 'cuman test ajaa', 'aktif', '2026-11-09 00:57:16', '2026-11-09 00:57:16'),
-(6, 19, 7, 2, '2026-11-09', '2026-11-09 07:57:30', 5, 'cuman test ajaa', 'cuman test ajaa', 'aktif', '2026-11-09 00:57:30', '2026-11-09 00:57:30'),
-(7, 19, 7, 29, '2026-11-09', '2026-11-09 07:58:37', 5, 'cuman test ajaa', 'cuman test ajaa', 'aktif', '2026-11-09 00:58:37', '2026-11-09 00:58:37'),
-(8, 13, 1, 29, '2026-11-09', '2026-11-09 07:58:55', 5, 'cuman test ajaa', 'cuman test ajaa', 'aktif', '2026-11-09 00:58:55', '2026-11-09 00:58:55');
+INSERT INTO `t_pelanggaran_siswa` (`id`, `kelas_siswa_id`, `pelanggaran_id`, `guru_id`, `tanggal_pelanggaran`, `tanggal_dicatat`, `poin_saat_dicatat`, `keterangan`, `tindakan`, `status`, `created_at`, `updated_at`, `idempotency_key`) VALUES
+(1, 19, 4, 33, '2026-11-09', '2026-11-09 07:54:42', 10, 'Bolos pelajaran matematika', 'Cuman test ajaa', 'aktif', '2026-11-09 00:54:42', '2026-11-09 00:54:42', NULL),
+(2, 34, 19, 33, '2026-11-09', '2026-11-09 07:55:22', 15, 'cuman test ajaa', 'cuman test ajaa', 'aktif', '2026-11-09 00:55:22', '2026-11-09 00:55:22', NULL),
+(3, 125, 7, 33, '2026-11-09', '2026-11-09 07:56:07', 5, 'cuman test ajaa', 'cuman test ajaa', 'aktif', '2026-11-09 00:56:07', '2026-11-09 00:56:07', NULL),
+(4, 25, 7, 2, '2026-11-09', '2026-11-09 07:56:40', 5, 'cuman test ajaa', 'cuman test ajaa', 'aktif', '2026-11-09 00:56:40', '2026-11-09 00:56:40', NULL),
+(5, 45, 18, 2, '2026-11-09', '2026-11-09 07:57:16', 10, 'cuman test ajaa', 'cuman test ajaa', 'aktif', '2026-11-09 00:57:16', '2026-11-09 00:57:16', NULL),
+(6, 19, 7, 2, '2026-11-09', '2026-11-09 07:57:30', 5, 'cuman test ajaa', 'cuman test ajaa', 'aktif', '2026-11-09 00:57:30', '2026-11-09 00:57:30', NULL),
+(7, 19, 7, 29, '2026-11-09', '2026-11-09 07:58:37', 5, 'cuman test ajaa', 'cuman test ajaa', 'aktif', '2026-11-09 00:58:37', '2026-11-09 00:58:37', NULL),
+(8, 13, 1, 29, '2026-11-09', '2026-11-09 07:58:55', 5, 'cuman test ajaa', 'cuman test ajaa', 'aktif', '2026-11-09 00:58:55', '2026-11-09 00:58:55', NULL),
+(9, 43, 6, 29, '2026-11-10', '2026-11-10 12:32:06', 5, 'cuman test aja', 'cuman test aja', 'aktif', '2026-11-10 20:32:06', '2026-11-10 20:32:06', NULL),
+(10, 23, 13, 33, '2026-11-11', '2026-11-11 00:39:22', 10, 'cuman test ajaa', 'cuman test ajaa', 'aktif', '2026-11-11 08:39:22', '2026-11-11 08:39:22', NULL),
+(11, 50, 23, 33, '2026-11-11', '2026-11-11 01:06:11', 10, NULL, NULL, 'aktif', '2026-11-11 09:06:11', '2026-11-11 09:06:11', NULL),
+(12, 18, 24, 33, '2026-11-11', '2026-11-11 04:07:19', 10, 'fgfgh', NULL, 'dibatalkan', '2026-11-11 12:07:19', '2026-11-11 12:09:31', NULL),
+(13, 18, 24, 33, '2026-11-11', '2026-11-11 04:07:21', 10, 'fgfghwd', 'tess aja', 'aktif', '2026-11-11 12:07:21', '2026-11-11 22:59:45', NULL),
+(14, 188, 7, 12, '2026-11-12', '2026-11-12 04:05:08', 5, 'menggunakan seragam batik di hari senin', 'membaca surat', 'aktif', '2026-11-12 12:05:08', '2026-11-12 12:05:08', '1d9e9aaf-ccf2-4864-b018-8a007ccba8ac'),
+(15, 138, 16, 12, '2026-11-12', '2026-11-12 04:06:36', 5, NULL, NULL, 'aktif', '2026-11-12 12:06:36', '2026-11-12 12:06:36', '89334611-b626-406e-b8fc-f54a572f81e3'),
+(19, 195, 1, 12, '2026-11-12', '2026-11-12 04:18:50', 5, 'dddd', 'dddd', 'aktif', '2026-11-12 12:18:50', '2026-11-12 12:18:50', '87ea4414-21e6-48ec-a24f-78f45b276b82'),
+(20, 42, 16, 12, '2026-11-12', '2026-11-12 04:22:17', 5, 'test aja', 'test ajaaaa', 'aktif', '2026-11-12 12:22:17', '2026-11-12 12:22:36', '423d6c07-4c7e-4cc5-88c3-4c7b34d5fa30');
 
 -- --------------------------------------------------------
 
@@ -722,16 +870,16 @@ INSERT INTO `t_pelanggaran_siswa` (`id`, `kelas_siswa_id`, `pelanggaran_id`, `gu
 --
 
 CREATE TABLE `t_siswa` (
-  `id` bigint UNSIGNED NOT NULL,
-  `nisn` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `nama` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `jenis_kelamin` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `alamat` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `tahun_masuk` smallint UNSIGNED NOT NULL,
-  `status_siswa` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'aktif',
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `nisn` varchar(10) NOT NULL,
+  `nama` varchar(255) NOT NULL,
+  `jenis_kelamin` char(1) NOT NULL,
+  `alamat` text DEFAULT NULL,
+  `tahun_masuk` smallint(5) UNSIGNED NOT NULL,
+  `status_siswa` varchar(20) NOT NULL DEFAULT 'aktif',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `nis` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nis` varchar(10) DEFAULT NULL,
   `tanggal_lahir` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -867,7 +1015,8 @@ INSERT INTO `t_siswa` (`id`, `nisn`, `nama`, `jenis_kelamin`, `alamat`, `tahun_m
 (125, '0000000142', 'INDRA IRANA PUTRA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010142', '2008-09-13'),
 (126, '0000000143', 'KINKIN NURUL YAKIN', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010143', '2008-10-22'),
 (127, '0000000144', 'M IRSYAD NURFALLAH', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010144', '2008-11-16'),
-(128, '0000000145', 'MOCHAMAD FATHAN MUYASAR', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010145', '2008-12-05'),
+(128, '0000000145', 'MOCHAMAD FATHAN MUYASAR', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010145', '2008-12-05');
+INSERT INTO `t_siswa` (`id`, `nisn`, `nama`, `jenis_kelamin`, `alamat`, `tahun_masuk`, `status_siswa`, `created_at`, `updated_at`, `nis`, `tanggal_lahir`) VALUES
 (129, '0000000146', 'MOCHAMAD RIZQI ADITYA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010146', '2008-01-27'),
 (130, '0000000147', 'MUHAMAD FAHRUL HENDRAWAN', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010147', '2008-02-14'),
 (131, '0000000148', 'MUHAMAD RIZKI SYAPUTRA', 'L', 'Tasikmalaya', 2026, 'aktif', '2026-11-09 07:49:39', '2026-11-09 07:49:39', '2024010148', '2008-03-08'),
@@ -895,11 +1044,11 @@ INSERT INTO `t_siswa` (`id`, `nisn`, `nama`, `jenis_kelamin`, `alamat`, `tahun_m
 --
 
 CREATE TABLE `t_tahun_ajaran` (
-  `id` bigint UNSIGNED NOT NULL,
-  `nama_tahun_ajaran` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `nama_tahun_ajaran` varchar(20) NOT NULL,
   `tanggal_mulai` date NOT NULL,
   `tanggal_selesai` date NOT NULL,
-  `status_aktif` tinyint(1) NOT NULL DEFAULT '0',
+  `status_aktif` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -909,7 +1058,8 @@ CREATE TABLE `t_tahun_ajaran` (
 --
 
 INSERT INTO `t_tahun_ajaran` (`id`, `nama_tahun_ajaran`, `tanggal_mulai`, `tanggal_selesai`, `status_aktif`, `created_at`, `updated_at`) VALUES
-(1, '2026/2027', '2026-07-13', '2027-06-18', 1, '2026-11-04 08:04:43', '2026-11-04 08:04:43');
+(1, '2026/2027', '2026-07-13', '2027-06-18', 1, '2026-11-04 08:04:43', '2026-11-04 08:04:43'),
+(2, '2027/2028', '2027-07-13', '2028-06-18', 0, '2026-11-10 19:52:05', '2026-11-10 19:52:05');
 
 -- --------------------------------------------------------
 
@@ -918,13 +1068,13 @@ INSERT INTO `t_tahun_ajaran` (`id`, `nama_tahun_ajaran`, `tanggal_mulai`, `tangg
 --
 
 CREATE TABLE `t_users` (
-  `id` bigint UNSIGNED NOT NULL,
-  `nama` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `nama` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `role` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
+  `role` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -943,7 +1093,7 @@ INSERT INTO `t_users` (`id`, `nama`, `email`, `password`, `created_at`, `updated
 (10, 'Drs. Heri', 'heri@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (11, 'Asep Bastaman', 'asepbastaman@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (12, 'H. Encep Maemun, S.T., M.Pd', 'encepmaemun@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
-(13, 'Opik', 'opik@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(13, 'Opik', 'opik@sekolahku.com', '$2y$12$U5lWD5r3xeRs8bSjOOMn9eVciHod.hK/taqXEw/ncxk/K/uJWkELC', '2026-11-04 15:01:22', '2026-11-12 12:04:05', 'guru'),
 (14, 'Ida Farida, S. Pd', 'idafarida@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (15, 'Idah Mahmudah, S.Pd', 'idahmahmudah@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (16, 'Drs. Muhamad Ali', 'muhamadali@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
@@ -973,7 +1123,7 @@ INSERT INTO `t_users` (`id`, `nama`, `email`, `password`, `created_at`, `updated
 (40, 'Yusrin Noer Sabrina, S.Pd', 'yusrinnoersabrina@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (41, 'Senny Indayani, S.Pd', 'sennyindayani@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (42, 'Ilma Amalia, S.Pd', 'ilmaamalia@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
-(43, 'Alvira Sofwatunnisa, S.Pd', 'alvirasofwatunnisa@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(43, 'Alvira Sofwatunnisa, S.Pd', 'alvirasofwatunnisa@sekolahku.com', '$2y$12$1OPhE3Yr/z.aCUsYilJK/.YWXbLU3xtaQCKEe5KxmdYsSvKXCrZ7i', '2026-11-04 15:01:22', '2026-11-10 20:12:46', 'guru'),
 (44, 'Risna Andriyani, S.Pd', 'risnaandriyani@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (45, 'Dra. Tintin Noerhayati', 'tintinnoerhayati@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (46, 'Rizkia Fahira, S.Pd', 'rizkiafahira@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
@@ -981,7 +1131,7 @@ INSERT INTO `t_users` (`id`, `nama`, `email`, `password`, `created_at`, `updated
 (48, 'Ratnaningsih Hatil Aeni, S.Pd.', 'ratnaningshhatilaeni@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (49, 'Dheny Darajatul Hasani, S.Pd.', 'dhenydarajatulhasani@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (50, 'Fahrullah, S.Pd', 'fahrullah@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
-(51, 'Aan Andriana, S.T', 'aanandriana@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
+(51, 'Aan Andriana, S.T', 'aanandriana@sekolahku.com', '$2y$12$x97sbJTBhUHH9SvjzwEsNeyOEmeMIIFfUdMTzrnPB36AJkowqX.jC', '2026-11-04 15:01:22', '2026-11-10 19:56:14', 'guru'),
 (52, 'Fitri Fauziah, S.T', 'fitrifauziah@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (53, 'Nida Aulia, S.Pd', 'nidaaulia@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
 (54, 'Sri Nurrizki Putri Krisnadi, S.Pd', 'srinurrizkiputrikrisnadi@sekolahku.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2026-11-04 15:01:22', '2026-11-04 15:01:22', 'guru'),
@@ -996,13 +1146,13 @@ INSERT INTO `t_users` (`id`, `nama`, `email`, `password`, `created_at`, `updated
 --
 
 CREATE TABLE `t_wali_kelas` (
-  `id` bigint UNSIGNED NOT NULL,
-  `guru_id` bigint UNSIGNED NOT NULL,
-  `kelas_id` bigint UNSIGNED NOT NULL,
-  `tahun_ajaran_id` bigint UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `guru_id` bigint(20) UNSIGNED NOT NULL,
+  `kelas_id` bigint(20) UNSIGNED NOT NULL,
+  `tahun_ajaran_id` bigint(20) UNSIGNED NOT NULL,
   `tanggal_mulai` date NOT NULL,
   `tanggal_selesai` date DEFAULT NULL,
-  `status_aktif` tinyint(1) NOT NULL DEFAULT '1',
+  `status_aktif` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1135,6 +1285,7 @@ ALTER TABLE `t_pelanggaran_kategori`
 --
 ALTER TABLE `t_pelanggaran_siswa`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `t_ps_guru_idempotency_unique` (`guru_id`,`idempotency_key`),
   ADD KEY `t_pelanggaran_siswa_pelanggaran_id_foreign` (`pelanggaran_id`),
   ADD KEY `t_pelanggaran_siswa_guru_id_foreign` (`guru_id`),
   ADD KEY `t_ps_kelas_status_tanggal_idx` (`kelas_siswa_id`,`status`,`tanggal_pelanggaran`),
@@ -1178,91 +1329,91 @@ ALTER TABLE `t_wali_kelas`
 -- AUTO_INCREMENT for table `failed_jobs`
 --
 ALTER TABLE `failed_jobs`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `jobs`
 --
 ALTER TABLE `jobs`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `t_guru`
 --
 ALTER TABLE `t_guru`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT for table `t_kelas`
 --
 ALTER TABLE `t_kelas`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `t_kelas_siswa`
 --
 ALTER TABLE `t_kelas_siswa`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=208;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=208;
 
 --
 -- AUTO_INCREMENT for table `t_log_aktivitas`
 --
 ALTER TABLE `t_log_aktivitas`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=123;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=219;
 
 --
 -- AUTO_INCREMENT for table `t_log_pelanggaran`
 --
 ALTER TABLE `t_log_pelanggaran`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `t_pelanggaran`
 --
 ALTER TABLE `t_pelanggaran`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `t_pelanggaran_kategori`
 --
 ALTER TABLE `t_pelanggaran_kategori`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `t_pelanggaran_siswa`
 --
 ALTER TABLE `t_pelanggaran_siswa`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `t_siswa`
 --
 ALTER TABLE `t_siswa`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=171;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=171;
 
 --
 -- AUTO_INCREMENT for table `t_tahun_ajaran`
 --
 ALTER TABLE `t_tahun_ajaran`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `t_users`
 --
 ALTER TABLE `t_users`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT for table `t_wali_kelas`
 --
 ALTER TABLE `t_wali_kelas`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
@@ -1272,50 +1423,50 @@ ALTER TABLE `t_wali_kelas`
 -- Constraints for table `t_guru`
 --
 ALTER TABLE `t_guru`
-  ADD CONSTRAINT `t_guru_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `t_users` (`id`) ON DELETE RESTRICT;
+  ADD CONSTRAINT `t_guru_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `t_users` (`id`);
 
 --
 -- Constraints for table `t_kelas_siswa`
 --
 ALTER TABLE `t_kelas_siswa`
-  ADD CONSTRAINT `t_kelas_siswa_kelas_id_foreign` FOREIGN KEY (`kelas_id`) REFERENCES `t_kelas` (`id`) ON DELETE RESTRICT,
-  ADD CONSTRAINT `t_kelas_siswa_siswa_id_foreign` FOREIGN KEY (`siswa_id`) REFERENCES `t_siswa` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  ADD CONSTRAINT `t_kelas_siswa_tahun_ajaran_id_foreign` FOREIGN KEY (`tahun_ajaran_id`) REFERENCES `t_tahun_ajaran` (`id`) ON DELETE RESTRICT;
+  ADD CONSTRAINT `t_kelas_siswa_kelas_id_foreign` FOREIGN KEY (`kelas_id`) REFERENCES `t_kelas` (`id`),
+  ADD CONSTRAINT `t_kelas_siswa_siswa_id_foreign` FOREIGN KEY (`siswa_id`) REFERENCES `t_siswa` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `t_kelas_siswa_tahun_ajaran_id_foreign` FOREIGN KEY (`tahun_ajaran_id`) REFERENCES `t_tahun_ajaran` (`id`);
 
 --
 -- Constraints for table `t_log_aktivitas`
 --
 ALTER TABLE `t_log_aktivitas`
-  ADD CONSTRAINT `t_log_aktivitas_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `t_users` (`id`) ON DELETE RESTRICT;
+  ADD CONSTRAINT `t_log_aktivitas_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `t_users` (`id`);
 
 --
 -- Constraints for table `t_log_pelanggaran`
 --
 ALTER TABLE `t_log_pelanggaran`
-  ADD CONSTRAINT `t_log_pelanggaran_pelanggaran_siswa_id_foreign` FOREIGN KEY (`pelanggaran_siswa_id`) REFERENCES `t_pelanggaran_siswa` (`id`) ON DELETE RESTRICT,
-  ADD CONSTRAINT `t_log_pelanggaran_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `t_users` (`id`) ON DELETE RESTRICT;
+  ADD CONSTRAINT `t_log_pelanggaran_pelanggaran_siswa_id_foreign` FOREIGN KEY (`pelanggaran_siswa_id`) REFERENCES `t_pelanggaran_siswa` (`id`),
+  ADD CONSTRAINT `t_log_pelanggaran_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `t_users` (`id`);
 
 --
 -- Constraints for table `t_pelanggaran`
 --
 ALTER TABLE `t_pelanggaran`
-  ADD CONSTRAINT `t_pelanggaran_kategori_id_foreign` FOREIGN KEY (`kategori_id`) REFERENCES `t_pelanggaran_kategori` (`id`) ON DELETE RESTRICT;
+  ADD CONSTRAINT `t_pelanggaran_kategori_id_foreign` FOREIGN KEY (`kategori_id`) REFERENCES `t_pelanggaran_kategori` (`id`);
 
 --
 -- Constraints for table `t_pelanggaran_siswa`
 --
 ALTER TABLE `t_pelanggaran_siswa`
-  ADD CONSTRAINT `t_pelanggaran_siswa_guru_id_foreign` FOREIGN KEY (`guru_id`) REFERENCES `t_guru` (`id`) ON DELETE RESTRICT,
-  ADD CONSTRAINT `t_pelanggaran_siswa_kelas_siswa_id_foreign` FOREIGN KEY (`kelas_siswa_id`) REFERENCES `t_kelas_siswa` (`id`) ON DELETE RESTRICT,
-  ADD CONSTRAINT `t_pelanggaran_siswa_pelanggaran_id_foreign` FOREIGN KEY (`pelanggaran_id`) REFERENCES `t_pelanggaran` (`id`) ON DELETE RESTRICT;
+  ADD CONSTRAINT `t_pelanggaran_siswa_guru_id_foreign` FOREIGN KEY (`guru_id`) REFERENCES `t_guru` (`id`),
+  ADD CONSTRAINT `t_pelanggaran_siswa_kelas_siswa_id_foreign` FOREIGN KEY (`kelas_siswa_id`) REFERENCES `t_kelas_siswa` (`id`),
+  ADD CONSTRAINT `t_pelanggaran_siswa_pelanggaran_id_foreign` FOREIGN KEY (`pelanggaran_id`) REFERENCES `t_pelanggaran` (`id`);
 
 --
 -- Constraints for table `t_wali_kelas`
 --
 ALTER TABLE `t_wali_kelas`
-  ADD CONSTRAINT `t_wali_kelas_guru_id_foreign` FOREIGN KEY (`guru_id`) REFERENCES `t_guru` (`id`) ON DELETE RESTRICT,
-  ADD CONSTRAINT `t_wali_kelas_kelas_id_foreign` FOREIGN KEY (`kelas_id`) REFERENCES `t_kelas` (`id`) ON DELETE RESTRICT,
-  ADD CONSTRAINT `t_wali_kelas_tahun_ajaran_id_foreign` FOREIGN KEY (`tahun_ajaran_id`) REFERENCES `t_tahun_ajaran` (`id`) ON DELETE RESTRICT;
+  ADD CONSTRAINT `t_wali_kelas_guru_id_foreign` FOREIGN KEY (`guru_id`) REFERENCES `t_guru` (`id`),
+  ADD CONSTRAINT `t_wali_kelas_kelas_id_foreign` FOREIGN KEY (`kelas_id`) REFERENCES `t_kelas` (`id`),
+  ADD CONSTRAINT `t_wali_kelas_tahun_ajaran_id_foreign` FOREIGN KEY (`tahun_ajaran_id`) REFERENCES `t_tahun_ajaran` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -56,7 +56,7 @@ class LaporanController extends Controller
     {
         $generatedAt = now();
         $data = $this->printData($request->validated(), $service, $generatedAt);
-        $filename = 'laporan-pelanggaran-'.$generatedAt->format('Ymd-His').'.pdf';
+        $filename = 'laporan-pelanggaran-' . $generatedAt->format('Ymd-His') . '.pdf';
 
         return Pdf::loadView('laporan.print', $data)
             ->setPaper('a4', 'landscape')
@@ -108,7 +108,7 @@ class LaporanController extends Controller
             'Kelas kejadian' => $class?->nama_kelas ?? 'Semua kelas',
             'Siswa' => ($filters['q'] ?? '') !== '' ? (string) $filters['q'] : 'Semua siswa',
             'Rentang kejadian' => ($filters['tanggal_mulai'] ?? null) || ($filters['tanggal_selesai'] ?? null)
-                ? (($filters['tanggal_mulai'] ?? 'Awal').' — '.($filters['tanggal_selesai'] ?? 'Hari ini'))
+                ? (($filters['tanggal_mulai'] ?? 'Awal') . ' — ' . ($filters['tanggal_selesai'] ?? 'Hari ini'))
                 : 'Semua tanggal',
             'Jenis pelanggaran' => $violation?->nama_pelanggaran ?? 'Semua jenis',
             'Status' => match ($filters['status'] ?? null) {

@@ -29,9 +29,9 @@ class TahunAjaranController extends Controller
         $filters = $request->validated();
         $academicYears = TahunAjaran::query()
             ->withCount(['penempatanSiswa', 'penugasanWaliKelas'])
-            ->when($filters['q'] ?? null, static fn ($query, string $search) => $query
-                ->where('nama_tahun_ajaran', 'like', '%'.$search.'%'))
-            ->when(isset($filters['status']), static fn ($query) => $query->where('status_aktif', $filters['status'] === 'aktif'))
+            ->when($filters['q'] ?? null, static fn($query, string $search) => $query
+                ->where('nama_tahun_ajaran', 'like', '%' . $search . '%'))
+            ->when(isset($filters['status']), static fn($query) => $query->where('status_aktif', $filters['status'] === 'aktif'))
             ->orderByDesc('tanggal_mulai')
             ->orderByDesc('id')
             ->paginate(10)
@@ -56,7 +56,7 @@ class TahunAjaranController extends Controller
     public function store(StoreTahunAjaranRequest $request, TahunAjaranManager $manager, ActivityLogger $activityLogger): RedirectResponse
     {
         $academicYear = $manager->create($request->validated());
-        $activityLogger->record($request->user(), $request, 'Tahun ajaran ditambahkan', 'Periode tahun ajaran ID #'.$academicYear->id.' berhasil ditambahkan.');
+        $activityLogger->record($request->user(), $request, 'Tahun ajaran ditambahkan', 'Periode tahun ajaran ID #' . $academicYear->id . ' berhasil ditambahkan.');
 
         return to_route('admin.academic-years.show', $academicYear)->with('success', 'Tahun ajaran berhasil ditambahkan.');
     }
@@ -92,7 +92,7 @@ class TahunAjaranController extends Controller
         ActivityLogger $activityLogger,
     ): RedirectResponse {
         $manager->update($tahunAjaran, $request->validated());
-        $activityLogger->record($request->user(), $request, 'Tahun ajaran diperbarui', 'Pengaturan tahun ajaran ID #'.$tahunAjaran->id.' berhasil diperbarui.');
+        $activityLogger->record($request->user(), $request, 'Tahun ajaran diperbarui', 'Pengaturan tahun ajaran ID #' . $tahunAjaran->id . ' berhasil diperbarui.');
 
         return to_route('admin.academic-years.show', $tahunAjaran)->with('success', 'Pengaturan tahun ajaran berhasil diperbarui.');
     }
@@ -115,7 +115,7 @@ class TahunAjaranController extends Controller
 
             $lockedYear->delete();
         });
-        $activityLogger->record($request->user(), $request, 'Tahun ajaran dihapus', 'Tahun ajaran ID #'.$tahunAjaran->id.' tanpa histori berhasil dihapus.');
+        $activityLogger->record($request->user(), $request, 'Tahun ajaran dihapus', 'Tahun ajaran ID #' . $tahunAjaran->id . ' tanpa histori berhasil dihapus.');
 
         return to_route('admin.academic-years.index')->with('success', 'Tahun ajaran tanpa riwayat berhasil dihapus permanen.');
     }

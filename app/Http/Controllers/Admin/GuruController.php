@@ -70,7 +70,7 @@ class GuruController extends Controller
                 'status_aktif' => true,
             ]);
         });
-        $activityLogger->record($request->user(), $request, 'Guru ditambahkan', 'Identitas Guru ID #'.$guru->id.' dan akun login berhasil dibuat.');
+        $activityLogger->record($request->user(), $request, 'Guru ditambahkan', 'Identitas Guru ID #' . $guru->id . ' dan akun login berhasil dibuat.');
 
         return to_route('admin.teachers.show', $guru)->with('success', 'Data Guru berhasil ditambahkan.');
     }
@@ -130,7 +130,7 @@ class GuruController extends Controller
                 ]);
             }
         });
-        $activityLogger->record($request->user(), $request, 'Data Guru diperbarui', 'Identitas Guru ID #'.$guru->id.' berhasil diperbarui.');
+        $activityLogger->record($request->user(), $request, 'Data Guru diperbarui', 'Identitas Guru ID #' . $guru->id . ' berhasil diperbarui.');
 
         return to_route('admin.teachers.show', $guru)->with('success', 'Identitas Guru berhasil diperbarui.');
     }
@@ -146,10 +146,12 @@ class GuruController extends Controller
             $lockedGuru = Guru::query()->whereKey($guru->id)->lockForUpdate()->firstOrFail();
             $user = User::query()->whereKey($lockedGuru->user_id)->lockForUpdate()->firstOrFail();
 
-            if ($lockedGuru->waliKelas()->exists()
+            if (
+                $lockedGuru->waliKelas()->exists()
                 || $lockedGuru->catatanPelanggaran()->exists()
                 || LogPelanggaran::query()->where('user_id', $user->id)->exists()
-                || LogAktivitas::query()->where('user_id', $user->id)->exists()) {
+                || LogAktivitas::query()->where('user_id', $user->id)->exists()
+            ) {
                 throw ValidationException::withMessages([
                     'guru' => 'Guru memiliki riwayat penugasan, catatan, atau aktivitas sehingga tidak dapat dihapus permanen. Nonaktifkan Guru untuk mempertahankan riwayat.',
                 ]);
@@ -158,7 +160,7 @@ class GuruController extends Controller
             $lockedGuru->delete();
             $user->delete();
         });
-        $activityLogger->record($request->user(), $request, 'Guru dihapus', 'Identitas Guru ID #'.$guru->id.' tanpa histori berhasil dihapus.');
+        $activityLogger->record($request->user(), $request, 'Guru dihapus', 'Identitas Guru ID #' . $guru->id . ' tanpa histori berhasil dihapus.');
 
         return to_route('admin.teachers.index')
             ->with('success', 'Data Guru dan akun login tanpa riwayat berhasil dihapus permanen.');
@@ -174,7 +176,7 @@ class GuruController extends Controller
         DB::transaction(function () use ($guru): void {
             Guru::query()->whereKey($guru->id)->lockForUpdate()->firstOrFail()->update(['status_aktif' => false]);
         });
-        $activityLogger->record($request->user(), $request, 'Guru dinonaktifkan', 'Guru ID #'.$guru->id.' berhasil dinonaktifkan.');
+        $activityLogger->record($request->user(), $request, 'Guru dinonaktifkan', 'Guru ID #' . $guru->id . ' berhasil dinonaktifkan.');
 
         return to_route('admin.teachers.show', $guru)
             ->with('success', 'Guru dinonaktifkan. Akun login, penugasan, dan seluruh histori tetap tersimpan.');
@@ -212,7 +214,7 @@ class GuruController extends Controller
             $user->nama = $lockedGuru->nama;
             $user->save();
         });
-        $activityLogger->record($request->user(), $request, 'Akun Guru diperbarui', 'Pengaturan akun Guru ID #'.$guru->id.' diperbarui tanpa mencatat data kredensial.');
+        $activityLogger->record($request->user(), $request, 'Akun Guru diperbarui', 'Pengaturan akun Guru ID #' . $guru->id . ' diperbarui tanpa mencatat data kredensial.');
 
         return to_route('admin.teachers.show', $guru)->with('success', 'Pengaturan akun login berhasil diperbarui.');
     }
@@ -227,7 +229,7 @@ class GuruController extends Controller
         DB::transaction(function () use ($guru): void {
             Guru::query()->whereKey($guru->id)->lockForUpdate()->firstOrFail()->update(['status_aktif' => true]);
         });
-        $activityLogger->record($request->user(), $request, 'Guru diaktifkan', 'Guru ID #'.$guru->id.' berhasil diaktifkan.');
+        $activityLogger->record($request->user(), $request, 'Guru diaktifkan', 'Guru ID #' . $guru->id . ' berhasil diaktifkan.');
 
         return to_route('admin.teachers.show', $guru)->with('success', 'Guru dan akun login yang terhubung berhasil diaktifkan.');
     }

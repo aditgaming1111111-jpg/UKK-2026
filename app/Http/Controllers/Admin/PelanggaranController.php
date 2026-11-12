@@ -30,12 +30,12 @@ class PelanggaranController extends Controller
         $violations = Pelanggaran::query()
             ->with('kategori:id,nama_kategori,status_aktif')
             ->withCount('catatanSiswa')
-            ->when($filters['q'] ?? null, static fn ($query, string $search) => $query->where(static function ($searchQuery) use ($search): void {
-                $searchQuery->where('kode', 'like', '%'.$search.'%')
-                    ->orWhere('nama_pelanggaran', 'like', '%'.$search.'%');
+            ->when($filters['q'] ?? null, static fn($query, string $search) => $query->where(static function ($searchQuery) use ($search): void {
+                $searchQuery->where('kode', 'like', '%' . $search . '%')
+                    ->orWhere('nama_pelanggaran', 'like', '%' . $search . '%');
             }))
-            ->when($filters['kategori_id'] ?? null, static fn ($query, int|string $categoryId) => $query->where('kategori_id', $categoryId))
-            ->when(isset($filters['status']), static fn ($query) => $query->where('status_aktif', $filters['status'] === 'aktif'))
+            ->when($filters['kategori_id'] ?? null, static fn($query, int|string $categoryId) => $query->where('kategori_id', $categoryId))
+            ->when(isset($filters['status']), static fn($query) => $query->where('status_aktif', $filters['status'] === 'aktif'))
             ->orderBy('kode')
             ->orderBy('id')
             ->paginate(10)
@@ -75,7 +75,7 @@ class PelanggaranController extends Controller
 
             return $category->jenisPelanggaran()->create(collect($attributes)->except('kategori_id')->all());
         });
-        $activityLogger->record($request->user(), $request, 'Jenis pelanggaran ditambahkan', 'Jenis pelanggaran ID #'.$violation->id.' berhasil ditambahkan.');
+        $activityLogger->record($request->user(), $request, 'Jenis pelanggaran ditambahkan', 'Jenis pelanggaran ID #' . $violation->id . ' berhasil ditambahkan.');
 
         return to_route('admin.violations.show', $violation)->with('success', 'Jenis pelanggaran berhasil ditambahkan.');
     }
@@ -130,7 +130,7 @@ class PelanggaranController extends Controller
 
             $lockedViolation->update($attributes);
         });
-        $activityLogger->record($request->user(), $request, 'Jenis pelanggaran diperbarui', 'Data jenis pelanggaran ID #'.$pelanggaran->id.' diperbarui. Snapshot poin pada catatan lama tidak berubah.');
+        $activityLogger->record($request->user(), $request, 'Jenis pelanggaran diperbarui', 'Data jenis pelanggaran ID #' . $pelanggaran->id . ' diperbarui. Snapshot poin pada catatan lama tidak berubah.');
 
         return to_route('admin.violations.show', $pelanggaran)->with('success', 'Jenis pelanggaran berhasil diperbarui. Poin pada catatan lama tetap menggunakan snapshot saat pencatatan.');
     }
@@ -153,7 +153,7 @@ class PelanggaranController extends Controller
 
             $lockedViolation->delete();
         });
-        $activityLogger->record($request->user(), $request, 'Jenis pelanggaran dihapus', 'Jenis pelanggaran ID #'.$pelanggaran->id.' tanpa catatan terkait berhasil dihapus.');
+        $activityLogger->record($request->user(), $request, 'Jenis pelanggaran dihapus', 'Jenis pelanggaran ID #' . $pelanggaran->id . ' tanpa catatan terkait berhasil dihapus.');
 
         return to_route('admin.violations.index')->with('success', 'Jenis pelanggaran tanpa catatan siswa berhasil dihapus permanen.');
     }
@@ -176,7 +176,7 @@ class PelanggaranController extends Controller
 
             $lockedViolation->update(['status_aktif' => $isActivating]);
         });
-        $activityLogger->record($request->user(), $request, 'Status jenis pelanggaran diubah', 'Status jenis pelanggaran ID #'.$pelanggaran->id.' diubah menjadi '.($pelanggaran->fresh()->status_aktif ? 'aktif' : 'nonaktif').'.');
+        $activityLogger->record($request->user(), $request, 'Status jenis pelanggaran diubah', 'Status jenis pelanggaran ID #' . $pelanggaran->id . ' diubah menjadi ' . ($pelanggaran->fresh()->status_aktif ? 'aktif' : 'nonaktif') . '.');
 
         return to_route('admin.violations.show', $pelanggaran)->with('success', $pelanggaran->fresh()->status_aktif
             ? 'Jenis pelanggaran diaktifkan.'

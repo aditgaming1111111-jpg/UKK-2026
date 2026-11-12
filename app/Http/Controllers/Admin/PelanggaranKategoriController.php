@@ -29,8 +29,8 @@ class PelanggaranKategoriController extends Controller
         $filters = $request->validated();
         $categories = PelanggaranKategori::query()
             ->withCount('jenisPelanggaran')
-            ->when($filters['q'] ?? null, static fn ($query, string $search) => $query->where('nama_kategori', 'like', '%'.$search.'%'))
-            ->when(isset($filters['status']), static fn ($query) => $query->where('status_aktif', $filters['status'] === 'aktif'))
+            ->when($filters['q'] ?? null, static fn($query, string $search) => $query->where('nama_kategori', 'like', '%' . $search . '%'))
+            ->when(isset($filters['status']), static fn($query) => $query->where('status_aktif', $filters['status'] === 'aktif'))
             ->orderBy('nama_kategori')
             ->orderBy('id')
             ->paginate(10)
@@ -55,7 +55,7 @@ class PelanggaranKategoriController extends Controller
     public function store(StorePelanggaranKategoriRequest $request, ActivityLogger $activityLogger): RedirectResponse
     {
         $category = PelanggaranKategori::query()->create($request->validated());
-        $activityLogger->record($request->user(), $request, 'Kategori pelanggaran ditambahkan', 'Kategori pelanggaran ID #'.$category->id.' berhasil ditambahkan.');
+        $activityLogger->record($request->user(), $request, 'Kategori pelanggaran ditambahkan', 'Kategori pelanggaran ID #' . $category->id . ' berhasil ditambahkan.');
 
         return to_route('admin.violation-categories.show', $category)->with('success', 'Kategori pelanggaran berhasil ditambahkan.');
     }
@@ -66,7 +66,7 @@ class PelanggaranKategoriController extends Controller
     public function show(PelanggaranKategori $pelanggaranKategori): View
     {
         Gate::authorize('view', $pelanggaranKategori);
-        $pelanggaranKategori->loadCount(['jenisPelanggaran', 'jenisPelanggaran as active_violations_count' => static fn ($query) => $query->where('status_aktif', true)]);
+        $pelanggaranKategori->loadCount(['jenisPelanggaran', 'jenisPelanggaran as active_violations_count' => static fn($query) => $query->where('status_aktif', true)]);
         $violations = $pelanggaranKategori->jenisPelanggaran()->withCount('catatanSiswa')->orderBy('nama_pelanggaran')->paginate(10);
 
         return view('admin.kategori-pelanggaran.show', ['category' => $pelanggaranKategori, 'violations' => $violations]);
@@ -88,7 +88,7 @@ class PelanggaranKategoriController extends Controller
     public function update(UpdatePelanggaranKategoriRequest $request, PelanggaranKategori $pelanggaranKategori, ActivityLogger $activityLogger): RedirectResponse
     {
         $pelanggaranKategori->update($request->validated());
-        $activityLogger->record($request->user(), $request, 'Kategori pelanggaran diperbarui', 'Kategori pelanggaran ID #'.$pelanggaranKategori->id.' berhasil diperbarui.');
+        $activityLogger->record($request->user(), $request, 'Kategori pelanggaran diperbarui', 'Kategori pelanggaran ID #' . $pelanggaranKategori->id . ' berhasil diperbarui.');
 
         return to_route('admin.violation-categories.show', $pelanggaranKategori)->with('success', 'Kategori pelanggaran berhasil diperbarui.');
     }
@@ -111,7 +111,7 @@ class PelanggaranKategoriController extends Controller
 
             $lockedCategory->delete();
         });
-        $activityLogger->record($request->user(), $request, 'Kategori pelanggaran dihapus', 'Kategori pelanggaran ID #'.$pelanggaranKategori->id.' tanpa jenis terkait berhasil dihapus.');
+        $activityLogger->record($request->user(), $request, 'Kategori pelanggaran dihapus', 'Kategori pelanggaran ID #' . $pelanggaranKategori->id . ' tanpa jenis terkait berhasil dihapus.');
 
         return to_route('admin.violation-categories.index')->with('success', 'Kategori tanpa jenis pelanggaran berhasil dihapus permanen.');
     }
@@ -132,7 +132,7 @@ class PelanggaranKategoriController extends Controller
                 Pelanggaran::query()->where('kategori_id', $category->id)->where('status_aktif', true)->update(['status_aktif' => false]);
             }
         });
-        $activityLogger->record($request->user(), $request, 'Status kategori pelanggaran diubah', 'Status kategori pelanggaran ID #'.$pelanggaranKategori->id.' diubah menjadi '.($pelanggaranKategori->fresh()->status_aktif ? 'aktif' : 'nonaktif').'.');
+        $activityLogger->record($request->user(), $request, 'Status kategori pelanggaran diubah', 'Status kategori pelanggaran ID #' . $pelanggaranKategori->id . ' diubah menjadi ' . ($pelanggaranKategori->fresh()->status_aktif ? 'aktif' : 'nonaktif') . '.');
 
         return to_route('admin.violation-categories.show', $pelanggaranKategori)->with('success', $pelanggaranKategori->fresh()->status_aktif
             ? 'Kategori diaktifkan kembali. Jenis pelanggaran tetap berstatus masing-masing.'
