@@ -8,6 +8,13 @@
     <title>@yield('title', 'SekolahKu') — SekolahKu</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('head')
+    <script>
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+    </script>
 </head>
 
 <body class="min-h-screen bg-gray-100 text-gray-900 antialiased">

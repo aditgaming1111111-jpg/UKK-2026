@@ -7,6 +7,7 @@ use App\Models\Kelas;
 use App\Models\TahunAjaran;
 use App\Models\WaliKelas;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -15,6 +16,52 @@ use Illuminate\Validation\ValidationException;
  */
 class WaliKelasAssignmentService
 {
+    /**
+     * Mengakhiri penugasan aktif pada tahun ajaran yang sudah berakhir sebelum periode baru dimulai.
+     *
+     * @return Collection<int, WaliKelas>
+     */
+    public function completeExpiredBefore(TahunAjaran $newAcademicYear): Collection
+    {
+        return DB::transaction(function () use ($newAcademicYear): Collection {
+            $expiredYears = TahunAjaran::query()
+                ->whereDate('tanggal_selesai', '<=', $newAcademicYear->tanggal_mulai->toDateString())
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get(['id', 'tanggal_selesai'])
+                ->keyBy('id');
+
+            if ($expiredYears->isEmpty()) {
+                return collect();
+            }
+
+            $assignments = WaliKelas::query()
+                ->whereIn('tahun_ajaran_id', $expiredYears->keys())
+                ->where('status_aktif', true)
+                ->whereNull('tanggal_selesai')
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get();
+
+            foreach ($assignments as $assignment) {
+                $yearEnd = $expiredYears->get($assignment->tahun_ajaran_id)->tanggal_selesai;
+
+                if ($assignment->tanggal_mulai->gt($yearEnd)) {
+                    throw ValidationException::withMessages([
+                        'status_aktif' => 'Terdapat penugasan wali kelas dengan tanggal mulai di luar periode tahun ajaran. Periksa riwayat penugasan sebelum mengaktifkan tahun ajaran baru.',
+                    ]);
+                }
+
+                $assignment->update([
+                    'tanggal_selesai' => $yearEnd->toDateString(),
+                    'status_aktif' => false,
+                ]);
+            }
+
+            return $assignments->map(static fn (WaliKelas $assignment): WaliKelas => $assignment->refresh());
+        });
+    }
+
     /**
      * Membuat penugasan wali kelas setelah memeriksa benturan periode pada kelas.
      *

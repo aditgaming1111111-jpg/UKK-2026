@@ -33,19 +33,19 @@ class KelasController extends Controller
 
         $classes = Kelas::query()
             ->withCount([
-                'penempatanSiswa as active_placement_count' => static fn($query) => $query
+                'penempatanSiswa as active_placement_count' => static fn ($query) => $query
                     ->where('status_aktif', true)
                     ->whereNull('tanggal_selesai'),
                 'penempatanSiswa as historical_placement_count',
             ])
-            ->when($filters['q'] ?? null, static fn($query, string $search) => $query->where(static function ($searchQuery) use ($search): void {
-                $searchQuery->where('nama_kelas', 'like', '%' . $search . '%')
-                    ->orWhere('tingkat', 'like', '%' . $search . '%')
-                    ->orWhere('jurusan', 'like', '%' . $search . '%');
+            ->when($filters['q'] ?? null, static fn ($query, string $search) => $query->where(static function ($searchQuery) use ($search): void {
+                $searchQuery->where('nama_kelas', 'like', '%'.$search.'%')
+                    ->orWhere('tingkat', 'like', '%'.$search.'%')
+                    ->orWhere('jurusan', 'like', '%'.$search.'%');
             }))
-            ->when(($filters['status'] ?? null) === 'terisi', static fn($query) => $query->whereHas('penempatanSiswa', static fn($placementQuery) => $placementQuery
+            ->when(($filters['status'] ?? null) === 'terisi', static fn ($query) => $query->whereHas('penempatanSiswa', static fn ($placementQuery) => $placementQuery
                 ->where('status_aktif', true)->whereNull('tanggal_selesai')))
-            ->when(($filters['status'] ?? null) === 'kosong', static fn($query) => $query->whereDoesntHave('penempatanSiswa', static fn($placementQuery) => $placementQuery
+            ->when(($filters['status'] ?? null) === 'kosong', static fn ($query) => $query->whereDoesntHave('penempatanSiswa', static fn ($placementQuery) => $placementQuery
                 ->where('status_aktif', true)->whereNull('tanggal_selesai')))
             ->orderBy('tingkat')
             ->orderBy('nama_kelas')
@@ -72,7 +72,7 @@ class KelasController extends Controller
     public function store(StoreKelasRequest $request, ActivityLogger $activityLogger): RedirectResponse
     {
         $kelas = Kelas::query()->create($request->validated());
-        $activityLogger->record($request->user(), $request, 'Kelas ditambahkan', 'Data kelas ID #' . $kelas->id . ' berhasil ditambahkan.');
+        $activityLogger->record($request->user(), $request, 'Kelas ditambahkan', 'Data kelas ID #'.$kelas->id.' berhasil ditambahkan.');
 
         return to_route('admin.classes.show', $kelas)->with('success', 'Data kelas berhasil ditambahkan.');
     }
@@ -83,32 +83,52 @@ class KelasController extends Controller
     public function show(Request $request, Kelas $kelas): View
     {
         Gate::authorize('view', $kelas);
-        $kelas->loadCount(['penempatanSiswa', 'penugasanWaliKelas', 'penempatanSiswa as active_placement_count' => static fn($query) => $query
-            ->where('status_aktif', true)->whereNull('tanggal_selesai')]);
-
         $filters = $request->validate([
             'q' => ['nullable', 'string', 'max:100'],
         ]);
         $academicYear = TahunAjaran::query()->where('status_aktif', true)->orderByDesc('tanggal_mulai')->first();
+        $today = today()->toDateString();
+        $currentPlacementConstraints = static function (Builder $query) use ($academicYear, $today): void {
+            $query->where('status_aktif', true)
+                ->whereDate('tanggal_mulai', '<=', $today)
+                ->where(static function (Builder $dateQuery) use ($today): void {
+                    $dateQuery->whereNull('tanggal_selesai')
+                        ->orWhereDate('tanggal_selesai', '>=', $today);
+                })
+                ->whereHas('siswa', static fn (Builder $studentQuery): Builder => $studentQuery
+                    ->where('status_siswa', 'aktif')
+                    ->whereNull('deleted_at'));
+
+            if ($academicYear === null) {
+                $query->whereRaw('1 = 0');
+
+                return;
+            }
+
+            $query->where('tahun_ajaran_id', $academicYear->id);
+        };
+
+        $kelas->loadCount([
+            'penempatanSiswa',
+            'penugasanWaliKelas',
+            'penempatanSiswa as active_placement_count' => $currentPlacementConstraints,
+        ]);
+
+        $rosterQuery = KelasSiswa::query()->where('kelas_id', $kelas->id);
+        $currentPlacementConstraints($rosterQuery);
         $placements = $academicYear === null
             ? null
-            : KelasSiswa::query()
-            ->where('kelas_id', $kelas->id)
-            ->where('tahun_ajaran_id', $academicYear->id)
-            ->where('status_aktif', true)
-            ->whereDate('tanggal_mulai', '<=', today())
-            ->whereNull('tanggal_selesai')
-            ->whereHas('siswa', static fn(Builder $query): Builder => $query->where('status_siswa', 'aktif'))
-            ->with('siswa:id,nisn,nama,status_siswa')
-            ->when($filters['q'] ?? null, static fn(Builder $query, string $search): Builder => $query
-                ->whereHas('siswa', static fn(Builder $studentQuery): Builder => $studentQuery
-                    ->where(static function (Builder $searchQuery) use ($search): void {
-                        $searchQuery->where('nisn', 'like', '%' . $search . '%')
-                            ->orWhere('nama', 'like', '%' . $search . '%');
-                    })))
-            ->orderBy('id')
-            ->paginate(10)
-            ->withQueryString();
+            : $rosterQuery
+                ->with('siswa:id,nisn,nama,status_siswa')
+                ->when($filters['q'] ?? null, static fn (Builder $query, string $search): Builder => $query
+                    ->whereHas('siswa', static fn (Builder $studentQuery): Builder => $studentQuery
+                        ->where(static function (Builder $searchQuery) use ($search): void {
+                            $searchQuery->where('nisn', 'like', '%'.$search.'%')
+                                ->orWhere('nama', 'like', '%'.$search.'%');
+                        })))
+                ->orderBy('id')
+                ->paginate(10)
+                ->withQueryString();
 
         return view('admin.kelas.show', compact('kelas', 'academicYear', 'placements', 'filters'));
     }
@@ -129,7 +149,7 @@ class KelasController extends Controller
     public function update(UpdateKelasRequest $request, Kelas $kelas, ActivityLogger $activityLogger): RedirectResponse
     {
         $kelas->update($request->validated());
-        $activityLogger->record($request->user(), $request, 'Kelas diperbarui', 'Data kelas ID #' . $kelas->id . ' berhasil diperbarui.');
+        $activityLogger->record($request->user(), $request, 'Kelas diperbarui', 'Data kelas ID #'.$kelas->id.' berhasil diperbarui.');
 
         return to_route('admin.classes.show', $kelas)->with('success', 'Data kelas berhasil diperbarui.');
     }
@@ -155,7 +175,7 @@ class KelasController extends Controller
 
             $lockedClass->delete();
         });
-        $activityLogger->record($request->user(), $request, 'Kelas dihapus', 'Data kelas ID #' . $kelas->id . ' tanpa histori berhasil dihapus.');
+        $activityLogger->record($request->user(), $request, 'Kelas dihapus', 'Data kelas ID #'.$kelas->id.' tanpa histori berhasil dihapus.');
 
         return to_route('admin.classes.index')->with('success', 'Data kelas berhasil dihapus.');
     }

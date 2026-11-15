@@ -142,7 +142,10 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (6, '2026_10_01_155432_add_unique_index_to_t_pelanggaran_kode', 1),
 (7, '2026_11_04_113055_add_nis_and_tanggal_lahir_to_t_siswa_table', 1),
 (8, '2026_11_04_115330_create_t_log_aktivitas_table', 1),
-(9, '2026_11_05_103812_add_status_kepegawaian_to_t_guru_table', 2);
+(9, '2026_11_05_103812_add_status_kepegawaian_to_t_guru_table', 2),
+(10, '2026_11_11_230152_add_idempotency_key_to_t_pelanggaran_siswa_table', 3),
+(11, '2026_11_14_073930_add_deleted_at_to_t_siswa_table', 4),
+(12, '2026_11_14_083803_create_t_proses_transisi_siswa_table', 4);
 
 -- --------------------------------------------------------
 
@@ -866,6 +869,27 @@ INSERT INTO `t_pelanggaran_siswa` (`id`, `kelas_siswa_id`, `pelanggaran_id`, `gu
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `t_proses_transisi_siswa`
+--
+
+CREATE TABLE `t_proses_transisi_siswa` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `batch_id` char(36) NOT NULL,
+  `tahun_ajaran_asal_id` bigint(20) UNSIGNED NOT NULL,
+  `tahun_ajaran_tujuan_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `jenis_proses` varchar(20) NOT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'selesai',
+  `jumlah_diproses` int(10) UNSIGNED NOT NULL,
+  `jumlah_dikecualikan` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `data_snapshot` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`data_snapshot`)),
+  `dibatalkan_oleh_user_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `dibatalkan_pada` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
 -- Table structure for table `t_siswa`
 --
 
@@ -880,7 +904,8 @@ CREATE TABLE `t_siswa` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `nis` varchar(10) DEFAULT NULL,
-  `tanggal_lahir` date DEFAULT NULL
+  `tanggal_lahir` date DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -1259,6 +1284,17 @@ ALTER TABLE `t_log_aktivitas`
   ADD KEY `t_log_aktivitas_user_created_idx` (`user_id`,`created_at`);
 
 --
+-- Indexes for table `t_proses_transisi_siswa`
+--
+ALTER TABLE `t_proses_transisi_siswa`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `t_proses_transisi_siswa_batch_id_unique` (`batch_id`),
+  ADD KEY `t_proses_transisi_asal_created_idx` (`tahun_ajaran_asal_id`,`created_at`),
+  ADD KEY `t_proses_transisi_siswa_tahun_ajaran_tujuan_id_foreign` (`tahun_ajaran_tujuan_id`),
+  ADD KEY `t_proses_transisi_siswa_user_id_foreign` (`user_id`),
+  ADD KEY `t_proses_transisi_siswa_dibatalkan_oleh_user_id_foreign` (`dibatalkan_oleh_user_id`);
+
+--
 -- Indexes for table `t_log_pelanggaran`
 --
 ALTER TABLE `t_log_pelanggaran`
@@ -1341,7 +1377,7 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `t_guru`
@@ -1366,6 +1402,12 @@ ALTER TABLE `t_kelas_siswa`
 --
 ALTER TABLE `t_log_aktivitas`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=219;
+
+--
+-- AUTO_INCREMENT for table `t_proses_transisi_siswa`
+--
+ALTER TABLE `t_proses_transisi_siswa`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `t_log_pelanggaran`
@@ -1438,6 +1480,15 @@ ALTER TABLE `t_kelas_siswa`
 --
 ALTER TABLE `t_log_aktivitas`
   ADD CONSTRAINT `t_log_aktivitas_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `t_users` (`id`);
+
+--
+-- Constraints for table `t_proses_transisi_siswa`
+--
+ALTER TABLE `t_proses_transisi_siswa`
+  ADD CONSTRAINT `t_proses_transisi_siswa_tahun_ajaran_asal_id_foreign` FOREIGN KEY (`tahun_ajaran_asal_id`) REFERENCES `t_tahun_ajaran` (`id`) ON DELETE RESTRICT,
+  ADD CONSTRAINT `t_proses_transisi_siswa_tahun_ajaran_tujuan_id_foreign` FOREIGN KEY (`tahun_ajaran_tujuan_id`) REFERENCES `t_tahun_ajaran` (`id`) ON DELETE RESTRICT,
+  ADD CONSTRAINT `t_proses_transisi_siswa_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `t_users` (`id`) ON DELETE RESTRICT,
+  ADD CONSTRAINT `t_proses_transisi_siswa_dibatalkan_oleh_user_id_foreign` FOREIGN KEY (`dibatalkan_oleh_user_id`) REFERENCES `t_users` (`id`) ON DELETE RESTRICT;
 
 --
 -- Constraints for table `t_log_pelanggaran`

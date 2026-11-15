@@ -72,6 +72,7 @@
             @php
                 $excludedCount = count(old('dikecualikan', []));
                 $selectedCount = max(0, $eligibleCount - $excludedCount);
+                $mappableClasses = $preview['source_classes']->where('eligible_count', '>', 0);
             @endphp
 
             {{-- Bagian ini mengelompokkan informasi yang saling berkaitan. --}}
@@ -87,14 +88,14 @@
                         <h2 class="font-semibold text-gray-950">Pemetaan kelas asal ke kelas tujuan</h2>
                         <p class="mt-1 text-sm text-gray-500">Pilih kelas tujuan untuk setiap kelas asal. Siswa yang memenuhi syarat mengikuti pemetaan kelasnya.</p>
                     </div>
-                    @if ($preview['source_classes']->isNotEmpty())
+                    @if ($mappableClasses->isNotEmpty())
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200 text-left text-sm">
                                 <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
                                     <tr><th class="px-5 py-3 font-medium">Kelas asal</th><th class="px-5 py-3 font-medium">Siswa</th><th class="px-5 py-3 font-medium">Kelas tujuan</th></tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-100">
-                                    @foreach ($preview['source_classes'] as $classSummary)
+                                    @foreach ($mappableClasses as $classSummary)
                                         <tr>
                                             <td class="px-5 py-4 font-medium text-gray-900">{{ $classSummary['class']->nama_kelas }} <span class="text-xs text-gray-500">· tingkat {{ $classSummary['class']->tingkat }}</span></td>
                                             <td class="whitespace-nowrap px-5 py-4 text-gray-600">{{ $classSummary['eligible_count'] }} memenuhi syarat / {{ $classSummary['total_count'] }} tercatat</td>
@@ -118,7 +119,11 @@
                             </table>
                         </div>
                     @else
-                        <div class="p-5"><x-ui.empty-state title="Belum ada penempatan pada tahun asal" description="Tidak ada kelas untuk dipetakan pada periode ini." /></div>
+                        <div class="p-5">
+                            <x-ui.empty-state
+                                :title="$mode === 'naik' ? 'Tidak ada kelas yang dapat dinaikkan' : 'Tidak ada kelas yang dapat diproses'"
+                                :description="$mode === 'naik' ? 'Tahun ajaran asal ini tidak memiliki siswa aktif kelas X atau XI yang memenuhi syarat. Siswa kelas XII diproses melalui kelulusan massal.' : 'Tidak ada siswa aktif dengan penempatan valid untuk dipetakan pada periode ini.'" />
+                        </div>
                     @endif
                 </x-ui.card>
             @endif
@@ -189,14 +194,42 @@
             @if ($preview['items']->where('eligible', true)->isNotEmpty())
                 {{-- Dialog ini memuat informasi atau konfirmasi sebelum tindakan dijalankan. --}}
                 <x-ui.modal id="confirm-student-transition" title="Konfirmasi proses siswa?"
-                    :description="'Aksi ini akan memproses maksimal '.$selectedCount.' siswa yang tidak dikecualikan. Penempatan lama tetap disimpan dan aktivitas dicatat.'">
+                    :description="'Proses ini berdampak pada '.$selectedCount.' siswa yang dipilih. Penempatan lama tetap disimpan dan aktivitas dicatat.'">
                     <div class="mb-5 rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700">
                         <p><span class="font-medium">Jenis proses:</span> {{ match($mode) { 'naik' => 'Kenaikan kelas', 'tinggal' => 'Tinggal kelas', default => 'Kelulusan kelas XII' } }}</p>
                         <p class="mt-1"><span class="font-medium">Tahun asal:</span> {{ $tahunAjaran->nama_tahun_ajaran }}</p>
                         @if ($targetYear)
                             <p class="mt-1"><span class="font-medium">Tahun tujuan:</span> {{ $targetYear->nama_tahun_ajaran }}</p>
                         @endif
-                        <p class="mt-1"><span class="font-medium">Tanggal mulai penempatan baru:</span> {{ $targetYear?->tanggal_mulai->format('d/m/Y') ?? 'Tidak ada untuk kelulusan' }}</p>
+                        <p class="mt-1"><span class="font-medium">Jumlah siswa yang terdampak:</span> {{ $selectedCount }}</p>
+                        @if ($mode === 'lulus')
+                            @php
+                                $excludedIds = array_map('intval', old('dikecualikan', []));
+                                $graduationClasses = $preview['items']
+                                    ->filter(fn ($item) => $item['eligible'] && !in_array($item['student']->id, $excludedIds, true))
+                                    ->map(fn ($item) => $item['source_class']->nama_kelas)
+                                    ->unique()
+                                    ->implode(', ');
+                            @endphp
+                            <p class="mt-1"><span class="font-medium">Kelas yang diproses:</span> {{ $graduationClasses ?: '—' }}</p>
+                            <p class="mt-1">Status siswa berubah menjadi Lulus dan penempatan aktif diakhiri; tidak dibuat penempatan baru.</p>
+                        @else
+                            <p class="mt-1"><span class="font-medium">Pemetaan dan jumlah:</span></p>
+                            <ul class="mt-1 list-inside list-disc">
+                                @foreach ($preview['source_classes'] as $classSummary)
+                                    @php
+                                        $excludedIds = array_map('intval', old('dikecualikan', []));
+                                        $classSelectedCount = $preview['items']->filter(fn ($item) => $item['eligible'] && $item['source_class']->id === $classSummary['class']->id && !in_array($item['student']->id, $excludedIds, true))->count();
+                                        $mappedClassId = old('pemetaan.'.$classSummary['class']->id);
+                                        $mappedClass = $classes->firstWhere('id', (int) $mappedClassId);
+                                    @endphp
+                                    @if ($classSelectedCount > 0)
+                                        <li>{{ $classSummary['class']->nama_kelas }} → {{ $mappedClass?->nama_kelas ?? 'kelas tujuan belum dipilih' }}: {{ $classSelectedCount }} siswa</li>
+                                    @endif
+                                @endforeach
+                            </ul>
+                            <p class="mt-1">Penempatan asal diakhiri dan penempatan baru dibuat mulai {{ $targetYear?->tanggal_mulai->format('d/m/Y') ?? '—' }}.</p>
+                        @endif
                     </div>
                     <div class="flex justify-end gap-2">
                         <x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button>
@@ -208,8 +241,67 @@
 
         <x-ui.card :padding="false">
             <div class="border-b border-gray-200 px-5 py-4">
-                <h2 class="font-semibold text-gray-950">Riwayat proses tahun asal</h2>
-                <p class="mt-1 text-sm text-gray-500">Setiap siswa yang diproses memiliki catatan aktivitas Admin.</p>
+                <h2 class="font-semibold text-gray-950">Batch proses dan pembatalan</h2>
+                <p class="mt-1 text-sm text-gray-500">Pembatalan hanya tersedia jika status dan penempatan siswa belum berubah setelah proses.</p>
+            </div>
+            @if ($batches->isNotEmpty())
+                <div class="divide-y divide-gray-100">
+                    @foreach ($batches as $batch)
+                        @php
+                            $processLabel = match ($batch->jenis_proses) { 'naik' => 'Kenaikan kelas', 'tinggal' => 'Tinggal kelas', default => 'Kelulusan kelas XII' };
+                            $batchMappings = collect($batch->data_snapshot)
+                                ->map(fn ($snapshot) => $snapshot['kelas_asal_nama'].' → '.($snapshot['kelas_tujuan_nama'] ?? 'Lulus'))
+                                ->unique()
+                                ->values();
+                            $undoModalId = 'undo-transition-'.$batch->id;
+                        @endphp
+                        <article class="flex flex-col gap-4 px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
+                            <div class="min-w-0 space-y-1 text-sm text-gray-700">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <p class="font-semibold text-gray-950">{{ $processLabel }}</p>
+                                    <x-ui.badge :variant="$batch->status === 'selesai' ? 'dark' : 'outline'">{{ ucfirst($batch->status) }}</x-ui.badge>
+                                </div>
+                                <p>{{ $tahunAjaran->nama_tahun_ajaran }}{{ $batch->tahunAjaranTujuan ? ' → '.$batch->tahunAjaranTujuan->nama_tahun_ajaran : ' → Kelulusan' }} · {{ $batch->jumlah_diproses }} siswa diproses · {{ $batch->jumlah_dikecualikan }} dikecualikan</p>
+                                <p>Kelas: {{ $batchMappings->implode(', ') ?: '—' }}</p>
+                                <p class="text-xs text-gray-500">Oleh {{ $batch->pengguna?->nama ?? 'Akun tidak tersedia' }} · {{ $batch->created_at->format('d/m/Y H:i') }}</p>
+                                @if ($batch->status === 'dibatalkan')
+                                    <p class="text-xs text-gray-500">Dibatalkan oleh {{ $batch->pembatal?->nama ?? 'Akun tidak tersedia' }} · {{ $batch->dibatalkan_pada?->format('d/m/Y H:i') }}</p>
+                                @endif
+                            </div>
+                            @if ($batch->status === 'selesai')
+                                <x-ui.button variant="secondary" type="button" :data-modal-open="$undoModalId">Batalkan proses</x-ui.button>
+                                <x-ui.modal :id="$undoModalId" title="Batalkan batch proses?"
+                                    :description="'Batch '.$processLabel.' untuk '.$batch->jumlah_diproses.' siswa akan dipulihkan jika tidak ada perubahan lanjutan pada data mereka.'">
+                                    <div class="mb-5 rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700">
+                                        <p><span class="font-medium">Tahun asal:</span> {{ $tahunAjaran->nama_tahun_ajaran }}</p>
+                                        <p class="mt-1"><span class="font-medium">Tahun tujuan:</span> {{ $batch->tahunAjaranTujuan?->nama_tahun_ajaran ?? 'Tidak ada untuk kelulusan' }}</p>
+                                        <p class="mt-1"><span class="font-medium">Kelas:</span> {{ $batchMappings->implode(', ') ?: '—' }}</p>
+                                        <p class="mt-1"><span class="font-medium">Siswa terdampak:</span> {{ $batch->jumlah_diproses }}</p>
+                                        <p class="mt-2">Status dan penempatan asal akan dipulihkan. Penempatan tujuan dari batch ini akan dihapus hanya jika belum memiliki catatan pelanggaran atau perubahan lanjutan.</p>
+                                    </div>
+                                    <form method="POST" action="{{ route('admin.academic-years.student-transitions.undo', ['tahunAjaran' => $tahunAjaran, 'batchId' => $batch->batch_id, 'mode' => $mode, 'tahun_ajaran_tujuan_id' => $batch->tahun_ajaran_tujuan_id]) }}">
+                                        @csrf
+                                        @method('PATCH')
+                                        <div class="flex justify-end gap-2">
+                                            <x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button>
+                                            <x-ui.button type="submit">Konfirmasi pembatalan</x-ui.button>
+                                        </div>
+                                    </form>
+                                </x-ui.modal>
+                            @endif
+                        </article>
+                    @endforeach
+                </div>
+                <div class="border-t border-gray-200 p-4"><x-ui.pagination :paginator="$batches" /></div>
+            @else
+                <div class="p-5"><x-ui.empty-state title="Belum ada batch proses" description="Batch kenaikan kelas dan kelulusan yang dapat ditelusuri akan tampil di sini." /></div>
+            @endif
+        </x-ui.card>
+
+        <x-ui.card :padding="false">
+            <div class="border-b border-gray-200 px-5 py-4">
+                <h2 class="font-semibold text-gray-950">Jejak aktivitas per siswa</h2>
+                <p class="mt-1 text-sm text-gray-500">Audit aktivitas tetap disimpan, termasuk setelah batch dibatalkan.</p>
             </div>
             @if ($history->isNotEmpty())
                 <div class="divide-y divide-gray-100">

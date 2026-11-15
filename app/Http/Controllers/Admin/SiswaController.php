@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\MoveSiswaClassRequest;
 use App\Http\Requests\Admin\SiswaIndexRequest;
 use App\Http\Requests\Admin\StorePenempatanKelasRequest;
 use App\Http\Requests\Admin\StoreSiswaRequest;
@@ -16,6 +17,7 @@ use App\Services\ActivityLogger;
 use App\Services\SiswaPenempatanService;
 use App\Services\SiswaReadService;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -53,6 +55,48 @@ class SiswaController extends Controller
     }
 
     /**
+     * Menampilkan arsip siswa yang telah berstatus keluar.
+     */
+    public function archivedIndex(Request $request): View
+    {
+        Gate::authorize('viewAny', Siswa::class);
+        $filters = $request->validate(['q' => ['nullable', 'string', 'max:100']]);
+
+        $students = Siswa::onlyTrashed()
+            ->where('status_siswa', 'keluar')
+            ->when($filters['q'] ?? null, static fn (Builder $query, string $search): Builder => $query->where(static function (Builder $searchQuery) use ($search): void {
+                $searchQuery->where('nis', 'like', '%'.$search.'%')
+                    ->orWhere('nisn', 'like', '%'.$search.'%')
+                    ->orWhere('nama', 'like', '%'.$search.'%');
+            }))
+            ->orderBy('nama')
+            ->orderBy('id')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('siswa.archived-index', compact('students', 'filters'));
+    }
+
+    /**
+     * Menampilkan arsip siswa beserta histori yang masih terhubung.
+     */
+    public function showArchived(int $studentId, SiswaReadService $siswaReadService): View
+    {
+        Gate::authorize('viewAny', Siswa::class);
+        $student = Siswa::onlyTrashed()->where('status_siswa', 'keluar')->findOrFail($studentId);
+
+        return view('siswa.show', array_merge([
+            'student' => $student,
+            'canManageStudents' => false,
+            'canPermanentlyDelete' => false,
+            'canGraduate' => false,
+            'isArchived' => true,
+            'classes' => collect(),
+            'academicYears' => collect(),
+        ], $siswaReadService->detail($student)));
+    }
+
+    /**
      * Menampilkan formulir untuk membuat siswa.
      */
     public function create(): View
@@ -66,7 +110,7 @@ class SiswaController extends Controller
     public function store(StoreSiswaRequest $request, ActivityLogger $activityLogger): RedirectResponse
     {
         $siswa = Siswa::query()->create($request->validated());
-        $activityLogger->record($request->user(), $request, 'Siswa ditambahkan', 'Identitas siswa ID #' . $siswa->id . ' berhasil ditambahkan.');
+        $activityLogger->record($request->user(), $request, 'Siswa ditambahkan', 'Identitas siswa ID #'.$siswa->id.' berhasil ditambahkan.');
 
         return to_route('admin.students.show', $siswa)->with('success', 'Data siswa berhasil ditambahkan.');
     }
@@ -76,16 +120,29 @@ class SiswaController extends Controller
      */
     public function show(Siswa $siswa, SiswaReadService $siswaReadService): View
     {
+        $studentDetails = $siswaReadService->detail($siswa);
+        $openPlacements = $studentDetails['placements']->filter(
+            static fn ($placement): bool => $placement->status_aktif || $placement->tanggal_selesai === null,
+        )->values();
+        $currentPlacement = $openPlacements->count() === 1
+            && $openPlacements->first()->status_aktif
+            && $openPlacements->first()->tanggal_selesai === null
+            ? $openPlacements->first()
+            : null;
+
         return view('siswa.show', array_merge([
             'student' => $siswa,
             'canManageStudents' => true,
-            'canPermanentlyDelete' => $siswa->status_siswa !== 'lulus'
+            'isArchived' => false,
+            'canPermanentlyDelete' => ! in_array($siswa->status_siswa, ['keluar', 'lulus'], true)
                 && ! $siswa->penempatanKelas()->exists()
                 && ! $siswa->catatanPelanggaran()->exists(),
             'canGraduate' => $siswa->status_siswa !== 'lulus' && $siswa->hasCompletedGradeTwelvePlacement(),
             'classes' => Kelas::query()->orderBy('tingkat')->orderBy('nama_kelas')->get(),
-            'academicYears' => TahunAjaran::query()->orderByDesc('tanggal_mulai')->get(),
-        ], $siswaReadService->detail($siswa)));
+            'academicYears' => TahunAjaran::query()->where('status_aktif', true)->orderByDesc('tanggal_mulai')->get(),
+            'activePlacementCount' => $openPlacements->count(),
+            'currentPlacement' => $currentPlacement,
+        ], $studentDetails));
     }
 
     /**
@@ -104,7 +161,7 @@ class SiswaController extends Controller
     public function update(UpdateSiswaRequest $request, Siswa $siswa, ActivityLogger $activityLogger): RedirectResponse
     {
         $siswa->update($request->validated());
-        $activityLogger->record($request->user(), $request, 'Siswa diperbarui', 'Data siswa ID #' . $siswa->id . ' berhasil diperbarui.');
+        $activityLogger->record($request->user(), $request, 'Siswa diperbarui', 'Data siswa ID #'.$siswa->id.' berhasil diperbarui.');
 
         return to_route('admin.students.show', $siswa)->with('success', 'Data siswa berhasil diperbarui.');
     }
@@ -120,18 +177,18 @@ class SiswaController extends Controller
             $lockedStudent = Siswa::query()->whereKey($siswa->id)->lockForUpdate()->firstOrFail();
 
             if (
-                $lockedStudent->status_siswa === 'lulus'
+                in_array($lockedStudent->status_siswa, ['keluar', 'lulus'], true)
                 || $lockedStudent->penempatanKelas()->exists()
                 || $lockedStudent->catatanPelanggaran()->exists()
             ) {
                 throw ValidationException::withMessages([
-                    'siswa' => 'Siswa berstatus lulus atau memiliki riwayat kelas/pelanggaran sehingga tidak dapat dihapus permanen. Arsipkan dengan mempertahankan data siswa.',
+                    'siswa' => 'Siswa berstatus keluar/lulus atau memiliki riwayat kelas/pelanggaran sehingga tidak dapat dihapus permanen.',
                 ]);
             }
 
-            $lockedStudent->delete();
+            $lockedStudent->forceDelete();
         });
-        $activityLogger->record($request->user(), $request, 'Siswa dihapus', 'Identitas siswa ID #' . $siswa->id . ' tanpa histori berhasil dihapus.');
+        $activityLogger->record($request->user(), $request, 'Siswa dihapus', 'Identitas siswa ID #'.$siswa->id.' tanpa histori berhasil dihapus.');
 
         return to_route('admin.students.index')->with('success', 'Data siswa tanpa riwayat berhasil dihapus permanen.');
     }
@@ -139,11 +196,15 @@ class SiswaController extends Controller
     /**
      * Memperbarui status siswa melalui alur yang diotorisasi.
      */
-    public function updateStatus(UpdateSiswaStatusRequest $request, Siswa $siswa, ActivityLogger $activityLogger): RedirectResponse
-    {
+    public function updateStatus(
+        UpdateSiswaStatusRequest $request,
+        Siswa $siswa,
+        SiswaPenempatanService $siswaPenempatanService,
+        ActivityLogger $activityLogger,
+    ): RedirectResponse {
         $status = $request->validated('status_siswa');
 
-        DB::transaction(static function () use ($siswa, $status): void {
+        [$previousStatus, $closedPlacementCount] = DB::transaction(function () use ($request, $siswa, $status, $siswaPenempatanService, $activityLogger): array {
             $lockedStudent = Siswa::query()->whereKey($siswa->id)->lockForUpdate()->firstOrFail();
 
             if ($status === 'lulus' && ! $lockedStudent->hasCompletedGradeTwelvePlacement()) {
@@ -152,19 +213,89 @@ class SiswaController extends Controller
                 ]);
             }
 
+            $previousStatus = $lockedStudent->status_siswa;
+            $mustEndPlacements = in_array($status, ['keluar', 'lulus'], true)
+                || ($status === 'aktif' && in_array($previousStatus, ['keluar', 'lulus'], true));
+            $closedPlacementCount = $mustEndPlacements
+                ? $siswaPenempatanService->endActivePlacements($lockedStudent, CarbonImmutable::today())
+                : 0;
             $lockedStudent->update(['status_siswa' => $status]);
+            $activityLogger->record(
+                $request->user(),
+                $request,
+                'Status siswa diubah',
+                sprintf('Status siswa ID #%d (%s, NISN %s) diubah dari %s menjadi %s. Penempatan aktif yang diakhiri: %d.', $lockedStudent->id, $lockedStudent->nama, $lockedStudent->nisn, $previousStatus, $status, $closedPlacementCount),
+            );
+
+            return [$previousStatus, $closedPlacementCount];
         });
-        $activityLogger->record($request->user(), $request, 'Status siswa diubah', 'Status siswa ID #' . $siswa->id . ' diubah menjadi ' . $status . '.');
 
         $message = match ($status) {
-            'aktif' => 'Siswa berhasil diaktifkan. Riwayat siswa tetap tersimpan.',
+            'aktif' => in_array($previousStatus, ['keluar', 'lulus'], true)
+                ? 'Siswa berhasil diaktifkan kembali. Belum ada penempatan kelas; Admin perlu membuat penempatan baru.'
+                : 'Siswa berhasil diaktifkan. Riwayat siswa tetap tersimpan.',
             'nonaktif' => 'Siswa dinonaktifkan. Riwayat siswa tetap tersimpan.',
-            'pindah' => 'Status siswa diperbarui menjadi pindah. Riwayat siswa tetap tersimpan.',
-            'keluar' => 'Status siswa diperbarui menjadi keluar. Riwayat siswa tetap tersimpan.',
-            'lulus' => 'Siswa ditandai lulus dan tersimpan sebagai arsip alumni. Riwayat tetap tersimpan.',
+            'keluar' => 'Status siswa diperbarui menjadi keluar dan penempatan aktif diakhiri. Riwayat tetap tersimpan.',
+            'lulus' => 'Siswa ditandai lulus dan penempatan aktif diakhiri. Riwayat tetap tersimpan.',
         };
 
         return to_route('admin.students.show', $siswa)->with('success', $message);
+    }
+
+    /**
+     * Mengarsipkan siswa berstatus keluar tanpa menghapus relasi dan histori.
+     */
+    public function archive(Siswa $siswa, Request $request, ActivityLogger $activityLogger): RedirectResponse
+    {
+        Gate::authorize('archive', $siswa);
+
+        DB::transaction(function () use ($siswa, $request, $activityLogger): void {
+            $lockedStudent = Siswa::query()->whereKey($siswa->id)->lockForUpdate()->firstOrFail();
+
+            if ($lockedStudent->status_siswa !== 'keluar') {
+                throw ValidationException::withMessages([
+                    'siswa' => 'Hanya siswa berstatus keluar yang dapat diarsipkan.',
+                ]);
+            }
+
+            $lockedStudent->delete();
+            $activityLogger->record(
+                $request->user(),
+                $request,
+                'Siswa diarsipkan',
+                sprintf('Siswa ID #%d (%s, NISN %s) berstatus keluar diarsipkan. Data penempatan dan pelanggaran dipertahankan.', $lockedStudent->id, $lockedStudent->nama, $lockedStudent->nisn),
+            );
+        });
+
+        return to_route('admin.students.archived.index')->with('success', 'Siswa Keluar berhasil diarsipkan. Riwayat tetap tersimpan.');
+    }
+
+    /**
+     * Memulihkan siswa keluar yang sebelumnya diarsipkan.
+     */
+    public function restore(int $studentId, Request $request, ActivityLogger $activityLogger): RedirectResponse
+    {
+        Gate::authorize('restoreArchive', Siswa::class);
+
+        DB::transaction(function () use ($studentId, $request, $activityLogger): void {
+            $student = Siswa::onlyTrashed()->whereKey($studentId)->lockForUpdate()->firstOrFail();
+
+            if ($student->status_siswa !== 'keluar') {
+                throw ValidationException::withMessages([
+                    'siswa' => 'Hanya arsip siswa berstatus keluar yang dapat dipulihkan.',
+                ]);
+            }
+
+            $student->restore();
+            $activityLogger->record(
+                $request->user(),
+                $request,
+                'Arsip siswa dipulihkan',
+                sprintf('Arsip siswa ID #%d (%s, NISN %s) berstatus keluar dipulihkan.', $student->id, $student->nama, $student->nisn),
+            );
+        });
+
+        return to_route('admin.students.archived.index')->with('success', 'Arsip siswa berhasil dipulihkan.');
     }
 
     /**
@@ -177,9 +308,50 @@ class SiswaController extends Controller
         ActivityLogger $activityLogger,
     ): RedirectResponse {
         $placement = $siswaPenempatanService->assign($siswa, $request->validated());
-        $activityLogger->record($request->user(), $request, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #' . $siswa->id . ' dicatat dengan ID #' . $placement->id . '.');
+        $activityLogger->record($request->user(), $request, 'Penempatan kelas ditambahkan', 'Penempatan siswa ID #'.$siswa->id.' dicatat dengan ID #'.$placement->id.'.');
 
         return to_route('admin.students.show', $siswa)->with('success', 'Penempatan kelas berhasil disimpan.');
+    }
+
+    /**
+     * Memindahkan siswa ke kelas lain pada periode penempatan saat ini.
+     */
+    public function moveClass(
+        MoveSiswaClassRequest $request,
+        Siswa $siswa,
+        SiswaPenempatanService $siswaPenempatanService,
+        ActivityLogger $activityLogger,
+    ): RedirectResponse {
+        DB::transaction(function () use ($request, $siswa, $siswaPenempatanService, $activityLogger): void {
+            $placements = $siswaPenempatanService->transfer($siswa, $request->validated());
+            $previousPlacement = $placements['previous'];
+            $currentPlacement = $placements['current'];
+            $previousClass = $previousPlacement->kelas;
+            $currentClass = $currentPlacement->kelas;
+
+            $activityLogger->record(
+                $request->user(),
+                $request,
+                'Siswa pindah kelas',
+                sprintf(
+                    'Siswa ID #%d (%s, NISN %s) pindah dari kelas %s (%s) ke kelas %s (%s), tahun ajaran %s, tanggal %s. Alasan: %s. Penempatan lama #%d diakhiri dan penempatan baru #%d dibuat; status siswa tetap Aktif.',
+                    $siswa->id,
+                    $siswa->nama,
+                    $siswa->nisn,
+                    $previousClass->nama_kelas,
+                    $previousClass->jurusan ?? 'tanpa jurusan',
+                    $currentClass->nama_kelas,
+                    $currentClass->jurusan ?? 'tanpa jurusan',
+                    $currentPlacement->tahunAjaran->nama_tahun_ajaran,
+                    $currentPlacement->tanggal_mulai->format('d/m/Y'),
+                    $request->validated('alasan'),
+                    $previousPlacement->id,
+                    $currentPlacement->id,
+                ),
+            );
+        });
+
+        return to_route('admin.students.show', $siswa)->with('success', 'Siswa berhasil dipindahkan kelas. Status Aktif dan seluruh riwayat tetap tersimpan.');
     }
 
     /**

@@ -66,7 +66,7 @@ return [
     */
 
     // Zona waktu bawaan untuk fungsi tanggal dan waktu aplikasi.
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Jakarta',
 
     /*
     |--------------------------------------------------------------------------

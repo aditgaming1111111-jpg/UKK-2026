@@ -18,6 +18,9 @@
 @section('page-heading')
     <x-ui.page-heading title="Detail Riwayat" description="Informasi kejadian dan jejak audit riwayat pelanggaran.">
         <div class="flex flex-wrap gap-2">
+            @if ($record->status === 'aktif')
+                <x-ui.button variant="secondary" :href="route($routePrefix.'.notice', $record)">Cetak surat untuk orang tua</x-ui.button>
+            @endif
             @if ($canManage)
                 <x-ui.button variant="secondary" :href="route('guru.my-notes.edit', $record)">Koreksi riwayat</x-ui.button>
                 <x-ui.button type="button" data-modal-open="cancel-record">Batalkan riwayat</x-ui.button>

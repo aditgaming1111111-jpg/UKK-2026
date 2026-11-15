@@ -12,7 +12,10 @@
 @section('page-heading')
     <x-ui.page-heading title="Data Siswa" description="Cari siswa, lihat kelas, serta rekap poin aktif per tahun ajaran.">
         @if ($canManageStudents)
-            <x-ui.button :href="route('admin.students.create')">Tambah siswa</x-ui.button>
+            <div class="flex flex-wrap gap-2">
+                <x-ui.button variant="secondary" :href="route('admin.students.archived.index')">Arsip siswa</x-ui.button>
+                <x-ui.button :href="route('admin.students.create')">Tambah siswa</x-ui.button>
+            </div>
         @endif
     </x-ui.page-heading>
 @endsection
@@ -63,7 +66,6 @@
                     <option value="">Semua status</option>
                     <option value="aktif" @selected(($filters['status'] ?? '') === 'aktif')>Aktif</option>
                     <option value="nonaktif" @selected(($filters['status'] ?? '') === 'nonaktif')>Nonaktif</option>
-                    <option value="pindah" @selected(($filters['status'] ?? '') === 'pindah')>Pindah</option>
                     <option value="keluar" @selected(($filters['status'] ?? '') === 'keluar')>Keluar</option>
                     <option value="lulus" @selected(($filters['status'] ?? '') === 'lulus')>Lulus</option>
                 </select></label>

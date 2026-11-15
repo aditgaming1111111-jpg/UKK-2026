@@ -79,6 +79,39 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_admin_and_guru_internal_pages_are_not_cacheable_and_cannot_be_reopened_after_logout(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $guruUser = User::factory()->create(['role' => 'guru']);
+        Guru::factory()->for($guruUser)->create();
+
+        foreach ([[$admin, 'admin.dashboard'], [$guruUser, 'guru.dashboard']] as [$user, $dashboardRoute]) {
+            $dashboardResponse = $this->actingAs($user)->get(route($dashboardRoute));
+            $cacheControl = $dashboardResponse->headers->get('Cache-Control');
+
+            $dashboardResponse
+                ->assertOk()
+                ->assertHeader('Pragma', 'no-cache')
+                ->assertHeader('Expires', '0')
+                ->assertSee('name="_token"', false)
+                ->assertSee('event.persisted', false);
+            $this->assertStringContainsString('no-store', $cacheControl);
+            $this->assertStringContainsString('no-cache', $cacheControl);
+
+            $this->post(route('logout'))->assertRedirect(route('login'));
+            $this->assertGuest();
+            $this->get(route($dashboardRoute))->assertRedirect(route('login'));
+        }
+    }
+
+    public function test_logout_does_not_accept_get_requests(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $this->actingAs($admin)->get(route('logout'))->assertMethodNotAllowed();
+        $this->assertAuthenticatedAs($admin);
+    }
+
     public function test_internal_routes_redirect_guests_to_login(): void
     {
         $this->get(route('admin.dashboard'))->assertRedirect(route('login'));

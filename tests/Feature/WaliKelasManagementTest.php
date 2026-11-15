@@ -69,6 +69,18 @@ class WaliKelasManagementTest extends TestCase
         ]);
     }
 
+    public function test_new_homeroom_assignment_form_only_offers_active_academic_years(): void
+    {
+        $administrator = User::factory()->state(['role' => 'admin'])->create();
+        $activeYear = TahunAjaran::factory()->create(['nama_tahun_ajaran' => 'Tahun Aktif', 'status_aktif' => true]);
+        TahunAjaran::factory()->create(['nama_tahun_ajaran' => 'Tahun Selesai', 'status_aktif' => false]);
+
+        $this->actingAs($administrator)->get(route('admin.homeroom-teachers.create'))
+            ->assertOk()
+            ->assertSee($activeYear->nama_tahun_ajaran)
+            ->assertDontSee('Tahun Selesai');
+    }
+
     public function test_overlapping_assignment_is_rejected_without_changing_previous_record(): void
     {
         $this->actingAs(User::factory()->state(['role' => 'admin'])->create());

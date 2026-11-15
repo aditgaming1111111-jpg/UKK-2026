@@ -2,13 +2,14 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Middleware\PreventAuthenticatedPageCache;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // Arahkan pengguna masuk ke dasbor sesuai perannya, atau ke halaman login.
-Route::get('/', fn() => Auth::user() instanceof User
+Route::get('/', fn () => Auth::user() instanceof User
     ? to_route(Auth::user()->dashboardRouteName())
     : to_route('login'));
 
@@ -19,7 +20,7 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->name('logout');
 
 // Profil dan rute aplikasi internal memerlukan akun yang sudah aktif.
-Route::middleware(['auth', 'account.active'])->group(function (): void {
+Route::middleware(['auth', 'account.active', PreventAuthenticatedPageCache::class])->group(function (): void {
     Route::get('/profil', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profil', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profil/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
@@ -35,6 +36,6 @@ Route::middleware(['auth', 'account.active'])->group(function (): void {
     })->name('ui-demo');
 
     // Pisahkan definisi rute berdasarkan peran agar mudah dikelola.
-    require __DIR__ . '/admin.php';
-    require __DIR__ . '/guru.php';
+    require __DIR__.'/admin.php';
+    require __DIR__.'/guru.php';
 });

@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProcessStudentTransitionRequest;
+use App\Http\Requests\Admin\UndoStudentTransitionRequest;
 use App\Models\Kelas;
 use App\Models\LogAktivitas;
+use App\Models\StudentTransitionBatch;
 use App\Models\TahunAjaran;
 use App\Services\StudentTransitionService;
 use Illuminate\Http\RedirectResponse;
@@ -52,10 +54,17 @@ class StudentTransitionController extends Controller
                 'Proses tinggal kelas massal',
                 'Kelulusan massal',
             ])
-            ->where('deskripsi', 'like', '%Tahun asal ID #' . $tahunAjaran->id . ' (' . $tahunAjaran->nama_tahun_ajaran . ')%')
+            ->where('deskripsi', 'like', '%Tahun asal ID #'.$tahunAjaran->id.' ('.$tahunAjaran->nama_tahun_ajaran.')%')
             ->orderByDesc('created_at')
             ->orderByDesc('id')
             ->paginate(10)
+            ->withQueryString();
+        $batches = StudentTransitionBatch::query()
+            ->with(['pengguna:id,nama', 'pembatal:id,nama', 'tahunAjaranTujuan:id,nama_tahun_ajaran'])
+            ->where('tahun_ajaran_asal_id', $tahunAjaran->id)
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->paginate(10, ['*'], 'batch_page')
             ->withQueryString();
         $sourceYearHasEnded = $tahunAjaran->tanggal_selesai->lte(today());
         $eligibleCount = ($preview['items'] ?? collect())->where('eligible', true)->count();
@@ -68,6 +77,7 @@ class StudentTransitionController extends Controller
             'classes',
             'preview',
             'history',
+            'batches',
             'sourceYearHasEnded',
             'eligibleCount',
         ));
@@ -115,5 +125,23 @@ class StudentTransitionController extends Controller
             'mode' => $mode,
             'tahun_ajaran_tujuan_id' => $targetYear?->id,
         ])->with('success', $message);
+    }
+
+    /**
+     * Membatalkan batch transisi jika kondisi data belum berubah sejak proses dijalankan.
+     */
+    public function undo(
+        UndoStudentTransitionRequest $request,
+        TahunAjaran $tahunAjaran,
+        string $batchId,
+        StudentTransitionService $transitionService,
+    ): RedirectResponse {
+        $restored = $transitionService->undo($tahunAjaran, $batchId, $request->user(), $request);
+
+        return to_route('admin.academic-years.student-transitions', [
+            'tahunAjaran' => $tahunAjaran,
+            'mode' => $request->query('mode', StudentTransitionService::MODE_PROMOTE),
+            'tahun_ajaran_tujuan_id' => $request->query('tahun_ajaran_tujuan_id'),
+        ])->with('success', sprintf('Batch berhasil dibatalkan. Status dan penempatan %d siswa dipulihkan.', $restored));
     }
 }

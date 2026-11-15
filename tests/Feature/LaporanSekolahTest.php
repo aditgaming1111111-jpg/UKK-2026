@@ -82,6 +82,126 @@ class LaporanSekolahTest extends TestCase
         $this->assertGreaterThan(500, strlen($pdfContent));
     }
 
+    public function test_notice_pdf_uses_the_historical_placement_and_current_letterhead_configuration(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        [$year, $historicalClass, $placement, $teacher, $violation] = $this->recordContext();
+        $historicalClass->update(['nama_kelas' => 'X RPL 1 Saat Kejadian']);
+        $student = $placement->siswa;
+        $student->update(['nis' => '1234567890', 'nisn' => '0987654321', 'nama' => 'Siswa Surat Uji']);
+        $currentYear = TahunAjaran::factory()->create([
+            'nama_tahun_ajaran' => '2027/2028',
+            'tanggal_mulai' => $year->tanggal_selesai->copy()->addDay()->toDateString(),
+            'tanggal_selesai' => $year->tanggal_selesai->copy()->addYear()->toDateString(),
+            'status_aktif' => false,
+        ]);
+        $currentClass = Kelas::factory()->create(['nama_kelas' => 'XI RPL 2 Sekarang']);
+        KelasSiswa::factory()->create([
+            'siswa_id' => $student->id,
+            'kelas_id' => $currentClass->id,
+            'tahun_ajaran_id' => $currentYear->id,
+            'tanggal_mulai' => $currentYear->tanggal_mulai,
+        ]);
+        $record = PelanggaranSiswa::factory()->create([
+            'kelas_siswa_id' => $placement->id,
+            'guru_id' => $teacher->id,
+            'pelanggaran_id' => $violation->id,
+            'tanggal_pelanggaran' => $year->tanggal_mulai,
+            'poin_saat_dicatat' => 17,
+            'keterangan' => 'Keterangan surat uji',
+            'tindakan' => 'Tindak lanjut surat uji',
+        ]);
+        config([
+            'school.organization' => 'Majelis Pendidikan Contoh',
+            'school.name' => 'SMK Contoh Negeri',
+            'school.address' => 'Jl. Pendidikan No. 1',
+            'school.logo_path' => null,
+        ]);
+
+        $record->load([
+            'penempatanKelas.siswa:id,nis,nisn,nama',
+            'penempatanKelas.kelas:id,nama_kelas,tingkat,jurusan',
+            'penempatanKelas.tahunAjaran:id,nama_tahun_ajaran',
+            'pelanggaran:id,kategori_id,kode,nama_pelanggaran,poin',
+            'pelanggaran.kategori:id,nama_kategori',
+            'guru:id,nama',
+        ]);
+        $letterHtml = view('pelanggaran-siswa.notice', ['record' => $record, 'generatedAt' => now()])->render();
+
+        $this->assertStringContainsString('SMK Contoh Negeri', $letterHtml);
+        $this->assertStringContainsString('Majelis Pendidikan Contoh', $letterHtml);
+        $this->assertStringContainsString('Jl. Pendidikan No. 1', $letterHtml);
+        $this->assertStringContainsString('X RPL 1 Saat Kejadian', $letterHtml);
+        $this->assertStringNotContainsString('XI RPL 2 Sekarang', $letterHtml);
+        $this->assertStringContainsString($year->nama_tahun_ajaran, $letterHtml);
+        $this->assertStringContainsString($violation->nama_pelanggaran, $letterHtml);
+        $this->assertStringContainsString($violation->kategori->nama_kategori, $letterHtml);
+        $this->assertStringContainsString('0987654321', $letterHtml);
+        $this->assertStringContainsString($teacher->nama, $letterHtml);
+        $this->assertStringContainsString('17 poin', $letterHtml);
+        $this->assertStringContainsString('Keterangan surat uji', $letterHtml);
+        $this->assertStringContainsString('Tindak lanjut surat uji', $letterHtml);
+
+        $response = $this->actingAs($administrator)->get(route('admin.student-violations.notice', $record));
+        $response->assertOk()->assertHeader('content-type', 'application/pdf');
+        $this->assertStringStartsWith('%PDF-', $response->getContent());
+        $this->assertStringEndsWith('%%EOF', trim($response->getContent()));
+    }
+
+    public function test_teacher_can_print_visible_history_but_not_another_teachers_personal_note(): void
+    {
+        $firstTeacherUser = User::factory()->create(['role' => 'guru']);
+        $firstTeacher = Guru::factory()->create(['user_id' => $firstTeacherUser->id]);
+        $secondTeacherUser = User::factory()->create(['role' => 'guru']);
+        Guru::factory()->create(['user_id' => $secondTeacherUser->id]);
+        [, , $placement, , $violation] = $this->recordContext();
+        $record = PelanggaranSiswa::factory()->create([
+            'kelas_siswa_id' => $placement->id,
+            'guru_id' => $firstTeacher->id,
+            'pelanggaran_id' => $violation->id,
+            'status' => 'aktif',
+        ]);
+
+        $this->actingAs($secondTeacherUser)
+            ->get(route('guru.violations.notice', $record))
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf');
+
+        $this->get(route('guru.my-notes.notice', $record))->assertForbidden();
+    }
+
+    public function test_cancelled_violation_cannot_generate_parent_notice(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        [, , $placement, $teacher, $violation] = $this->recordContext();
+        $record = PelanggaranSiswa::factory()->create([
+            'kelas_siswa_id' => $placement->id,
+            'guru_id' => $teacher->id,
+            'pelanggaran_id' => $violation->id,
+            'status' => 'dibatalkan',
+        ]);
+
+        $this->actingAs($administrator)->get(route('admin.student-violations.notice', $record))->assertNotFound();
+    }
+
+    public function test_historical_academic_years_remain_available_in_report_and_violation_history_filters(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $historicalYear = TahunAjaran::factory()->create([
+            'nama_tahun_ajaran' => '2024/2025 Arsip',
+            'status_aktif' => false,
+        ]);
+
+        $this->actingAs($administrator)
+            ->get(route('admin.reports.index'))
+            ->assertOk()
+            ->assertSee($historicalYear->nama_tahun_ajaran);
+
+        $this->get(route('admin.student-violations.index'))
+            ->assertOk()
+            ->assertSee($historicalYear->nama_tahun_ajaran);
+    }
+
     public function test_admin_print_report_includes_all_filtered_records_across_pages(): void
     {
         $this->travelTo('2026-10-20 12:00:00');
@@ -382,6 +502,79 @@ class LaporanSekolahTest extends TestCase
             ->assertSee('Jumlah siswa')
             ->assertSee('Catatan aktif')
             ->assertSee('>0<', false);
+    }
+
+    public function test_homeroom_recap_excludes_exited_and_archived_students_from_rows_counts_points_and_details(): void
+    {
+        $teacherUser = User::factory()->create(['role' => 'guru']);
+        $teacher = Guru::factory()->create(['user_id' => $teacherUser->id]);
+        $year = TahunAjaran::factory()->create([
+            'tanggal_mulai' => now()->subMonths(4)->toDateString(),
+            'tanggal_selesai' => now()->addMonths(4)->toDateString(),
+            'status_aktif' => true,
+        ]);
+        $class = Kelas::factory()->create();
+        WaliKelas::factory()->create([
+            'guru_id' => $teacher->id,
+            'kelas_id' => $class->id,
+            'tahun_ajaran_id' => $year->id,
+            'tanggal_mulai' => $year->tanggal_mulai,
+            'status_aktif' => true,
+        ]);
+
+        $activeStudent = Siswa::factory()->create(['nama' => 'Murid Aktif Rekap']);
+        $exitedStudent = Siswa::factory()->create([
+            'nama' => 'Murid Keluar Rekap',
+            'status_siswa' => 'keluar',
+        ]);
+        $archivedStudent = Siswa::factory()->create([
+            'nama' => 'Murid Keluar Diarsipkan',
+            'status_siswa' => 'keluar',
+        ]);
+        $archivedStudent->delete();
+
+        $activePlacement = KelasSiswa::factory()->for($activeStudent, 'siswa')->create([
+            'kelas_id' => $class->id,
+            'tahun_ajaran_id' => $year->id,
+            'tanggal_mulai' => $year->tanggal_mulai,
+        ]);
+        $exitedPlacement = KelasSiswa::factory()->for($exitedStudent, 'siswa')->create([
+            'kelas_id' => $class->id,
+            'tahun_ajaran_id' => $year->id,
+            'tanggal_mulai' => $year->tanggal_mulai,
+        ]);
+        $archivedPlacement = KelasSiswa::factory()->for($archivedStudent, 'siswa')->create([
+            'kelas_id' => $class->id,
+            'tahun_ajaran_id' => $year->id,
+            'tanggal_mulai' => $year->tanggal_mulai,
+        ]);
+        $violation = Pelanggaran::factory()->create();
+
+        foreach ([[$activePlacement, 5], [$exitedPlacement, 20], [$archivedPlacement, 30]] as [$placement, $points]) {
+            PelanggaranSiswa::factory()->create([
+                'kelas_siswa_id' => $placement->id,
+                'guru_id' => $teacher->id,
+                'pelanggaran_id' => $violation->id,
+                'poin_saat_dicatat' => $points,
+            ]);
+        }
+
+        $this->actingAs($teacherUser)->get(route('guru.class-recap.index', ['tahun_ajaran_id' => $year->id]))
+            ->assertOk()
+            ->assertSee($activeStudent->nama)
+            ->assertDontSee($exitedStudent->nama)
+            ->assertDontSee($archivedStudent->nama)
+            ->assertViewHas('summary', static fn (array $summary): bool => $summary['student_count'] === 1
+                && $summary['students_with_active_records'] === 1
+                && $summary['active_records'] === 1
+                && $summary['active_points'] === 5)
+            ->assertViewHas('students', static fn ($students): bool => $students->total() === 1);
+
+        $this->get(route('guru.class-recap.show', [$year->id, $class->id, $exitedStudent->id]))
+            ->assertNotFound();
+
+        $this->get(route('guru.class-recap.show', [$year->id, $class->id, $archivedStudent->id]))
+            ->assertNotFound();
     }
 
     public function test_homeroom_student_detail_is_scoped_and_shows_cancelled_audit_without_counting_it(): void

@@ -6,30 +6,41 @@
 {{-- Menunjukkan posisi halaman dan jalur kembali ke bagian induk. --}}
 @section('breadcrumbs')
     <x-ui.breadcrumbs :items="[
-        ['label' => auth()->user()->role === 'admin' ? 'Data Siswa' : 'Rekap Kelas Saya', 'url' => route(auth()->user()->role === 'admin' ? 'admin.students.index' : 'guru.class-recap.index')],
+        ['label' => $isArchived ? 'Arsip Siswa' : (auth()->user()->role === 'admin' ? 'Data Siswa' : 'Rekap Kelas Saya'), 'url' => $isArchived ? route('admin.students.archived.index') : route(auth()->user()->role === 'admin' ? 'admin.students.index' : 'guru.class-recap.index')],
         ['label' => $student->nama],
     ]" />
 @endsection
 
 {{-- Menyajikan judul, ringkasan, serta aksi utama untuk halaman ini. --}}
 @section('page-heading')
-    <x-ui.page-heading :title="$student->nama" description="Identitas tetap, riwayat kelas, dan riwayat pelanggaran siswa.">
+    <x-ui.page-heading :title="$student->nama" :description="$isArchived ? 'Arsip siswa Keluar beserta riwayat kelas dan pelanggaran.' : 'Identitas tetap, riwayat kelas, dan riwayat pelanggaran siswa.'">
         @if ($canManageStudents)
             <div class="flex flex-wrap gap-2"><x-ui.button variant="secondary" :href="route('admin.students.edit', $student)">Edit identitas</x-ui.button>
                 @if ($student->status_siswa === 'aktif')
                     <x-ui.button variant="secondary" type="button"
                         data-modal-open="deactivate-student">Nonaktifkan</x-ui.button>
+                    @if ($currentPlacement && $classes->count() > 1)
+                        <x-ui.button type="button" data-modal-open="move-student-class">Pindah Kelas</x-ui.button>
+                    @endif
                 @elseif ($student->status_siswa === 'nonaktif')
                     <x-ui.button variant="secondary" type="button"
                         data-modal-open="activate-student">Aktifkan</x-ui.button>
                 @endif
+                @if ($student->status_siswa !== 'keluar' && $student->status_siswa !== 'lulus')
+                    <x-ui.button variant="secondary" type="button" data-modal-open="exit-student">Tandai Keluar</x-ui.button>
+                @endif
                 @if ($canGraduate)
                     <x-ui.button variant="secondary" type="button" data-modal-open="graduate-student">Tandai lulus</x-ui.button>
+                @endif
+                @if ($student->status_siswa === 'keluar')
+                    <x-ui.button variant="secondary" type="button" data-modal-open="archive-student">Arsipkan</x-ui.button>
                 @endif
                 @if ($canPermanentlyDelete)
                     <x-ui.button variant="secondary" type="button" data-modal-open="delete-student">Hapus permanen</x-ui.button>
                 @endif
             </div>
+        @elseif ($isArchived)
+            <x-ui.button type="button" data-modal-open="restore-student">Pulihkan arsip</x-ui.button>
         @endif
     </x-ui.page-heading>
 @endsection
@@ -45,12 +56,17 @@
     @endif
     @if ($canManageStudents && !$canPermanentlyDelete)
         <div role="status" class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700">
-            Siswa memiliki riwayat kelas atau pelanggaran. Identitas tidak dapat dihapus permanen agar arsip dan histori tetap tersimpan.
+            Siswa berstatus Keluar/Lulus atau memiliki riwayat kelas/pelanggaran. Identitas tidak dapat dihapus permanen agar arsip dan histori tetap tersimpan.
         </div>
     @endif
     @if ($canManageStudents && $student->status_siswa === 'lulus')
         <div role="status" class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700">
             Siswa ini tersimpan sebagai arsip alumni. Riwayat kelas, wali kelas, dan pelanggaran tetap dipertahankan.
+        </div>
+    @endif
+    @if ($isArchived)
+        <div role="status" class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700">
+            Siswa Keluar ini sedang diarsipkan. Identitas, penempatan kelas, dan riwayat pelanggaran tetap tersimpan.
         </div>
     @endif
 
@@ -96,6 +112,29 @@
                     <dd class="mt-1 whitespace-pre-line text-sm text-gray-800">{{ $student->alamat ?: 'Belum diisi' }}</dd>
                 </div>
             </dl>
+            @if ($canManageStudents)
+                <form id="student-status-form" method="POST" data-modal-confirm-form action="{{ route('admin.students.status', $student) }}" class="mt-5 flex flex-wrap items-end gap-3 border-t border-gray-100 pt-4">
+                    @csrf
+                    @method('PATCH')
+                    <label class="min-w-56 flex-1 space-y-1.5">
+                        <span class="block text-sm font-medium text-gray-700">Koreksi status siswa</span>
+                        <select name="status_siswa" required class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-gray-500 focus:ring-2 focus:ring-gray-200">
+                            @if ($student->status_siswa === 'pindah')
+                                <option value="pindah" selected disabled>Pindah (status lama; pilih status pengganti)</option>
+                            @endif
+                            @foreach (['aktif' => 'Aktif', 'nonaktif' => 'Nonaktif', 'keluar' => 'Keluar'] as $statusValue => $statusLabel)
+                                <option value="{{ $statusValue }}" @selected($student->status_siswa === $statusValue)>{{ $statusLabel }}</option>
+                            @endforeach
+                            @if ($canGraduate)
+                                <option value="lulus">Lulus</option>
+                            @elseif ($student->status_siswa === 'lulus')
+                                <option value="lulus" selected>Lulus</option>
+                            @endif
+                        </select>
+                    </label>
+                    <x-ui.button type="button" data-modal-open="confirm-student-status">Simpan status</x-ui.button>
+                </form>
+            @endif
         </x-ui.card>
 
         <x-ui.card>
@@ -229,14 +268,13 @@
         @endif
     </x-ui.card>
 
-    @if ($canManageStudents && $student->status_siswa === 'aktif')
+    @if ($canManageStudents && $student->status_siswa === 'aktif' && $activePlacementCount === 0)
         <x-ui.card>
             <h2 class="text-base font-semibold text-gray-950">Tambah penempatan kelas</h2>
-            <p class="mt-1 text-sm text-gray-500">Tanggal mulai harus berada di dalam periode tahun ajaran. Penempatan aktif
-                sebelumnya akan diakhiri sehari sebelum tanggal ini.</p>
+            <p class="mt-1 text-sm text-gray-500">Gunakan untuk menambahkan penempatan setelah siswa diaktifkan kembali. Perpindahan dari kelas aktif dilakukan melalui tindakan Pindah Kelas.</p>
             @if ($classes->isNotEmpty() && $academicYears->isNotEmpty())
                 {{-- Formulir ini mengirim pilihan atau data untuk tindakan pada halaman. --}}
-                <form method="POST" action="{{ route('admin.students.placements.store', $student) }}"
+                <form id="student-placement-form" method="POST" data-modal-confirm-form action="{{ route('admin.students.placements.store', $student) }}"
                     class="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">@csrf
                     <label class="space-y-1.5"><span class="block text-sm font-medium text-gray-700">Kelas</span><select
                             name="kelas_id" required
@@ -260,10 +298,17 @@
                         <x-ui.form-error name="tahun_ajaran_id" /></label>
                     <div><x-ui.input label="Tanggal mulai" name="tanggal_mulai" type="date" :value="now()->toDateString()" required />
                     </div>
-                    <div class="flex items-end"><x-ui.button type="submit">Simpan penempatan</x-ui.button></div>
+                    <div class="flex items-end"><x-ui.button type="button" data-modal-open="confirm-student-placement">Simpan penempatan</x-ui.button></div>
             </form>@else<x-ui.empty-state class="mt-4" title="Data kelas atau tahun ajaran belum tersedia"
                     description="Tambahkan data kelas dan tahun ajaran terlebih dahulu." />
             @endif
+        </x-ui.card>
+    @endif
+
+    @if ($canManageStudents && $student->status_siswa === 'aktif' && $activePlacementCount > 0 && !$currentPlacement)
+        <x-ui.card>
+            <x-ui.error-state title="Riwayat penempatan terbuka perlu diperiksa"
+                description="Penempatan siswa tidak menunjukkan tepat satu penempatan aktif yang konsisten. Perbaiki riwayat penempatan sebelum memindahkan atau menambah penempatan baru." />
         </x-ui.card>
     @endif
 
@@ -313,6 +358,72 @@
         @endif
     </x-ui.card>
 
+    @if ($canManageStudents)
+        <x-ui.modal id="confirm-student-status" title="Konfirmasi perubahan status"
+            description="Status siswa {{ $student->nama }} akan diubah sesuai pilihan di atas.">
+            <p class="mb-5 text-sm text-gray-600">Jika status menjadi Keluar atau Lulus, penempatan aktif akan diakhiri. Mengaktifkan kembali siswa yang Keluar atau Lulus tidak membuat penempatan baru. Riwayat kelas, wali kelas, dan pelanggaran tetap tersimpan.</p>
+            <div class="flex justify-end gap-2">
+                <x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button>
+                <x-ui.button type="submit" form="student-status-form">Konfirmasi perubahan</x-ui.button>
+            </div>
+        </x-ui.modal>
+    @endif
+
+    @if ($canManageStudents && $student->status_siswa === 'aktif' && $classes->isNotEmpty() && $academicYears->isNotEmpty())
+        <x-ui.modal id="confirm-student-placement" title="Konfirmasi perubahan kelas"
+            description="Penempatan baru untuk {{ $student->nama }} akan menggunakan kelas dan tahun ajaran yang dipilih.">
+            <p class="mb-5 text-sm text-gray-600">Penempatan baru akan ditambahkan tanpa mengubah riwayat penempatan atau catatan pelanggaran yang sudah tersimpan.</p>
+            <div class="flex justify-end gap-2">
+                <x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button>
+                <x-ui.button type="submit" form="student-placement-form">Konfirmasi dan simpan</x-ui.button>
+            </div>
+        </x-ui.modal>
+    @endif
+
+    @if ($canManageStudents && $currentPlacement)
+        <x-ui.modal id="move-student-class" title="Konfirmasi pindah kelas"
+                :description="'Siswa ' . $student->nama . ' akan dipindahkan dari ' . ($currentPlacement->kelas?->nama_kelas ?? 'kelas tidak tersedia')
+                    . ' pada tahun ajaran ' . ($currentPlacement->tahunAjaran?->nama_tahun_ajaran ?? '—')
+                    . '. Penempatan lama berakhir sehari sebelum tanggal pindah, penempatan baru dimulai pada tanggal tersebut, status siswa tetap Aktif, dan semua histori tetap tersimpan.'">
+                <form method="POST" action="{{ route('admin.students.move-class', $student) }}" class="grid gap-4">
+                    @csrf
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700">
+                        <p><span class="font-medium">Siswa:</span> {{ $student->nama }} (NISN {{ $student->nisn }})</p>
+                        <p class="mt-1"><span class="font-medium">Kelas saat ini:</span> {{ $currentPlacement->kelas?->nama_kelas }} · {{ $currentPlacement->kelas?->tingkat }}{{ $currentPlacement->kelas?->jurusan ? ' · ' . $currentPlacement->kelas->jurusan : '' }}</p>
+                        <p class="mt-1"><span class="font-medium">Tahun ajaran:</span> {{ $currentPlacement->tahunAjaran?->nama_tahun_ajaran }}</p>
+                    </div>
+                    <label class="space-y-1.5">
+                        <span class="block text-sm font-medium text-gray-700">Kelas tujuan</span>
+                        <select name="kelas_id" required class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200">
+                            <option value="">Pilih kelas tujuan</option>
+                            @foreach ($classes as $class)
+                                <option value="{{ $class->id }}" @disabled($class->id === $currentPlacement->kelas_id)>
+                                    {{ $class->nama_kelas }} · {{ $class->tingkat }}{{ $class->jurusan ? ' · ' . $class->jurusan : '' }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <span class="block text-xs text-gray-500">Jurusan mengikuti kelas tujuan yang dipilih.</span>
+                        <x-ui.form-error name="kelas_id" />
+                    </label>
+                    <label class="space-y-1.5">
+                        <span class="block text-sm font-medium text-gray-700">Tanggal pindah</span>
+                        <input type="date" name="tanggal_pindah" required value="{{ old('tanggal_pindah') }}" min="{{ $currentPlacement->tanggal_mulai?->addDay()->toDateString() }}" max="{{ $currentPlacement->tahunAjaran?->tanggal_selesai?->toDateString() }}" class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200">
+                        <span class="block text-xs text-gray-500">Tanggal harus berada setelah awal penempatan dan dalam tahun ajaran ini.</span>
+                        <x-ui.form-error name="tanggal_pindah" />
+                    </label>
+                    <label class="space-y-1.5">
+                        <span class="block text-sm font-medium text-gray-700">Alasan pindah</span>
+                        <textarea name="alasan" required maxlength="2000" rows="3" class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-200" placeholder="Jelaskan alasan perpindahan kelas">{{ old('alasan') }}</textarea>
+                        <x-ui.form-error name="alasan" />
+                    </label>
+                    <div class="flex justify-end gap-2">
+                        <x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button>
+                        <x-ui.button type="submit">Konfirmasi dan pindahkan</x-ui.button>
+                    </div>
+                </form>
+        </x-ui.modal>
+    @endif
+
     @if ($canManageStudents && $student->status_siswa === 'aktif')
         {{-- Dialog ini memuat informasi atau konfirmasi sebelum tindakan dijalankan. --}}
         <x-ui.modal id="deactivate-student" title="Nonaktifkan siswa?"
@@ -322,6 +433,49 @@
                 <input type="hidden" name="status_siswa" value="nonaktif"><div
                     class="flex justify-end gap-2"><x-ui.button variant="secondary" type="button"
                         data-modal-close>Batal</x-ui.button><x-ui.button type="submit">Nonaktifkan siswa</x-ui.button>
+                </div>
+            </form>
+        </x-ui.modal>
+    @endif
+
+    @if ($canManageStudents && $student->status_siswa !== 'keluar' && $student->status_siswa !== 'lulus')
+        <x-ui.modal id="exit-student" title="Tandai siswa Keluar?"
+            description="Siswa akan berstatus Keluar. Riwayat kelas dan pelanggaran tetap tersimpan, dan siswa tidak dapat dipilih untuk pencatatan baru.">
+            <form method="POST" action="{{ route('admin.students.status', $student) }}">
+                @csrf
+                @method('PATCH')
+                <input type="hidden" name="status_siswa" value="keluar">
+                <div class="flex justify-end gap-2">
+                    <x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button>
+                    <x-ui.button type="submit">Tandai Keluar</x-ui.button>
+                </div>
+            </form>
+        </x-ui.modal>
+    @endif
+
+    @if ($canManageStudents && $student->status_siswa === 'keluar')
+        <x-ui.modal id="archive-student" title="Arsipkan siswa Keluar?"
+            :description="'Arsip siswa ' . $student->nama . ' (NISN ' . $student->nisn . '). Riwayat kelas dan pelanggaran tidak dihapus.'">
+            <form method="POST" action="{{ route('admin.students.archive', $student) }}">
+                @csrf
+                @method('PATCH')
+                <div class="flex justify-end gap-2">
+                    <x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button>
+                    <x-ui.button type="submit">Arsipkan siswa</x-ui.button>
+                </div>
+            </form>
+        </x-ui.modal>
+    @endif
+
+    @if ($isArchived)
+        <x-ui.modal id="restore-student" title="Pulihkan siswa dari arsip?"
+            :description="'Siswa ' . $student->nama . ' (NISN ' . $student->nisn . ') akan kembali ke daftar utama dengan status Keluar.'">
+            <form method="POST" action="{{ route('admin.students.archived.restore', $student->id) }}">
+                @csrf
+                @method('PATCH')
+                <div class="flex justify-end gap-2">
+                    <x-ui.button variant="secondary" type="button" data-modal-close>Batal</x-ui.button>
+                    <x-ui.button type="submit">Pulihkan siswa</x-ui.button>
                 </div>
             </form>
         </x-ui.modal>

@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\UpdateTahunAjaranRequest;
 use App\Models\TahunAjaran;
 use App\Services\ActivityLogger;
 use App\Services\TahunAjaranManager;
+use App\Services\WaliKelasAssignmentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -29,9 +30,9 @@ class TahunAjaranController extends Controller
         $filters = $request->validated();
         $academicYears = TahunAjaran::query()
             ->withCount(['penempatanSiswa', 'penugasanWaliKelas'])
-            ->when($filters['q'] ?? null, static fn($query, string $search) => $query
-                ->where('nama_tahun_ajaran', 'like', '%' . $search . '%'))
-            ->when(isset($filters['status']), static fn($query) => $query->where('status_aktif', $filters['status'] === 'aktif'))
+            ->when($filters['q'] ?? null, static fn ($query, string $search) => $query
+                ->where('nama_tahun_ajaran', 'like', '%'.$search.'%'))
+            ->when(isset($filters['status']), static fn ($query) => $query->where('status_aktif', $filters['status'] === 'aktif'))
             ->orderByDesc('tanggal_mulai')
             ->orderByDesc('id')
             ->paginate(10)
@@ -53,12 +54,29 @@ class TahunAjaranController extends Controller
     /**
      * Memvalidasi dan menyimpan tahun ajaran baru.
      */
-    public function store(StoreTahunAjaranRequest $request, TahunAjaranManager $manager, ActivityLogger $activityLogger): RedirectResponse
-    {
-        $academicYear = $manager->create($request->validated());
-        $activityLogger->record($request->user(), $request, 'Tahun ajaran ditambahkan', 'Periode tahun ajaran ID #' . $academicYear->id . ' berhasil ditambahkan.');
+    public function store(
+        StoreTahunAjaranRequest $request,
+        TahunAjaranManager $manager,
+        WaliKelasAssignmentService $assignmentService,
+        ActivityLogger $activityLogger,
+    ): RedirectResponse {
+        $attributes = $request->validated();
+        [$academicYear, $completedAssignments] = DB::transaction(function () use ($attributes, $manager, $assignmentService, $activityLogger, $request): array {
+            $academicYear = $manager->create($attributes);
+            $completedAssignments = $attributes['status_aktif']
+                ? $this->completeExpiredAssignments($academicYear, $assignmentService, $activityLogger, $request)
+                : 0;
 
-        return to_route('admin.academic-years.show', $academicYear)->with('success', 'Tahun ajaran berhasil ditambahkan.');
+            return [$academicYear, $completedAssignments];
+        });
+        $activityLogger->record($request->user(), $request, 'Tahun ajaran ditambahkan', 'Periode tahun ajaran ID #'.$academicYear->id.' berhasil ditambahkan.');
+
+        $message = 'Tahun ajaran berhasil ditambahkan.';
+        if ($completedAssignments > 0) {
+            $message .= sprintf(' %d penugasan wali kelas dari periode yang sudah berakhir otomatis diselesaikan.', $completedAssignments);
+        }
+
+        return to_route('admin.academic-years.show', $academicYear)->with('success', $message);
     }
 
     /**
@@ -89,12 +107,57 @@ class TahunAjaranController extends Controller
         UpdateTahunAjaranRequest $request,
         TahunAjaran $tahunAjaran,
         TahunAjaranManager $manager,
+        WaliKelasAssignmentService $assignmentService,
         ActivityLogger $activityLogger,
     ): RedirectResponse {
-        $manager->update($tahunAjaran, $request->validated());
-        $activityLogger->record($request->user(), $request, 'Tahun ajaran diperbarui', 'Pengaturan tahun ajaran ID #' . $tahunAjaran->id . ' berhasil diperbarui.');
+        $attributes = $request->validated();
+        [$tahunAjaran, $completedAssignments] = DB::transaction(function () use ($tahunAjaran, $attributes, $manager, $assignmentService, $activityLogger, $request): array {
+            $updatedYear = $manager->update($tahunAjaran, $attributes);
+            $completedAssignments = $attributes['status_aktif']
+                ? $this->completeExpiredAssignments($updatedYear, $assignmentService, $activityLogger, $request)
+                : 0;
 
-        return to_route('admin.academic-years.show', $tahunAjaran)->with('success', 'Pengaturan tahun ajaran berhasil diperbarui.');
+            return [$updatedYear, $completedAssignments];
+        });
+        $activityLogger->record($request->user(), $request, 'Tahun ajaran diperbarui', 'Pengaturan tahun ajaran ID #'.$tahunAjaran->id.' berhasil diperbarui.');
+
+        $message = 'Pengaturan tahun ajaran berhasil diperbarui.';
+        if ($completedAssignments > 0) {
+            $message .= sprintf(' %d penugasan wali kelas dari periode yang sudah berakhir otomatis diselesaikan.', $completedAssignments);
+        }
+
+        return to_route('admin.academic-years.show', $tahunAjaran)->with('success', $message);
+    }
+
+    /**
+     * Menutup penugasan yang periodenya berakhir sebelum tahun ajaran aktif dimulai dan mencatat auditnya.
+     */
+    private function completeExpiredAssignments(
+        TahunAjaran $newAcademicYear,
+        WaliKelasAssignmentService $assignmentService,
+        ActivityLogger $activityLogger,
+        Request $request,
+    ): int {
+        $assignments = $assignmentService->completeExpiredBefore($newAcademicYear);
+
+        foreach ($assignments as $assignment) {
+            $activityLogger->record(
+                $request->user(),
+                $request,
+                'Penugasan wali kelas diakhiri otomatis',
+                sprintf(
+                    'Penugasan ID #%d (guru #%d, kelas #%d, tahun ajaran #%d) otomatis diselesaikan pada %s saat tahun ajaran %s diaktifkan.',
+                    $assignment->id,
+                    $assignment->guru_id,
+                    $assignment->kelas_id,
+                    $assignment->tahun_ajaran_id,
+                    $assignment->tanggal_selesai->toDateString(),
+                    $newAcademicYear->nama_tahun_ajaran,
+                ),
+            );
+        }
+
+        return $assignments->count();
     }
 
     /**
@@ -115,7 +178,7 @@ class TahunAjaranController extends Controller
 
             $lockedYear->delete();
         });
-        $activityLogger->record($request->user(), $request, 'Tahun ajaran dihapus', 'Tahun ajaran ID #' . $tahunAjaran->id . ' tanpa histori berhasil dihapus.');
+        $activityLogger->record($request->user(), $request, 'Tahun ajaran dihapus', 'Tahun ajaran ID #'.$tahunAjaran->id.' tanpa histori berhasil dihapus.');
 
         return to_route('admin.academic-years.index')->with('success', 'Tahun ajaran tanpa riwayat berhasil dihapus permanen.');
     }

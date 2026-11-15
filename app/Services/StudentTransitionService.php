@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Kelas;
 use App\Models\KelasSiswa;
 use App\Models\Siswa;
+use App\Models\StudentTransitionBatch;
 use App\Models\TahunAjaran;
 use App\Models\User;
 use Carbon\CarbonImmutable;
@@ -59,11 +60,11 @@ class StudentTransitionService
         $existingTargetPlacementIds = $targetYear === null
             ? []
             : KelasSiswa::query()
-            ->where('tahun_ajaran_id', $targetYear->id)
-            ->whereIn('siswa_id', $placementsByStudent->keys())
-            ->pluck('siswa_id')
-            ->map(static fn($studentId): int => (int) $studentId)
-            ->all();
+                ->where('tahun_ajaran_id', $targetYear->id)
+                ->whereIn('siswa_id', $placementsByStudent->keys())
+                ->pluck('siswa_id')
+                ->map(static fn ($studentId): int => (int) $studentId)
+                ->all();
 
         $items = $placementsByStudent->map(function (Collection $studentPlacements) use (
             $mode,
@@ -87,7 +88,7 @@ class StudentTransitionService
 
             $placement = $effectiveAtYearEnd->count() === 1
                 ? $effectiveAtYearEnd->first()
-                : $studentPlacements->sortByDesc(static fn(KelasSiswa $item): string => $item->tanggal_mulai->toDateString() . '|' . str_pad((string) $item->id, 12, '0', STR_PAD_LEFT))->first();
+                : $studentPlacements->sortByDesc(static fn (KelasSiswa $item): string => $item->tanggal_mulai->toDateString().'|'.str_pad((string) $item->id, 12, '0', STR_PAD_LEFT))->first();
             $sourceClass = $placement->kelas;
             $reason = null;
 
@@ -127,8 +128,8 @@ class StudentTransitionService
         })->filter()->values();
 
         $sourceClasses = $items
-            ->filter(static fn(array $item): bool => $item['source_class'] instanceof Kelas)
-            ->groupBy(static fn(array $item): int => $item['source_class']->id)
+            ->filter(static fn (array $item): bool => $item['source_class'] instanceof Kelas)
+            ->groupBy(static fn (array $item): int => $item['source_class']->id)
             ->map(function (Collection $classItems) use ($mode): array {
                 /** @var Kelas $sourceClass */
                 $sourceClass = $classItems->first()['source_class'];
@@ -137,9 +138,9 @@ class StudentTransitionService
                 $targetClasses = $targetLevel === null
                     ? collect()
                     : Kelas::query()
-                    ->whereIn('tingkat', $this->levelAliases($targetLevel))
-                    ->orderBy('nama_kelas')
-                    ->get(['id', 'nama_kelas', 'tingkat', 'jurusan']);
+                        ->whereIn('tingkat', $this->levelAliases($targetLevel))
+                        ->orderBy('nama_kelas')
+                        ->get(['id', 'nama_kelas', 'tingkat', 'jurusan']);
 
                 return [
                     'class' => $sourceClass,
@@ -148,7 +149,7 @@ class StudentTransitionService
                     'target_classes' => $targetClasses,
                 ];
             })
-            ->sortBy(static fn(array $summary): string => $summary['class']->tingkat . '|' . $summary['class']->nama_kelas)
+            ->sortBy(static fn (array $summary): string => $summary['class']->tingkat.'|'.$summary['class']->nama_kelas)
             ->values();
 
         return ['items' => $items, 'source_classes' => $sourceClasses];
@@ -217,7 +218,7 @@ class StudentTransitionService
                 throw ValidationException::withMessages(['siswa' => 'Tidak ada siswa yang memenuhi syarat untuk proses ini.']);
             }
 
-            $eligibleStudentIds = $eligibleItems->map(static fn(array $item): int => $item['student']->id)->all();
+            $eligibleStudentIds = $eligibleItems->map(static fn (array $item): int => $item['student']->id)->all();
             $excludedIds = array_values(array_unique(array_map('intval', $excludedStudentIds)));
             // Tolak pengecualian dari daftar lama agar hasil pratinjau tidak dapat dipakai untuk data berbeda.
             $unknownExcludedIds = array_diff($excludedIds, $eligibleStudentIds);
@@ -227,7 +228,7 @@ class StudentTransitionService
             }
 
             $selectedItems = $eligibleItems
-                ->reject(static fn(array $item): bool => in_array($item['student']->id, $excludedIds, true))
+                ->reject(static fn (array $item): bool => in_array($item['student']->id, $excludedIds, true))
                 ->values();
 
             if ($selectedItems->isEmpty()) {
@@ -237,13 +238,30 @@ class StudentTransitionService
             $mappings = $mode === self::MODE_GRADUATE
                 ? []
                 : $this->validateClassMappings($selectedItems, $preview['source_classes'], $classMapping, $mode);
-            $studentIds = $selectedItems->map(static fn(array $item): int => $item['student']->id)->all();
-            $placementIds = $selectedItems->map(static fn(array $item): int => $item['placement']->id)->all();
+            $studentIds = $selectedItems->map(static fn (array $item): int => $item['student']->id)->all();
+            $placementIds = $selectedItems->map(static fn (array $item): int => $item['placement']->id)->all();
             $students = Siswa::query()->whereKey($studentIds)->orderBy('id')->lockForUpdate()->get()->keyBy('id');
             $placements = KelasSiswa::query()->whereKey($placementIds)->orderBy('id')->lockForUpdate()->get()->keyBy('id');
+            $placementHistory = KelasSiswa::query()
+                ->whereIn('siswa_id', $studentIds)
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get()
+                ->groupBy('siswa_id');
 
             if ($students->count() !== count($studentIds) || $placements->count() !== count($placementIds)) {
                 throw ValidationException::withMessages(['siswa' => 'Data siswa atau penempatan berubah. Muat ulang pratinjau sebelum mencoba kembali.']);
+            }
+
+            $sourcePlacementIds = $selectedItems->map(static fn (array $item): int => $item['placement']->id)->all();
+            $hasOtherActivePlacement = KelasSiswa::query()
+                ->whereIn('siswa_id', $studentIds)
+                ->where('status_aktif', true)
+                ->whereNotIn('id', $sourcePlacementIds)
+                ->exists();
+
+            if ($hasOtherActivePlacement) {
+                throw ValidationException::withMessages(['siswa' => 'Sebagian siswa memiliki penempatan aktif lain di luar kelas asal yang dipilih. Periksa dan benahi penempatannya sebelum proses. Tidak ada perubahan yang disimpan.']);
             }
 
             if ($lockedTarget instanceof TahunAjaran) {
@@ -256,7 +274,6 @@ class StudentTransitionService
                     throw ValidationException::withMessages(['siswa' => 'Sebagian siswa sudah memiliki penempatan pada tahun tujuan. Tidak ada perubahan yang disimpan.']);
                 }
 
-                $sourcePlacementIds = $selectedItems->map(static fn(array $item): int => $item['placement']->id)->all();
                 $hasConflictingFuturePlacement = KelasSiswa::query()
                     ->whereIn('siswa_id', $studentIds)
                     ->whereNotIn('id', $sourcePlacementIds)
@@ -277,6 +294,7 @@ class StudentTransitionService
                 self::MODE_REPEAT => 'Proses tinggal kelas massal',
                 self::MODE_GRADUATE => 'Kelulusan massal',
             };
+            $dataSnapshot = [];
 
             foreach ($selectedItems as $item) {
                 /** @var Siswa $student */
@@ -284,6 +302,7 @@ class StudentTransitionService
                 /** @var KelasSiswa $placement */
                 $placement = $placements->get($item['placement']->id);
                 $sourceClass = $item['source_class'];
+                $sourcePlacementBefore = $this->placementSnapshot($placement);
 
                 if (
                     $student->status_siswa !== 'aktif'
@@ -311,10 +330,11 @@ class StudentTransitionService
                 ]);
 
                 $targetClass = null;
+                $targetPlacement = null;
 
                 if ($lockedTarget instanceof TahunAjaran) {
                     $targetClass = $mappings[$sourceClass->id];
-                    KelasSiswa::query()->create([
+                    $targetPlacement = KelasSiswa::query()->create([
                         'siswa_id' => $student->id,
                         'kelas_id' => $targetClass->id,
                         'tahun_ajaran_id' => $lockedTarget->id,
@@ -325,6 +345,29 @@ class StudentTransitionService
                 } else {
                     $student->update(['status_siswa' => 'lulus']);
                 }
+
+                $student->refresh();
+                $placement->refresh();
+                $dataSnapshot[] = [
+                    'siswa_id' => (int) $student->id,
+                    'penempatan_sebelum' => $placementHistory
+                        ->get($student->id, collect())
+                        ->map(static fn (KelasSiswa $historyPlacement): int => (int) $historyPlacement->id)
+                        ->values()
+                        ->all(),
+                    'status_sebelum' => 'aktif',
+                    'status_sesudah' => $student->status_siswa,
+                    'siswa_updated_at_sesudah' => $this->timestampSnapshot($student->updated_at),
+                    'kelas_asal_id' => (int) $sourceClass->id,
+                    'kelas_asal_nama' => $sourceClass->nama_kelas,
+                    'kelas_tujuan_id' => $targetClass?->id,
+                    'kelas_tujuan_nama' => $targetClass?->nama_kelas,
+                    'penempatan_asal_sebelum' => $sourcePlacementBefore,
+                    'penempatan_asal_sesudah' => $this->placementSnapshot($placement),
+                    'penempatan_tujuan' => $targetPlacement === null
+                        ? null
+                        : $this->placementSnapshot($targetPlacement->refresh()),
+                ];
 
                 $targetClassDescription = $targetClass === null
                     ? 'tidak ada (lulus)'
@@ -350,12 +393,190 @@ class StudentTransitionService
                 $this->activityLogger->record($actor, $request, $activity, $description);
             }
 
+            StudentTransitionBatch::query()->create([
+                'batch_id' => $batchId,
+                'tahun_ajaran_asal_id' => $lockedOrigin->id,
+                'tahun_ajaran_tujuan_id' => $lockedTarget?->id,
+                'jenis_proses' => $mode,
+                'status' => StudentTransitionBatch::STATUS_COMPLETED,
+                'jumlah_diproses' => $selectedItems->count(),
+                'jumlah_dikecualikan' => count($excludedIds),
+                'user_id' => $actor->id,
+                'data_snapshot' => $dataSnapshot,
+            ]);
+
             return [
                 'processed' => $selectedItems->count(),
                 'excluded' => count($excludedIds),
                 'batch_id' => $batchId,
             ];
         });
+    }
+
+    /**
+     * Membatalkan batch hanya jika seluruh data yang diubah proses masih berada pada kondisi sesudah proses.
+     */
+    public function undo(
+        TahunAjaran $originYear,
+        string $batchId,
+        User $actor,
+        Request $request,
+    ): int {
+        return DB::transaction(function () use ($originYear, $batchId, $actor, $request): int {
+            $batch = StudentTransitionBatch::query()
+                ->where('batch_id', $batchId)
+                ->where('tahun_ajaran_asal_id', $originYear->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($batch->status !== StudentTransitionBatch::STATUS_COMPLETED) {
+                throw ValidationException::withMessages([
+                    'batch' => 'Batch ini sudah dibatalkan atau tidak dapat dibatalkan lagi.',
+                ]);
+            }
+
+            $snapshots = $batch->data_snapshot;
+            $studentIds = collect($snapshots)->pluck('siswa_id')->map(static fn ($id): int => (int) $id)->all();
+            $students = Siswa::query()->whereKey($studentIds)->orderBy('id')->lockForUpdate()->get()->keyBy('id');
+            $placements = KelasSiswa::query()
+                ->whereIn('siswa_id', $studentIds)
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('id');
+            $placementsByStudent = $placements->groupBy('siswa_id');
+
+            if ($students->count() !== count($studentIds)) {
+                throw ValidationException::withMessages([
+                    'batch' => 'Sebagian siswa sudah tidak tersedia. Batch tidak dibatalkan agar perubahan lain tetap aman.',
+                ]);
+            }
+
+            foreach ($snapshots as $snapshot) {
+                $student = $students->get((int) $snapshot['siswa_id']);
+                $sourceBefore = $snapshot['penempatan_asal_sebelum'];
+                $sourceAfter = $snapshot['penempatan_asal_sesudah'];
+                $sourcePlacement = $placements->get((int) $sourceBefore['id']);
+                $targetAfter = $snapshot['penempatan_tujuan'];
+                $targetPlacement = $targetAfter === null ? null : $placements->get((int) $targetAfter['id']);
+
+                $expectedPlacementIds = array_map('intval', $snapshot['penempatan_sebelum']);
+
+                if ($targetAfter !== null) {
+                    $expectedPlacementIds[] = (int) $targetAfter['id'];
+                }
+
+                sort($expectedPlacementIds);
+                $currentPlacementIds = $placementsByStudent
+                    ->get($student->id, collect())
+                    ->map(static fn (KelasSiswa $placement): int => (int) $placement->id)
+                    ->sort()
+                    ->values()
+                    ->all();
+
+                if (
+                    $student->status_siswa !== $snapshot['status_sesudah']
+                    || $this->timestampSnapshot($student->updated_at) !== $snapshot['siswa_updated_at_sesudah']
+                    || ! $sourcePlacement instanceof KelasSiswa
+                    || ! $this->placementMatchesSnapshot($sourcePlacement, $sourceAfter)
+                    || $currentPlacementIds !== $expectedPlacementIds
+                    || ($targetAfter !== null && (
+                        ! $targetPlacement instanceof KelasSiswa
+                        || ! $this->placementMatchesSnapshot($targetPlacement, $targetAfter)
+                        || $targetPlacement->catatanPelanggaran()->exists()
+                    ))
+                ) {
+                    throw ValidationException::withMessages([
+                        'batch' => 'Ada perubahan siswa atau penempatan setelah batch dijalankan. Batch tidak dibatalkan agar perubahan tersebut tidak tertimpa.',
+                    ]);
+                }
+            }
+
+            foreach ($snapshots as $snapshot) {
+                $student = $students->get((int) $snapshot['siswa_id']);
+                $sourceBefore = $snapshot['penempatan_asal_sebelum'];
+                $sourcePlacement = $placements->get((int) $sourceBefore['id']);
+                $targetAfter = $snapshot['penempatan_tujuan'];
+
+                if ($targetAfter !== null) {
+                    $placements->get((int) $targetAfter['id'])->delete();
+                }
+
+                $sourcePlacement->update([
+                    'kelas_id' => $sourceBefore['kelas_id'],
+                    'tahun_ajaran_id' => $sourceBefore['tahun_ajaran_id'],
+                    'tanggal_mulai' => $sourceBefore['tanggal_mulai'],
+                    'tanggal_selesai' => $sourceBefore['tanggal_selesai'],
+                    'status_aktif' => $sourceBefore['status_aktif'],
+                ]);
+                $student->update(['status_siswa' => $snapshot['status_sebelum']]);
+
+                $activity = match ($batch->jenis_proses) {
+                    self::MODE_PROMOTE => 'Pembatalan kenaikan kelas massal',
+                    self::MODE_REPEAT => 'Pembatalan proses tinggal kelas massal',
+                    self::MODE_GRADUATE => 'Pembatalan kelulusan massal',
+                };
+
+                $this->activityLogger->record(
+                    $actor,
+                    $request,
+                    $activity,
+                    sprintf(
+                        'Batch %s dibatalkan. Siswa ID #%d, status dipulihkan menjadi %s dan penempatan asal ID #%d dipulihkan. Penempatan tujuan %s.',
+                        $batch->batch_id,
+                        $student->id,
+                        $snapshot['status_sebelum'],
+                        $sourcePlacement->id,
+                        $targetAfter === null ? 'tidak ada' : 'ID #'.(int) $targetAfter['id'].' dihapus setelah pemeriksaan aman',
+                    ),
+                );
+            }
+
+            $batch->update([
+                'status' => StudentTransitionBatch::STATUS_REVERTED,
+                'dibatalkan_oleh_user_id' => $actor->id,
+                'dibatalkan_pada' => now(),
+            ]);
+
+            return count($snapshots);
+        });
+    }
+
+    /**
+     * @return array{id: int, kelas_id: int, tahun_ajaran_id: int, tanggal_mulai: string, tanggal_selesai: string|null, status_aktif: bool, updated_at: string|null}
+     */
+    private function placementSnapshot(KelasSiswa $placement): array
+    {
+        return [
+            'id' => (int) $placement->id,
+            'kelas_id' => (int) $placement->kelas_id,
+            'tahun_ajaran_id' => (int) $placement->tahun_ajaran_id,
+            'tanggal_mulai' => $placement->tanggal_mulai?->toDateString(),
+            'tanggal_selesai' => $placement->tanggal_selesai?->toDateString(),
+            'status_aktif' => (bool) $placement->status_aktif,
+            'updated_at' => $this->timestampSnapshot($placement->updated_at),
+        ];
+    }
+
+    private function timestampSnapshot(mixed $timestamp): ?string
+    {
+        return $timestamp?->format('Y-m-d H:i:s.u');
+    }
+
+    /**
+     * Membandingkan nilai snapshot satu per satu agar urutan key JSON tidak memicu konflik palsu.
+     *
+     * @param  array{id: int|string, kelas_id: int|string, tahun_ajaran_id: int|string, tanggal_mulai: string|null, tanggal_selesai: string|null, status_aktif: bool|int|string, updated_at: string|null}  $snapshot
+     */
+    private function placementMatchesSnapshot(KelasSiswa $placement, array $snapshot): bool
+    {
+        return (int) $placement->id === (int) $snapshot['id']
+            && (int) $placement->kelas_id === (int) $snapshot['kelas_id']
+            && (int) $placement->tahun_ajaran_id === (int) $snapshot['tahun_ajaran_id']
+            && $placement->tanggal_mulai?->toDateString() === $snapshot['tanggal_mulai']
+            && $placement->tanggal_selesai?->toDateString() === $snapshot['tanggal_selesai']
+            && (bool) $placement->status_aktif === (bool) $snapshot['status_aktif']
+            && $this->timestampSnapshot($placement->updated_at) === $snapshot['updated_at'];
     }
 
     /**
@@ -388,7 +609,7 @@ class StudentTransitionService
         string $mode,
     ): array {
         $sourceClassIds = $selectedItems
-            ->map(static fn(array $item): int => $item['source_class']->id)
+            ->map(static fn (array $item): int => $item['source_class']->id)
             ->unique()
             ->values();
         $unknownMappingIds = array_diff(array_map('intval', array_keys($classMapping)), $sourceClassIds->all());
@@ -400,14 +621,14 @@ class StudentTransitionService
         $targetIds = [];
         foreach ($sourceClassIds as $sourceClassId) {
             if (! array_key_exists($sourceClassId, $classMapping)) {
-                throw ValidationException::withMessages(['pemetaan.' . $sourceClassId => 'Pilih kelas tujuan untuk kelas asal ini.']);
+                throw ValidationException::withMessages(['pemetaan.'.$sourceClassId => 'Pilih kelas tujuan untuk kelas asal ini.']);
             }
 
             $targetIds[$sourceClassId] = (int) $classMapping[$sourceClassId];
         }
 
         $targetClasses = Kelas::query()->whereKey(array_values($targetIds))->get(['id', 'nama_kelas', 'tingkat', 'jurusan'])->keyBy('id');
-        $sourceClassSummaries = $sourceClasses->keyBy(static fn(array $summary): int => $summary['class']->id);
+        $sourceClassSummaries = $sourceClasses->keyBy(static fn (array $summary): int => $summary['class']->id);
 
         $mapping = [];
         foreach ($targetIds as $sourceClassId => $targetId) {
@@ -415,7 +636,7 @@ class StudentTransitionService
             $targetClass = $targetClasses->get($targetId);
 
             if (! $sourceClass instanceof Kelas || ! $targetClass instanceof Kelas) {
-                throw ValidationException::withMessages(['pemetaan.' . $sourceClassId => 'Kelas asal atau tujuan tidak ditemukan.']);
+                throw ValidationException::withMessages(['pemetaan.'.$sourceClassId => 'Kelas asal atau tujuan tidak ditemukan.']);
             }
 
             $expectedLevel = $this->targetGradeNumber($sourceClass, $mode);
@@ -423,7 +644,7 @@ class StudentTransitionService
             if ($expectedLevel === null || $this->gradeNumber($targetClass->tingkat) !== $expectedLevel) {
                 $expectedLabel = $mode === self::MODE_PROMOTE ? 'satu tingkat di atas' : 'tingkat yang sama';
                 throw ValidationException::withMessages([
-                    'pemetaan.' . $sourceClassId => 'Kelas tujuan harus berada pada ' . $expectedLabel . ' kelas asal.',
+                    'pemetaan.'.$sourceClassId => 'Kelas tujuan harus berada pada '.$expectedLabel.' kelas asal.',
                 ]);
             }
 

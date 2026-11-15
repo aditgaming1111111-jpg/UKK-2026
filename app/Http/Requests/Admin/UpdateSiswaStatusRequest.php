@@ -29,7 +29,7 @@ class UpdateSiswaStatusRequest extends FormRequest
      */
     public function rules(): array
     {
-        return ['status_siswa' => ['required', 'string', Rule::in(['aktif', 'nonaktif', 'pindah', 'keluar', 'lulus'])]];
+        return ['status_siswa' => ['required', 'string', Rule::in(['aktif', 'nonaktif', 'keluar', 'lulus'])]];
     }
 
     /**

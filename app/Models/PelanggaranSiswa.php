@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Database\Factories\PelanggaranSiswaFactory;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,6 +28,29 @@ class PelanggaranSiswa extends Model
             'tanggal_dicatat' => 'datetime',
             'poin_saat_dicatat' => 'integer',
         ];
+    }
+
+    /**
+     * Menyimpan waktu pencatatan dalam UTC dan menampilkannya menurut zona waktu aplikasi.
+     */
+    protected function tanggalDicatat(): Attribute
+    {
+        return Attribute::make(
+            get: static fn (?string $value): ?CarbonImmutable => $value === null
+                ? null
+                : CarbonImmutable::parse($value, 'UTC')->setTimezone(config('app.timezone')),
+            set: static function (DateTimeInterface|string|null $value): ?string {
+                if ($value === null) {
+                    return null;
+                }
+
+                $dateTime = $value instanceof DateTimeInterface
+                    ? CarbonImmutable::instance($value)
+                    : CarbonImmutable::parse($value, config('app.timezone'));
+
+                return $dateTime->utc()->format('Y-m-d H:i:s');
+            },
+        );
     }
 
     public function penempatanKelas(): BelongsTo

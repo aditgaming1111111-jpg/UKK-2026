@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Kelas;
 use App\Models\KelasSiswa;
 use App\Models\Siswa;
 use App\Models\TahunAjaran;
@@ -15,6 +16,47 @@ use Illuminate\Validation\ValidationException;
  */
 class SiswaPenempatanService
 {
+    /**
+     * Mengakhiri seluruh penempatan aktif tanpa menghapus riwayat siswa.
+     */
+    public function endActivePlacements(Siswa $student, CarbonImmutable $effectiveDate): int
+    {
+        $placements = $student->penempatanKelas()
+            ->with('tahunAjaran:id,tanggal_mulai,tanggal_selesai')
+            ->where('status_aktif', true)
+            ->orderBy('id')
+            ->lockForUpdate()
+            ->get();
+
+        foreach ($placements as $placement) {
+            $startDate = CarbonImmutable::parse($placement->tanggal_mulai)->startOfDay();
+            $endDate = $effectiveDate->startOfDay();
+
+            if ($placement->tanggal_selesai !== null) {
+                $endDate = CarbonImmutable::parse($placement->tanggal_selesai)->startOfDay()->min($endDate);
+            }
+
+            $academicYearEnd = $placement->tahunAjaran?->tanggal_selesai;
+
+            if ($academicYearEnd !== null) {
+                $yearEnd = CarbonImmutable::parse($academicYearEnd)->startOfDay();
+
+                if ($yearEnd->gte($startDate)) {
+                    $endDate = $endDate->min($yearEnd);
+                }
+            }
+
+            $endDate = $endDate->max($startDate);
+
+            $placement->update([
+                'tanggal_selesai' => $endDate->toDateString(),
+                'status_aktif' => false,
+            ]);
+        }
+
+        return $placements->count();
+    }
+
     /**
      * Menolak koreksi penempatan yang melanggar urutan dan rentang riwayat siswa.
      */
@@ -89,6 +131,12 @@ class SiswaPenempatanService
                 ->lockForUpdate()
                 ->get();
 
+            if ($placements->contains(static fn (KelasSiswa $placement): bool => $placement->status_aktif)) {
+                throw ValidationException::withMessages([
+                    'tanggal_mulai' => 'Siswa sudah memiliki penempatan aktif. Gunakan tindakan Pindah Kelas untuk mengubah kelasnya.',
+                ]);
+            }
+
             foreach ($placements as $placement) {
                 $placementStart = CarbonImmutable::parse($placement->tanggal_mulai)->startOfDay();
                 $placementEnd = $placement->tanggal_selesai
@@ -127,6 +175,100 @@ class SiswaPenempatanService
                 'tanggal_selesai' => null,
                 'status_aktif' => true,
             ]);
+        });
+    }
+
+    /**
+     * Memindahkan siswa ke kelas lain dalam tahun ajaran penempatan aktifnya.
+     *
+     * @param  array{kelas_id: int, tanggal_pindah: string, alasan: string}  $attributes
+     * @return array{previous: KelasSiswa, current: KelasSiswa}
+     */
+    public function transfer(Siswa $student, array $attributes): array
+    {
+        return DB::transaction(function () use ($student, $attributes): array {
+            $lockedStudent = Siswa::query()->whereKey($student->id)->lockForUpdate()->firstOrFail();
+
+            if ($lockedStudent->status_siswa !== 'aktif') {
+                throw ValidationException::withMessages([
+                    'kelas_id' => 'Hanya siswa berstatus Aktif yang dapat dipindahkan kelasnya.',
+                ]);
+            }
+
+            $placements = $lockedStudent->penempatanKelas()
+                ->with(['kelas:id,nama_kelas,tingkat,jurusan', 'tahunAjaran:id,nama_tahun_ajaran,tanggal_mulai,tanggal_selesai'])
+                ->where('status_aktif', true)
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get();
+
+            if ($placements->count() !== 1 || $placements->first()->tanggal_selesai !== null) {
+                throw ValidationException::withMessages([
+                    'kelas_id' => 'Perpindahan memerlukan tepat satu penempatan aktif yang belum berakhir. Periksa riwayat penempatan siswa terlebih dahulu.',
+                ]);
+            }
+
+            $previousPlacement = $placements->first();
+            $targetClass = Kelas::query()->whereKey($attributes['kelas_id'])->lockForUpdate()->firstOrFail();
+
+            if ($targetClass->id === $previousPlacement->kelas_id) {
+                throw ValidationException::withMessages([
+                    'kelas_id' => 'Kelas tujuan harus berbeda dari kelas siswa saat ini.',
+                ]);
+            }
+
+            $transferDate = CarbonImmutable::parse($attributes['tanggal_pindah'])->startOfDay();
+            $academicYear = $previousPlacement->tahunAjaran;
+            $placementStart = CarbonImmutable::parse($previousPlacement->tanggal_mulai)->startOfDay();
+            $academicYearStart = CarbonImmutable::parse($academicYear->tanggal_mulai)->startOfDay();
+            $academicYearEnd = CarbonImmutable::parse($academicYear->tanggal_selesai)->startOfDay();
+
+            if ($transferDate->lte($placementStart) || $transferDate->lt($academicYearStart) || $transferDate->gt($academicYearEnd)) {
+                throw ValidationException::withMessages([
+                    'tanggal_pindah' => 'Tanggal pindah harus setelah tanggal mulai penempatan dan berada dalam rentang tahun ajaran saat ini.',
+                ]);
+            }
+
+            $hasOverlappingPlacement = $lockedStudent->penempatanKelas()
+                ->whereKeyNot($previousPlacement->id)
+                ->where(static function (Builder $query) use ($transferDate): void {
+                    $query->whereNull('tanggal_selesai')
+                        ->orWhereDate('tanggal_selesai', '>=', $transferDate->toDateString());
+                })
+                ->lockForUpdate()
+                ->exists();
+
+            if ($hasOverlappingPlacement) {
+                throw ValidationException::withMessages([
+                    'tanggal_pindah' => 'Tanggal pindah bertumpang tindih dengan riwayat penempatan siswa lainnya.',
+                ]);
+            }
+
+            if ($previousPlacement->catatanPelanggaran()
+                ->whereDate('tanggal_pelanggaran', '>=', $transferDate->toDateString())
+                ->exists()) {
+                throw ValidationException::withMessages([
+                    'tanggal_pindah' => 'Tanggal pindah tidak boleh mendahului catatan pelanggaran yang sudah tercatat pada kelas saat ini.',
+                ]);
+            }
+
+            $previousPlacement->update([
+                'tanggal_selesai' => $transferDate->subDay()->toDateString(),
+                'status_aktif' => false,
+            ]);
+
+            $currentPlacement = $lockedStudent->penempatanKelas()->create([
+                'kelas_id' => $targetClass->id,
+                'tahun_ajaran_id' => $academicYear->id,
+                'tanggal_mulai' => $transferDate->toDateString(),
+                'tanggal_selesai' => null,
+                'status_aktif' => true,
+            ]);
+
+            return [
+                'previous' => $previousPlacement->fresh(['kelas', 'tahunAjaran']),
+                'current' => $currentPlacement->load(['kelas', 'tahunAjaran']),
+            ];
         });
     }
 }

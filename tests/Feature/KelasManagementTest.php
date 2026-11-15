@@ -9,6 +9,7 @@ use App\Models\Siswa;
 use App\Models\TahunAjaran;
 use App\Models\User;
 use App\Models\WaliKelas;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -119,6 +120,88 @@ class KelasManagementTest extends TestCase
             ->assertDontSee('Siswa Riwayat Lama')
             ->assertDontSee('Siswa Nonaktif')
             ->assertViewHas('placements', fn ($placements): bool => $placements->total() === 1);
+    }
+
+    public function test_class_detail_uses_jakarta_calendar_day_for_placement_start_and_end_boundaries(): void
+    {
+        $administrator = User::factory()->state(['role' => 'admin'])->create();
+        $kelas = Kelas::factory()->create(['nama_kelas' => 'XI RPL Zona Waktu']);
+        $activeYear = TahunAjaran::factory()->create([
+            'nama_tahun_ajaran' => '2027/2028',
+            'tanggal_mulai' => '2026-11-15',
+            'tanggal_selesai' => '2027-06-18',
+            'status_aktif' => true,
+        ]);
+        $inactiveYear = TahunAjaran::factory()->create([
+            'nama_tahun_ajaran' => '2026/2027',
+            'tanggal_mulai' => '2025-11-15',
+            'tanggal_selesai' => '2026-11-14',
+            'status_aktif' => false,
+        ]);
+        $endedStudent = Siswa::factory()->create(['nama' => 'Siswa Penempatan Berakhir']);
+        $novemberFifteenthStudent = Siswa::factory()->create(['nama' => 'Siswa Mulai Lima Belas']);
+        $novemberSixteenthStudent = Siswa::factory()->create(['nama' => 'Siswa Mulai Enam Belas']);
+        $inactiveYearStudent = Siswa::factory()->create(['nama' => 'Siswa Tahun Tidak Aktif']);
+
+        KelasSiswa::factory()->for($endedStudent, 'siswa')->for($kelas, 'kelas')->for($activeYear, 'tahunAjaran')->create([
+            'tanggal_mulai' => '2026-11-01',
+            'tanggal_selesai' => '2026-11-14',
+            'status_aktif' => true,
+        ]);
+        KelasSiswa::factory()->for($novemberFifteenthStudent, 'siswa')->for($kelas, 'kelas')->for($activeYear, 'tahunAjaran')->create([
+            'tanggal_mulai' => '2026-11-15',
+            'tanggal_selesai' => null,
+            'status_aktif' => true,
+        ]);
+        KelasSiswa::factory()->for($novemberSixteenthStudent, 'siswa')->for($kelas, 'kelas')->for($activeYear, 'tahunAjaran')->create([
+            'tanggal_mulai' => '2026-11-16',
+            'tanggal_selesai' => null,
+            'status_aktif' => true,
+        ]);
+        KelasSiswa::factory()->for($inactiveYearStudent, 'siswa')->for($kelas, 'kelas')->for($inactiveYear, 'tahunAjaran')->create([
+            'tanggal_mulai' => '2026-11-15',
+            'tanggal_selesai' => null,
+            'status_aktif' => true,
+        ]);
+
+        $this->assertSame('Asia/Jakarta', config('app.timezone'));
+        $this->assertSame('Asia/Jakarta', date_default_timezone_get());
+
+        $this->travelTo(CarbonImmutable::parse('2026-11-14 23:59:00', 'Asia/Jakarta'));
+        $this->actingAs($administrator)->get(route('admin.classes.show', $kelas))
+            ->assertOk()
+            ->assertSee('Siswa Penempatan Berakhir')
+            ->assertDontSee('Siswa Mulai Lima Belas')
+            ->assertViewHas('placements', fn ($placements): bool => $placements->total() === 1)
+            ->assertViewHas('kelas', fn (Kelas $class): bool => $class->active_placement_count === 1);
+
+        $this->travelTo(CarbonImmutable::parse('2026-11-15 00:00:00', 'Asia/Jakarta'));
+        $this->get(route('admin.classes.show', $kelas))
+            ->assertOk()
+            ->assertSee('Siswa Mulai Lima Belas')
+            ->assertDontSee('Siswa Penempatan Berakhir')
+            ->assertDontSee('Siswa Mulai Enam Belas')
+            ->assertDontSee('Siswa Tahun Tidak Aktif')
+            ->assertViewHas('placements', fn ($placements): bool => $placements->total() === 1)
+            ->assertViewHas('kelas', fn (Kelas $class): bool => $class->active_placement_count === 1);
+
+        $this->travelTo(CarbonImmutable::parse('2026-11-15 00:05:00', 'Asia/Jakarta'));
+        $this->get(route('admin.classes.show', $kelas))
+            ->assertOk()
+            ->assertSee('Siswa Mulai Lima Belas')
+            ->assertViewHas('placements', fn ($placements): bool => $placements->total() === 1);
+
+        $this->travelTo(CarbonImmutable::parse('2026-11-16 00:00:00', 'Asia/Jakarta'));
+        $this->get(route('admin.classes.show', $kelas))
+            ->assertOk()
+            ->assertSee('Siswa Mulai Lima Belas')
+            ->assertSee('Siswa Mulai Enam Belas')
+            ->assertDontSee('Siswa Penempatan Berakhir')
+            ->assertDontSee('Siswa Tahun Tidak Aktif')
+            ->assertViewHas('placements', fn ($placements): bool => $placements->total() === 2)
+            ->assertViewHas('kelas', fn (Kelas $class): bool => $class->active_placement_count === 2);
+
+        $this->travelBack();
     }
 
     public function test_class_detail_roster_search_and_pagination_keep_the_search_query(): void

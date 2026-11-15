@@ -293,6 +293,9 @@ class RekapWaliKelasReport
                 $query->whereNull('tanggal_selesai')
                     ->orWhereDate('tanggal_selesai', '>=', $year->tanggal_mulai);
             })
+            ->whereHas('siswa', static fn (Builder $studentQuery): Builder => $studentQuery
+                ->where('t_siswa.status_siswa', 'aktif')
+                ->whereNull('t_siswa.deleted_at'))
             ->whereExists(static function (QueryBuilder $assignmentQuery) use ($context): void {
                 $assignmentQuery->selectRaw('1')
                     ->from('t_wali_kelas as recap_assignment')

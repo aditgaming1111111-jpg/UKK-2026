@@ -70,6 +70,83 @@ class TahunAjaranManagementTest extends TestCase
         $this->assertDatabaseCount('t_tahun_ajaran', 1);
     }
 
+    public function test_activating_next_academic_year_completes_previous_homeroom_assignments(): void
+    {
+        $administrator = User::factory()->state(['role' => 'admin'])->create();
+        $previousYear = TahunAjaran::factory()->create([
+            'nama_tahun_ajaran' => '2025/2026',
+            'tanggal_mulai' => '2025-07-01',
+            'tanggal_selesai' => '2026-06-30',
+            'status_aktif' => true,
+        ]);
+        $class = Kelas::factory()->create();
+        $teacher = Guru::factory()->create();
+        $assignment = WaliKelas::factory()->for($teacher, 'guru')->for($class, 'kelas')->for($previousYear, 'tahunAjaran')->create([
+            'tanggal_mulai' => '2025-07-01',
+            'tanggal_selesai' => null,
+            'status_aktif' => true,
+        ]);
+
+        $this->actingAs($administrator)->post(route('admin.academic-years.store'), [
+            'nama_tahun_ajaran' => '2026/2027',
+            'tanggal_mulai' => '2026-07-01',
+            'tanggal_selesai' => '2027-06-30',
+            'status_aktif' => '1',
+        ])->assertRedirect()->assertSessionHas('success');
+
+        $assignment->refresh();
+        $this->assertSame('2026-06-30', $assignment->tanggal_selesai->toDateString());
+        $this->assertFalse($assignment->status_aktif);
+        $this->assertDatabaseHas('t_tahun_ajaran', ['id' => $previousYear->id, 'status_aktif' => false]);
+        $this->assertDatabaseHas('t_log_aktivitas', [
+            'user_id' => $administrator->id,
+            'aktivitas' => 'Penugasan wali kelas diakhiri otomatis',
+        ]);
+        $this->assertDatabaseCount('t_wali_kelas', 1);
+    }
+
+    public function test_activating_year_does_not_close_its_own_homeroom_assignments(): void
+    {
+        $administrator = User::factory()->state(['role' => 'admin'])->create();
+        $previousYear = TahunAjaran::factory()->create([
+            'nama_tahun_ajaran' => '2025/2026',
+            'tanggal_mulai' => '2025-07-01',
+            'tanggal_selesai' => '2026-06-30',
+            'status_aktif' => false,
+        ]);
+        $nextYear = TahunAjaran::factory()->create([
+            'nama_tahun_ajaran' => '2026/2027',
+            'tanggal_mulai' => '2026-07-01',
+            'tanggal_selesai' => '2027-06-30',
+            'status_aktif' => false,
+        ]);
+        $class = Kelas::factory()->create();
+        $teacher = Guru::factory()->create();
+        $previousAssignment = WaliKelas::factory()->for($teacher, 'guru')->for($class, 'kelas')->for($previousYear, 'tahunAjaran')->create([
+            'tanggal_mulai' => '2025-07-01',
+            'tanggal_selesai' => null,
+            'status_aktif' => true,
+        ]);
+        $currentAssignment = WaliKelas::factory()->for($teacher, 'guru')->for($class, 'kelas')->for($nextYear, 'tahunAjaran')->create([
+            'tanggal_mulai' => '2026-07-01',
+            'tanggal_selesai' => null,
+            'status_aktif' => true,
+        ]);
+
+        $this->actingAs($administrator)->put(route('admin.academic-years.update', $nextYear), [
+            'nama_tahun_ajaran' => $nextYear->nama_tahun_ajaran,
+            'tanggal_mulai' => $nextYear->tanggal_mulai->toDateString(),
+            'tanggal_selesai' => $nextYear->tanggal_selesai->toDateString(),
+            'status_aktif' => '1',
+        ])->assertRedirect()->assertSessionHas('success');
+
+        $this->assertSame('2026-06-30', $previousAssignment->refresh()->tanggal_selesai->toDateString());
+        $this->assertFalse($previousAssignment->status_aktif);
+        $this->assertNull($currentAssignment->refresh()->tanggal_selesai);
+        $this->assertTrue($currentAssignment->status_aktif);
+        $this->assertDatabaseCount('t_wali_kelas', 2);
+    }
+
     public function test_academic_year_directory_paginates_ten_records(): void
     {
         $administrator = User::factory()->state(['role' => 'admin'])->create();

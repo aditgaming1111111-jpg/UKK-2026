@@ -24,6 +24,7 @@ class SiswaController extends Controller
         return view('siswa.show', array_merge([
             'student' => $siswa,
             'canManageStudents' => false,
+            'isArchived' => false,
             'classes' => collect(),
             'academicYears' => collect(),
         ], $siswaReadService->detail($siswa)));

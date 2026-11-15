@@ -65,6 +65,7 @@ class SiswaReadService
                         ->whereHas('kelas', static fn (Builder $classQuery): Builder => $classQuery
                             ->when($level, static fn (Builder $classQuery): Builder => $classQuery->where('tingkat', $level))
                             ->when($major, static fn (Builder $classQuery): Builder => $classQuery->where('jurusan', $major))))))
+            ->orderByRaw("CASE t_siswa.status_siswa WHEN 'aktif' THEN 0 WHEN 'nonaktif' THEN 1 WHEN 'pindah' THEN 2 WHEN 'keluar' THEN 3 WHEN 'lulus' THEN 4 ELSE 5 END")
             ->orderBy('nama')
             ->orderBy('id')
             ->paginate(10)

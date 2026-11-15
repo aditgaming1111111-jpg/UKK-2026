@@ -5,21 +5,23 @@
     <meta charset="utf-8">
     <title>Rekap Wali Kelas {{ $selectedClass->nama_kelas }}</title>
     <style>
-        /* Mengatur tipografi, batas tabel, dan kolom ringkasan pada hasil cetak. */
-        body { color: #111827; font-family: DejaVu Sans, sans-serif; font-size: 10px; }
-        h1 { font-size: 20px; margin-bottom: 4px; }
-        h2 { font-size: 13px; margin: 18px 0 8px; }
+        @page { margin: 18mm 14mm; }
+        body { color: #111827; font-family: DejaVu Sans, sans-serif; font-size: 9px; }
+        h1 { margin: 0 0 5px; font-size: 16px; text-align: center; text-transform: uppercase; }
+        h2 { margin: 16px 0 8px; font-size: 11px; }
         p { margin: 4px 0; }
         table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #d1d5db; padding: 6px; text-align: left; vertical-align: top; }
-        th { background: #f3f4f6; }
+        th, td { border: 1px solid #6b7280; padding: 4px; text-align: left; vertical-align: top; }
+        th { background: #e5e7eb; }
         .summary { width: auto; margin: 12px 0; }
         .muted { color: #4b5563; }
         .nowrap { white-space: nowrap; }
+        tr { page-break-inside: avoid; }
     </style>
 </head>
 <body>
     {{-- Menampilkan ringkasan identitas kelas dan data pelanggaran untuk dicetak. --}}
+    <x-documents.school-letterhead />
     <h1>Rekap Pelanggaran Kelas</h1>
     <p><strong>Kelas:</strong> {{ $selectedClass->nama_kelas }} · <strong>Tahun ajaran:</strong> {{ $selectedYear->nama_tahun_ajaran }}</p>
     <p><strong>Wali kelas:</strong> {{ $teacher->nama }}</p>

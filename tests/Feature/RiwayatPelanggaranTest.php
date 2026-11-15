@@ -351,6 +351,11 @@ class RiwayatPelanggaranTest extends TestCase
             'alasan' => 'Tidak memiliki akses.',
         ])->assertForbidden();
 
+        $this->get(route('guru.my-notes.show', $ownRecord))
+            ->assertOk()
+            ->assertSee('data-modal-open="cancel-record"', false)
+            ->assertSee('Catatan tetap tersimpan untuk riwayat');
+
         $this->patch(route('guru.my-notes.cancel', $ownRecord), ['alasan' => 'Salah pilih siswa saat input.'])
             ->assertRedirect(route('guru.my-notes.show', $ownRecord));
         $this->assertSame('dibatalkan', $ownRecord->fresh()->status);

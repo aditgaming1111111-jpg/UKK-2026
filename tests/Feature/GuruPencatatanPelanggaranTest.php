@@ -14,6 +14,7 @@ use App\Models\TahunAjaran;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -33,6 +34,7 @@ class GuruPencatatanPelanggaranTest extends TestCase
 
     public function test_teacher_can_record_violation_using_server_owned_teacher_points_and_status(): void
     {
+        $this->travelTo(CarbonImmutable::parse('2026-11-15 00:05:00', 'Asia/Jakarta'));
         [$teacherUser, $teacher, , $placement, $violation] = $this->recordingContext();
         $otherTeacher = Guru::factory()->create();
 
@@ -62,6 +64,10 @@ class GuruPencatatanPelanggaranTest extends TestCase
         $this->assertSame(now()->toDateString(), $record->tanggal_pelanggaran->toDateString());
         $this->assertSame(now()->toDateString(), $record->tanggal_pelanggaran->format('Y-m-d'));
         $this->assertSame(now()->format('Y-m-d H:i:s'), $record->tanggal_dicatat->format('Y-m-d H:i:s'));
+        $this->assertDatabaseHas('t_pelanggaran_siswa', [
+            'id' => $record->id,
+            'tanggal_dicatat' => '2026-11-14 17:05:00',
+        ]);
         $this->assertDatabaseHas('t_log_pelanggaran', [
             'pelanggaran_siswa_id' => $record->id,
             'user_id' => $teacherUser->id,
@@ -71,6 +77,27 @@ class GuruPencatatanPelanggaranTest extends TestCase
         $this->assertDatabaseHas('t_log_aktivitas', [
             'user_id' => $teacherUser->id,
             'aktivitas' => 'Pelanggaran dicatat',
+        ]);
+    }
+
+    public function test_historical_recording_datetime_is_read_as_utc_and_kept_unchanged_in_database(): void
+    {
+        [, $teacher, , $placement, $violation] = $this->recordingContext();
+        $record = PelanggaranSiswa::factory()
+            ->for($placement, 'penempatanKelas')
+            ->for($violation, 'pelanggaran')
+            ->for($teacher, 'guru')
+            ->create();
+        DB::table('t_pelanggaran_siswa')
+            ->where('id', $record->id)
+            ->update(['tanggal_dicatat' => '2026-11-14 17:05:00']);
+
+        $historicalRecord = $record->fresh();
+
+        $this->assertSame('2026-11-15 00:05:00 +07:00', $historicalRecord->tanggal_dicatat->format('Y-m-d H:i:s P'));
+        $this->assertDatabaseHas('t_pelanggaran_siswa', [
+            'id' => $record->id,
+            'tanggal_dicatat' => '2026-11-14 17:05:00',
         ]);
     }
 
@@ -116,6 +143,31 @@ class GuruPencatatanPelanggaranTest extends TestCase
     {
         [$teacherUser, , $student, $placement, $violation] = $this->recordingContext();
         $student->update(['status_siswa' => 'lulus']);
+
+        $this->actingAs($teacherUser)->getJson(route('guru.violations.student-search', [
+            'q' => 'Siswa Uji',
+            'tanggal_pelanggaran' => today()->toDateString(),
+        ]))->assertOk()->assertExactJson([]);
+
+        $this->from(route('guru.violations.create'))
+            ->post(route('guru.violations.store'), [
+                'kelas_siswa_id' => $placement->id,
+                'pelanggaran_id' => $violation->id,
+                'tanggal_pelanggaran' => today()->toDateString(),
+            ])
+            ->assertRedirect(route('guru.violations.create'))
+            ->assertSessionHasErrors([
+                'kelas_siswa_id' => 'Siswa tidak aktif dan tidak dapat menerima catatan pelanggaran baru.',
+            ]);
+
+        $this->assertDatabaseCount('t_pelanggaran_siswa', 0);
+        $this->assertDatabaseCount('t_log_pelanggaran', 0);
+    }
+
+    public function test_exited_student_is_excluded_from_search_and_cannot_receive_a_new_violation(): void
+    {
+        [$teacherUser, , $student, $placement, $violation] = $this->recordingContext();
+        $student->update(['status_siswa' => 'keluar']);
 
         $this->actingAs($teacherUser)->getJson(route('guru.violations.student-search', [
             'q' => 'Siswa Uji',

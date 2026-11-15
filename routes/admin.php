@@ -25,6 +25,7 @@ Route::prefix('admin')
         Route::get('laporan', [LaporanController::class, 'index'])->name('reports.index');
         Route::get('laporan/cetak', [LaporanController::class, 'print'])->name('reports.print');
         Route::get('laporan/pdf', [LaporanController::class, 'pdf'])->name('reports.pdf');
+        Route::get('data-pelanggaran/{pelanggaranSiswa}/surat', [RiwayatPelanggaranController::class, 'notice'])->name('student-violations.notice');
         Route::resource('data-pelanggaran', RiwayatPelanggaranController::class)
             ->parameters(['data-pelanggaran' => 'pelanggaranSiswa'])
             ->except(['create', 'store', 'destroy'])
@@ -34,9 +35,14 @@ Route::prefix('admin')
         Route::get('log-pelanggaran', [LogAktivitasController::class, 'index'])->name('audit-logs.index');
 
         // Pengelolaan siswa mencakup status dan penempatan ke kelas.
+        Route::get('siswa-arsip', [SiswaController::class, 'archivedIndex'])->name('students.archived.index');
+        Route::get('siswa-arsip/{studentId}', [SiswaController::class, 'showArchived'])->whereNumber('studentId')->name('students.archived.show');
+        Route::patch('siswa-arsip/{studentId}/pulihkan', [SiswaController::class, 'restore'])->whereNumber('studentId')->name('students.archived.restore');
         Route::resource('siswa', SiswaController::class)->parameters(['siswa' => 'siswa'])->names('students');
         Route::patch('siswa/{siswa}/status', [SiswaController::class, 'updateStatus'])->name('students.status');
+        Route::patch('siswa/{siswa}/arsipkan', [SiswaController::class, 'archive'])->name('students.archive');
         Route::post('siswa/{siswa}/penempatan', [SiswaController::class, 'storePlacement'])->name('students.placements.store');
+        Route::post('siswa/{siswa}/pindah-kelas', [SiswaController::class, 'moveClass'])->name('students.move-class');
         Route::patch('siswa/{siswa}/penempatan/{placementId}', [SiswaController::class, 'updatePlacement'])->name('students.placements.update');
         Route::delete('siswa/{siswa}/penempatan/{placementId}', [SiswaController::class, 'destroyPlacement'])->name('students.placements.destroy');
 
@@ -56,6 +62,9 @@ Route::prefix('admin')
             ->name('academic-years.student-transitions');
         Route::post('tahun-ajaran/{tahunAjaran}/proses-siswa', [StudentTransitionController::class, 'store'])
             ->name('academic-years.student-transitions.store');
+        Route::patch('tahun-ajaran/{tahunAjaran}/proses-siswa/{batchId}/batalkan', [StudentTransitionController::class, 'undo'])
+            ->whereUuid('batchId')
+            ->name('academic-years.student-transitions.undo');
 
         // Kategori dan jenis pelanggaran dapat dikelola serta diaktifkan ulang.
         Route::resource('kategori-pelanggaran', PelanggaranKategoriController::class)

@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Guru;
 use App\Models\Kelas;
 use App\Models\KelasSiswa;
+use App\Models\LogAktivitas;
 use App\Models\Pelanggaran;
 use App\Models\PelanggaranKategori;
 use App\Models\PelanggaranSiswa;
@@ -12,6 +13,7 @@ use App\Models\Siswa;
 use App\Models\TahunAjaran;
 use App\Models\User;
 use App\Models\WaliKelas;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -354,9 +356,14 @@ class SiswaManagementTest extends TestCase
 
         $this->patch(route('admin.students.status', $student), ['status_siswa' => 'lulus'])
             ->assertRedirect(route('admin.students.show', $student))
-            ->assertSessionHas('success', 'Siswa ditandai lulus dan tersimpan sebagai arsip alumni. Riwayat tetap tersimpan.');
+            ->assertSessionHas('success', 'Siswa ditandai lulus dan penempatan aktif diakhiri. Riwayat tetap tersimpan.');
 
         $this->assertDatabaseHas('t_siswa', ['id' => $student->id, 'status_siswa' => 'lulus']);
+        $this->assertDatabaseHas('t_kelas_siswa', [
+            'id' => $placement->id,
+            'status_aktif' => false,
+        ]);
+        $this->assertSame('2025-06-30', $placement->fresh()->tanggal_selesai->toDateString());
         $this->assertModelExists($placement);
         $this->assertDatabaseHas('t_log_aktivitas', [
             'user_id' => $administrator->id,
@@ -367,7 +374,9 @@ class SiswaManagementTest extends TestCase
             ->assertOk()
             ->assertSee('Alumni Dicari')
             ->assertSee('Lulus');
-        $this->get(route('admin.students.show', $student))->assertSee('arsip alumni');
+        $this->get(route('admin.students.show', $student))
+            ->assertSee('arsip alumni')
+            ->assertSee($class->nama_kelas);
 
         $this->delete(route('admin.students.destroy', $student))->assertSessionHasErrors('siswa');
         $this->assertModelExists($student);
@@ -398,18 +407,205 @@ class SiswaManagementTest extends TestCase
         $this->assertDatabaseCount('t_log_aktivitas', 0);
     }
 
-    public function test_existing_transfer_and_exit_statuses_remain_available(): void
+    public function test_student_cannot_be_given_legacy_transfer_status_but_can_be_marked_exited(): void
     {
         $administrator = User::factory()->create(['role' => 'admin']);
         $student = Siswa::factory()->create(['status_siswa' => 'aktif']);
 
-        foreach (['pindah', 'keluar'] as $status) {
-            $this->actingAs($administrator)
-                ->patch(route('admin.students.status', $student), ['status_siswa' => $status])
-                ->assertRedirect(route('admin.students.show', $student));
+        $this->actingAs($administrator)
+            ->from(route('admin.students.show', $student))
+            ->patch(route('admin.students.status', $student), ['status_siswa' => 'pindah'])
+            ->assertSessionHasErrors('status_siswa');
 
-            $this->assertDatabaseHas('t_siswa', ['id' => $student->id, 'status_siswa' => $status]);
+        $this->assertDatabaseHas('t_siswa', ['id' => $student->id, 'status_siswa' => 'aktif']);
+
+        $this->patch(route('admin.students.status', $student), ['status_siswa' => 'keluar'])
+            ->assertRedirect(route('admin.students.show', $student));
+
+        $this->assertDatabaseHas('t_siswa', ['id' => $student->id, 'status_siswa' => 'keluar']);
+    }
+
+    public function test_marking_student_exited_ends_active_placement_and_preserves_related_history(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $student = Siswa::factory()->create(['status_siswa' => 'aktif']);
+        $class = Kelas::factory()->create(['nama_kelas' => 'XI RPL Keluar']);
+        $today = today()->toDateString();
+        $year = TahunAjaran::factory()->create([
+            'nama_tahun_ajaran' => 'Periode Keluar',
+            'tanggal_mulai' => today()->subDays(30)->toDateString(),
+            'tanggal_selesai' => today()->addDays(180)->toDateString(),
+        ]);
+        $placement = KelasSiswa::factory()->for($student, 'siswa')->for($class, 'kelas')->for($year, 'tahunAjaran')
+            ->create(['tanggal_mulai' => $year->tanggal_mulai, 'status_aktif' => true]);
+        $teacher = Guru::factory()->create();
+        $homeroomAssignment = WaliKelas::factory()->for($teacher, 'guru')->for($class, 'kelas')->for($year, 'tahunAjaran')
+            ->create(['tanggal_mulai' => $year->tanggal_mulai]);
+        $category = PelanggaranKategori::factory()->create();
+        $violation = Pelanggaran::factory()->for($category, 'kategori')->create();
+        $record = PelanggaranSiswa::factory()->for($placement, 'penempatanKelas')
+            ->for($violation, 'pelanggaran')->for($teacher, 'guru')->create(['tanggal_pelanggaran' => $today]);
+
+        $this->actingAs($administrator)
+            ->patch(route('admin.students.status', $student), ['status_siswa' => 'keluar'])
+            ->assertRedirect(route('admin.students.show', $student))
+            ->assertSessionHas('success', 'Status siswa diperbarui menjadi keluar dan penempatan aktif diakhiri. Riwayat tetap tersimpan.');
+
+        $this->assertDatabaseHas('t_siswa', ['id' => $student->id, 'status_siswa' => 'keluar']);
+        $this->assertDatabaseHas('t_kelas_siswa', [
+            'id' => $placement->id,
+            'status_aktif' => false,
+        ]);
+        $this->assertSame($today, $placement->fresh()->tanggal_selesai->toDateString());
+        $this->assertDatabaseHas('t_wali_kelas', ['id' => $homeroomAssignment->id, 'kelas_id' => $class->id]);
+        $this->assertDatabaseHas('t_pelanggaran_siswa', ['id' => $record->id, 'kelas_siswa_id' => $placement->id]);
+        $this->get(route('admin.students.show', $student))
+            ->assertOk()
+            ->assertSee($class->nama_kelas)
+            ->assertSee($violation->nama_pelanggaran);
+    }
+
+    public function test_reactivating_exited_student_does_not_assign_a_class_and_admin_can_create_a_new_placement(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $student = Siswa::factory()->create(['status_siswa' => 'keluar']);
+        $today = CarbonImmutable::today();
+        $oldYear = TahunAjaran::factory()->create([
+            'tanggal_mulai' => $today->subDays(30)->toDateString(),
+            'tanggal_selesai' => $today->addDays(180)->toDateString(),
+        ]);
+        $oldPlacement = KelasSiswa::factory()->for($student, 'siswa')->for($oldYear, 'tahunAjaran')->create([
+            'tanggal_mulai' => $oldYear->tanggal_mulai,
+            'status_aktif' => true,
+        ]);
+
+        $this->actingAs($administrator)->patch(route('admin.students.status', $student), ['status_siswa' => 'aktif'])
+            ->assertRedirect(route('admin.students.show', $student))
+            ->assertSessionHas('success', 'Siswa berhasil diaktifkan kembali. Belum ada penempatan kelas; Admin perlu membuat penempatan baru.');
+
+        $this->assertSame(0, $student->penempatanKelas()->where('status_aktif', true)->whereNull('tanggal_selesai')->count());
+        $this->assertDatabaseHas('t_kelas_siswa', ['id' => $oldPlacement->id, 'status_aktif' => false]);
+
+        $newStartDate = $today->addDay();
+        $newYear = TahunAjaran::factory()->create([
+            'nama_tahun_ajaran' => 'Periode Penempatan Ulang',
+            'tanggal_mulai' => $newStartDate->toDateString(),
+            'tanggal_selesai' => $newStartDate->addYear()->toDateString(),
+        ]);
+        $newClass = Kelas::factory()->create(['nama_kelas' => 'XII RPL Penempatan Ulang']);
+
+        $this->post(route('admin.students.placements.store', $student), [
+            'kelas_id' => $newClass->id,
+            'tahun_ajaran_id' => $newYear->id,
+            'tanggal_mulai' => $newStartDate->toDateString(),
+        ])->assertRedirect(route('admin.students.show', $student));
+
+        $this->assertSame(1, $student->penempatanKelas()->where('status_aktif', true)->whereNull('tanggal_selesai')->count());
+        $this->assertDatabaseHas('t_kelas_siswa', [
+            'siswa_id' => $student->id,
+            'kelas_id' => $newClass->id,
+            'tahun_ajaran_id' => $newYear->id,
+            'status_aktif' => true,
+        ]);
+        $newPlacement = $student->penempatanKelas()->where('kelas_id', $newClass->id)->firstOrFail();
+        $this->assertSame($newStartDate->toDateString(), $newPlacement->tanggal_mulai->toDateString());
+        $this->assertDatabaseHas('t_kelas_siswa', ['id' => $oldPlacement->id, 'status_aktif' => false]);
+    }
+
+    public function test_admin_can_archive_and_restore_exited_student_without_breaking_history(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $student = Siswa::factory()->create(['nama' => 'Siswa Keluar Arsip', 'status_siswa' => 'keluar']);
+        $class = Kelas::factory()->create(['nama_kelas' => 'XI RPL Arsip']);
+        $year = TahunAjaran::factory()->create(['nama_tahun_ajaran' => '2026/2027']);
+        $placement = KelasSiswa::factory()->for($student, 'siswa')->for($class, 'kelas')->for($year, 'tahunAjaran')->create([
+            'tanggal_mulai' => '2026-07-13',
+            'status_aktif' => false,
+            'tanggal_selesai' => '2026-10-01',
+        ]);
+        $category = PelanggaranKategori::factory()->create();
+        $violation = Pelanggaran::factory()->for($category, 'kategori')->create();
+        $teacher = Guru::factory()->create();
+        $record = PelanggaranSiswa::factory()->for($placement, 'penempatanKelas')
+            ->for($violation, 'pelanggaran')->for($teacher, 'guru')->create(['poin_saat_dicatat' => 5]);
+
+        $this->actingAs($administrator)
+            ->get(route('admin.students.show', $student))
+            ->assertOk()
+            ->assertSee('data-modal-open="archive-student"', false)
+            ->assertSee('Riwayat kelas dan pelanggaran tidak dihapus.');
+
+        $this->patch(route('admin.students.archive', $student))
+            ->assertRedirect(route('admin.students.archived.index'))
+            ->assertSessionHas('success');
+
+        $this->assertSoftDeleted('t_siswa', ['id' => $student->id]);
+        $this->assertDatabaseHas('t_kelas_siswa', ['id' => $placement->id, 'siswa_id' => $student->id]);
+        $this->assertDatabaseHas('t_pelanggaran_siswa', ['id' => $record->id, 'kelas_siswa_id' => $placement->id]);
+        $this->assertSame($student->id, $placement->fresh()->siswa->id);
+        $this->get(route('admin.students.index', ['q' => 'Siswa Keluar Arsip']))
+            ->assertViewHas('students', fn ($students): bool => $students->isEmpty());
+        $this->get(route('admin.students.archived.index', ['q' => 'Siswa Keluar Arsip']))
+            ->assertOk()
+            ->assertSee('Siswa Keluar Arsip')
+            ->assertSee('restore-student-'.$student->id, false)
+            ->assertSee('akan kembali ke daftar utama dengan status Keluar.');
+        $this->get(route('admin.students.archived.show', $student->id))
+            ->assertOk()
+            ->assertSee('Siswa Keluar Arsip')
+            ->assertSee($violation->nama_pelanggaran)
+            ->assertSee($class->nama_kelas);
+        $this->assertDatabaseHas('t_log_aktivitas', [
+            'user_id' => $administrator->id,
+            'aktivitas' => 'Siswa diarsipkan',
+        ]);
+
+        $this->patch(route('admin.students.archived.restore', $student->id))
+            ->assertRedirect(route('admin.students.archived.index'))
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('t_siswa', ['id' => $student->id, 'status_siswa' => 'keluar', 'deleted_at' => null]);
+        $this->assertDatabaseHas('t_kelas_siswa', ['id' => $placement->id, 'siswa_id' => $student->id]);
+        $this->assertDatabaseHas('t_pelanggaran_siswa', ['id' => $record->id, 'kelas_siswa_id' => $placement->id]);
+        $this->assertDatabaseHas('t_log_aktivitas', [
+            'user_id' => $administrator->id,
+            'aktivitas' => 'Arsip siswa dipulihkan',
+        ]);
+        $this->get(route('admin.students.index', ['q' => 'Siswa Keluar Arsip']))->assertSee('Siswa Keluar Arsip');
+    }
+
+    public function test_only_admin_can_archive_or_restore_and_only_exited_students_can_be_archived(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $activeStudent = Siswa::factory()->create(['status_siswa' => 'aktif']);
+        $exitedStudent = Siswa::factory()->create(['status_siswa' => 'keluar']);
+        $teacher = User::factory()->create(['role' => 'guru']);
+        Guru::factory()->for($teacher, 'user')->create();
+
+        $this->actingAs($administrator)
+            ->from(route('admin.students.show', $activeStudent))
+            ->patch(route('admin.students.archive', $activeStudent))
+            ->assertSessionHasErrors('siswa');
+        $this->assertDatabaseHas('t_siswa', ['id' => $activeStudent->id, 'deleted_at' => null]);
+
+        $this->actingAs($teacher)->get(route('admin.students.archived.index'))->assertForbidden();
+        $this->patch(route('admin.students.archive', $exitedStudent))->assertForbidden();
+        $this->patch(route('admin.students.archived.restore', $exitedStudent->id))->assertForbidden();
+        $this->assertDatabaseHas('t_siswa', ['id' => $exitedStudent->id, 'deleted_at' => null]);
+    }
+
+    public function test_student_directory_orders_statuses_without_changing_status_values(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        foreach (['lulus', 'keluar', 'pindah', 'nonaktif', 'aktif'] as $status) {
+            Siswa::factory()->create(['nama' => 'Status '.ucfirst($status), 'status_siswa' => $status]);
         }
+
+        $this->actingAs($administrator)->get(route('admin.students.index'))
+            ->assertOk()
+            ->assertViewHas('students', function ($students): bool {
+                return $students->pluck('status_siswa')->all() === ['aktif', 'nonaktif', 'pindah', 'keluar', 'lulus'];
+            });
     }
 
     public function test_student_status_change_rejects_invalid_values_and_non_admin_users(): void
@@ -434,9 +630,9 @@ class SiswaManagementTest extends TestCase
     public function test_admin_can_move_a_student_and_keep_the_previous_class_history(): void
     {
         $administrator = User::factory()->create(['role' => 'admin']);
-        $student = Siswa::factory()->create();
-        $oldClass = Kelas::factory()->create(['nama_kelas' => 'VII A']);
-        $newClass = Kelas::factory()->create(['nama_kelas' => 'VII B']);
+        $student = Siswa::factory()->create(['status_siswa' => 'aktif']);
+        $oldClass = Kelas::factory()->create(['nama_kelas' => 'XI RPL 1', 'tingkat' => 'XI', 'jurusan' => 'RPL']);
+        $newClass = Kelas::factory()->create(['nama_kelas' => 'XI TKJ 1', 'tingkat' => 'XI', 'jurusan' => 'TKJ']);
         $year = TahunAjaran::factory()->create([
             'nama_tahun_ajaran' => '2026/2027',
             'tanggal_mulai' => '2026-07-01',
@@ -445,11 +641,20 @@ class SiswaManagementTest extends TestCase
         $oldPlacement = KelasSiswa::factory()
             ->for($student, 'siswa')->for($oldClass, 'kelas')->for($year, 'tahunAjaran')
             ->create(['tanggal_mulai' => '2026-07-01', 'tanggal_selesai' => null, 'status_aktif' => true]);
+        $homeroomTeacher = Guru::factory()->create();
+        $homeroomAssignment = WaliKelas::factory()->for($homeroomTeacher, 'guru')->for($oldClass, 'kelas')->for($year, 'tahunAjaran')
+            ->create(['tanggal_mulai' => '2026-07-01']);
+        $teacher = Guru::factory()->create();
+        $category = PelanggaranKategori::factory()->create();
+        $violation = Pelanggaran::factory()->for($category, 'kategori')->create();
+        $violationRecord = PelanggaranSiswa::factory()->for($oldPlacement, 'penempatanKelas')
+            ->for($violation, 'pelanggaran')->for($teacher, 'guru')
+            ->create(['tanggal_pelanggaran' => '2026-09-15', 'poin_saat_dicatat' => 5]);
 
-        $this->actingAs($administrator)->post(route('admin.students.placements.store', $student), [
+        $this->actingAs($administrator)->post(route('admin.students.move-class', $student), [
             'kelas_id' => $newClass->id,
-            'tahun_ajaran_id' => $year->id,
-            'tanggal_mulai' => '2026-10-01',
+            'tanggal_pindah' => '2026-10-01',
+            'alasan' => 'Penyesuaian jurusan sesuai pilihan siswa.',
         ])->assertRedirect(route('admin.students.show', $student));
 
         $this->assertDatabaseHas('t_kelas_siswa', [
@@ -466,11 +671,98 @@ class SiswaManagementTest extends TestCase
             'status_aktif' => true,
         ]);
         $this->assertSame('2026-10-01', $student->penempatanKelas()->where('kelas_id', $newClass->id)->firstOrFail()->tanggal_mulai->toDateString());
+        $this->assertSame(1, $student->penempatanKelas()->where('status_aktif', true)->whereNull('tanggal_selesai')->count());
+        $this->assertSame('aktif', $student->fresh()->status_siswa);
+        $this->assertDatabaseHas('t_wali_kelas', ['id' => $homeroomAssignment->id, 'kelas_id' => $oldClass->id, 'tahun_ajaran_id' => $year->id]);
+        $this->assertDatabaseHas('t_pelanggaran_siswa', ['id' => $violationRecord->id, 'kelas_siswa_id' => $oldPlacement->id]);
+        $this->assertDatabaseHas('t_log_aktivitas', [
+            'user_id' => $administrator->id,
+            'aktivitas' => 'Siswa pindah kelas',
+        ]);
+        $this->assertStringContainsString(
+            'Penyesuaian jurusan sesuai pilihan siswa.',
+            (string) LogAktivitas::query()->where('aktivitas', 'Siswa pindah kelas')->value('deskripsi'),
+        );
 
         $this->actingAs($administrator)->get(route('admin.students.show', $student))
-            ->assertSee('VII A')
-            ->assertSee('VII B')
-            ->assertSee('Riwayat kelas');
+            ->assertSee('XI RPL 1')
+            ->assertSee('XI TKJ 1')
+            ->assertSee('Riwayat kelas')
+            ->assertSee('Pindah Kelas');
+    }
+
+    public function test_class_transfer_is_rejected_when_student_has_no_active_placement(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $student = Siswa::factory()->create(['status_siswa' => 'aktif']);
+        $targetClass = Kelas::factory()->create();
+
+        $this->actingAs($administrator)
+            ->from(route('admin.students.show', $student))
+            ->post(route('admin.students.move-class', $student), [
+                'kelas_id' => $targetClass->id,
+                'tanggal_pindah' => today()->toDateString(),
+                'alasan' => 'Koreksi kelas.',
+            ])
+            ->assertSessionHasErrors('kelas_id');
+
+        $this->assertDatabaseCount('t_kelas_siswa', 0);
+        $this->assertDatabaseCount('t_log_aktivitas', 0);
+    }
+
+    public function test_teacher_cannot_transfer_a_students_class(): void
+    {
+        $teacherUser = User::factory()->create(['role' => 'guru']);
+        Guru::factory()->for($teacherUser, 'user')->create();
+        $student = Siswa::factory()->create(['status_siswa' => 'aktif']);
+        $targetClass = Kelas::factory()->create();
+
+        $this->actingAs($teacherUser)
+            ->post(route('admin.students.move-class', $student), [
+                'kelas_id' => $targetClass->id,
+                'tanggal_pindah' => today()->toDateString(),
+                'alasan' => 'Perpindahan kelas.',
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseCount('t_kelas_siswa', 0);
+    }
+
+    public function test_class_transfer_rejects_same_class_and_future_violation_without_partial_changes(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $student = Siswa::factory()->create(['status_siswa' => 'aktif']);
+        $class = Kelas::factory()->create(['nama_kelas' => 'XI RPL 1']);
+        $year = TahunAjaran::factory()->create([
+            'tanggal_mulai' => '2026-07-01',
+            'tanggal_selesai' => '2027-06-30',
+        ]);
+        $placement = KelasSiswa::factory()->for($student, 'siswa')->for($class, 'kelas')->for($year, 'tahunAjaran')
+            ->create(['tanggal_mulai' => '2026-07-01', 'status_aktif' => true]);
+        $teacher = Guru::factory()->create();
+        $category = PelanggaranKategori::factory()->create();
+        $violation = Pelanggaran::factory()->for($category, 'kategori')->create();
+        PelanggaranSiswa::factory()->for($placement, 'penempatanKelas')->for($violation, 'pelanggaran')->for($teacher, 'guru')
+            ->create(['tanggal_pelanggaran' => '2026-10-15']);
+
+        $this->actingAs($administrator)
+            ->from(route('admin.students.show', $student))
+            ->post(route('admin.students.move-class', $student), [
+                'kelas_id' => $class->id,
+                'tanggal_pindah' => '2026-10-01',
+                'alasan' => 'Koreksi kelas.',
+            ])
+            ->assertSessionHasErrors('kelas_id');
+
+        $this->post(route('admin.students.move-class', $student), [
+            'kelas_id' => Kelas::factory()->create()->id,
+            'tanggal_pindah' => '2026-10-01',
+            'alasan' => 'Koreksi kelas.',
+        ])->assertSessionHasErrors('tanggal_pindah');
+
+        $this->assertDatabaseCount('t_kelas_siswa', 1);
+        $this->assertDatabaseHas('t_kelas_siswa', ['id' => $placement->id, 'tanggal_selesai' => null, 'status_aktif' => true]);
+        $this->assertDatabaseCount('t_log_aktivitas', 0);
     }
 
     public function test_conflicting_placement_is_rejected_without_changing_existing_history(): void
@@ -490,9 +782,11 @@ class SiswaManagementTest extends TestCase
             ->post(route('admin.students.placements.store', $student), [
                 'kelas_id' => Kelas::factory()->create()->id,
                 'tahun_ajaran_id' => $year->id,
-                'tanggal_mulai' => '2026-06-15',
+                'tanggal_mulai' => '2026-10-15',
             ])
-            ->assertSessionHasErrors('tanggal_mulai');
+            ->assertSessionHasErrors([
+                'tanggal_mulai' => 'Siswa sudah memiliki penempatan aktif. Gunakan tindakan Pindah Kelas untuk mengubah kelasnya.',
+            ]);
 
         $this->assertDatabaseCount('t_kelas_siswa', 1);
         $this->assertDatabaseHas('t_kelas_siswa', [
@@ -827,6 +1121,39 @@ class SiswaManagementTest extends TestCase
             ->assertSee('Terlambat')
             ->assertSee('7 poin')
             ->assertSee('Dibatalkan');
+    }
+
+    public function test_student_placement_form_only_offers_active_academic_years(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $student = Siswa::factory()->create();
+        $activeYear = TahunAjaran::factory()->create(['nama_tahun_ajaran' => 'Tahun Operasional Aktif', 'status_aktif' => true]);
+        TahunAjaran::factory()->create(['nama_tahun_ajaran' => 'Tahun Lama Arsip', 'status_aktif' => false]);
+
+        $response = $this->actingAs($administrator)->get(route('admin.students.show', $student));
+
+        $response
+            ->assertOk()
+            ->assertViewHas('academicYears', static fn ($years): bool => $years->count() === 1
+                && $years->contains('id', $activeYear->id))
+            ->assertDontSee('Tahun Lama Arsip');
+    }
+
+    public function test_student_status_and_new_placement_forms_require_descriptive_confirmation(): void
+    {
+        $administrator = User::factory()->create(['role' => 'admin']);
+        $student = Siswa::factory()->create(['nama' => 'Siswa Konfirmasi']);
+        Kelas::factory()->create();
+        TahunAjaran::factory()->create(['status_aktif' => true]);
+
+        $this->actingAs($administrator)->get(route('admin.students.show', $student))
+            ->assertOk()
+            ->assertSee('data-modal-open="confirm-student-status"', false)
+            ->assertSee('Konfirmasi perubahan status')
+            ->assertSee('penempatan aktif akan diakhiri')
+            ->assertSee('data-modal-open="confirm-student-placement"', false)
+            ->assertSee('Konfirmasi perubahan kelas')
+            ->assertSee('Perpindahan dari kelas aktif dilakukan melalui tindakan Pindah Kelas.');
     }
 
     public function test_guru_cannot_open_student_directory_or_unassigned_student_details_or_manage_data(): void
